@@ -28,6 +28,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
+
             }
 
             @Override
