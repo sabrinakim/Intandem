@@ -23,7 +23,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -37,9 +36,18 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final String BASE_URL = "https://api.yelp.com/v3/";
+    private static final String API_KEY = "i dont get how to keep api key a secret so i erased it from here";
     private static final String FRIENDS = "user_friends";
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
     private CallbackManager callbackManager;
@@ -52,6 +60,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+
+        // next, we want to define the endpoints for our api by defining an interface.
+        // retrofit will be in charge of filling in the functions in the interface.
+
+        YelpService yelpService = retrofit.create(YelpService.class);
+        // search Restaurants is asynchronous
+//        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
+//
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.i(TAG, "on response " + response);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.i(TAG, "on failure ");
+//            }
+//        });
 
         ivProfilePic = findViewById(R.id.ivProfilePic);
         tvName = findViewById(R.id.tvName);
@@ -117,8 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
             // success
+
+            // this place instance can retrieve details about the place
             Place place = Autocomplete.getPlaceFromIntent(data);
             etSearch.setText(place.getAddress());
+            System.out.println("lat/long: " + place.getLatLng());
+            System.out.println("name: " + place.getName());
+
             Log.i(TAG, "place autocomplete success");
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
