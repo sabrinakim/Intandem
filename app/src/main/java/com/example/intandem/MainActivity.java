@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
-
+                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(i);
             }
 
             @Override
