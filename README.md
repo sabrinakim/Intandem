@@ -5,6 +5,8 @@ Original App Design Project - README Template
 
 ## Buddy Finding App
 
+build instructions: open project & run
+
 ## Table of Contents
 1. [Overview]
 1. [Product Spec](#Product-Spec)
