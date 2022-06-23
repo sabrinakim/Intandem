@@ -28,7 +28,12 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+import com.parse.SignUpCallback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final String BASE_URL = "https://api.yelp.com/v3/";
-    private static final String API_KEY = "i dont get how to keep api key a secret so i erased it from here";
+    private static final String API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
     private static final String FRIENDS = "user_friends";
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
     private CallbackManager callbackManager;
@@ -69,18 +74,18 @@ public class MainActivity extends AppCompatActivity {
 
         YelpService yelpService = retrofit.create(YelpService.class);
         // search Restaurants is asynchronous
-//        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
-//
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                Log.i(TAG, "on response " + response);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Log.i(TAG, "on failure ");
-//            }
-//        });
+        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
+
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i(TAG, "on response " + response);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.i(TAG, "on failure ");
+            }
+        });
 
         ivProfilePic = findViewById(R.id.ivProfilePic);
         tvName = findViewById(R.id.tvName);
@@ -97,9 +102,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // loginResult contains parameters like the access token & granted permissions u set up
+                // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
                 Intent i = new Intent(MainActivity.this, SecondActivity.class);
                 startActivity(i);
+
             }
 
             @Override
@@ -173,9 +180,45 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String name = jsonObject.getString("name");
                     String id = jsonObject.getString("id");
+                    String first_name = jsonObject.getString("first_name");
+                    String last_name = jsonObject.getString("last_name");
                     tvName.setText(name);
                     Picasso.get().load("https://graph.facebook.com/" + id + "/picture?type=large")
                             .into(ivProfilePic);
+
+                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+                    query.whereEqualTo(User.KEY_FBID, id);
+                    query.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> objects, ParseException e) {
+                            if (e != null) {
+                                Log.e(TAG, "Issue with getting user", e);
+                                return;
+                            }
+
+                            if (objects.size() == 0) {
+                                Log.i(TAG, "new user");
+                                ParseUser user = new ParseUser();
+                                user.put("firstName", first_name);
+                                user.put("lastName", last_name);
+                                user.put("username", name);
+                                user.put("password", name);
+                                user.put("fbId", id);
+
+                                user.signUpInBackground(new SignUpCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "something went wrong with saving user: " + e);
+                                            return;
+                                        }
+                                        Log.i(TAG, "user saved successfully");
+                                    }
+                                });
+                            }
+                        }
+                    });
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
