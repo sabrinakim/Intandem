@@ -32,10 +32,10 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,6 +48,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -101,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // loginResult contains parameters like the access token & granted permissions u set up
                 // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
                 Intent i = new Intent(MainActivity.this, SecondActivity.class);
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
         // we will use the Graph API
 
-        GraphRequest graphRequest = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+        GraphRequest meGraphRequest = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
                 Log.i(TAG, jsonObject.toString());
@@ -201,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                                 ParseUser user = new ParseUser();
                                 user.put("firstName", first_name);
                                 user.put("lastName", last_name);
+                                // username and password is just their name
                                 user.put("username", name);
                                 user.put("password", name);
                                 user.put("fbId", id);
@@ -231,8 +234,23 @@ public class MainActivity extends AppCompatActivity {
         // change later: these are what you are requesting from the graph api
         bundle.putString("fields", "name, id, first_name, last_name");
 
-        graphRequest.setParameters(bundle);
-        graphRequest.executeAsync();
+        meGraphRequest.setParameters(bundle);
+        meGraphRequest.executeAsync();
+
+//        // fetching logged in user's friends
+//        GraphRequest friendsGraphRequest = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
+//                new GraphRequest.GraphJSONArrayCallback() {
+//                    @Override
+//                    public void onCompleted(@Nullable JSONArray jsonArray, @Nullable GraphResponse graphResponse) {
+//                        if (jsonArray != null) {
+//                            Log.i(TAG, jsonArray.toString());
+//                            ParseQuery<Friendships> query = ParseQuery.getQuery(Friendships.class);
+//                            query.whereEqualTo("user1", ParseUser.getCurrentUser());
+//                        }
+//                    }
+//                });
+//
+//        friendsGraphRequest.executeAsync();
     }
 
     AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
