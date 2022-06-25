@@ -14,8 +14,17 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.libraries.places.api.model.Place;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import org.parceler.Parcels;
 
 import java.io.File;
 
@@ -26,7 +35,11 @@ public class ComposePictureActivity extends AppCompatActivity {
     private File photoFile;
     private String photoFileName = "photo.jpg";
     private ImageView ivImage;
-    private Button btnTakePicture;
+    private EditText etCaption;
+    private Button btnShare;
+    private Place location;
+    private String event;
+    private ParseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +47,22 @@ public class ComposePictureActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compose_picture);
 
         ivImage = findViewById(R.id.ivImage);
-        btnTakePicture = findViewById(R.id.btnTakePicture);
+        etCaption = findViewById(R.id.etCaption);
+        btnShare = findViewById(R.id.btnShare);
 
-        btnTakePicture.setOnClickListener(new View.OnClickListener() {
+        launchCamera();
+
+        // unwrap parcel here
+        location = Parcels.unwrap(getIntent().getParcelableExtra("location"));
+        event = getIntent().getExtras().getString("event");
+        user = getIntent().getExtras().getParcelable("user");
+
+        btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchCamera();
+                String caption = etCaption.getText().toString();
+                etCaption.setText(caption);
+                savePost(ParseUser.getCurrentUser(), event, etCaption.getText().toString(), photoFile);
             }
         });
     }
@@ -48,13 +71,13 @@ public class ComposePictureActivity extends AppCompatActivity {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Create a File reference for future access
-        photoFile = getPhotoFileUri(photoFileName);
+        photoFile = getPhotoFileUri(photoFileName); // this is where the taken photo will be stored.
 
         // wrap File object into a content provider
-        // required for API >= 24
+        // required for API >= 24 --> this is for security reasons
         // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
         Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider.intandem", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider); // --> we are telling the camera app where to store the photo that is taken.
 
         // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
         // So as long as the result is not null, it's safe to use the intent.
@@ -74,6 +97,7 @@ public class ComposePictureActivity extends AppCompatActivity {
                 // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
                 ivImage.setImageBitmap(takenImage);
+
             } else { // Result was a failure
                 Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
@@ -81,7 +105,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     }
 
     public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
+        // Get safe storage directory for photos --> points to the image location.
         // Use `getExternalFilesDir` on Context to access package-specific directories.
         // This way, we don't need to request external read/write runtime permissions.
         File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
@@ -94,5 +118,26 @@ public class ComposePictureActivity extends AppCompatActivity {
         // Return the file target for the photo based on filename
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
 
+    }
+
+    private void savePost(ParseUser currentUser, String event, String caption, File photoFile) {
+        Post post = new Post();
+        post.setUser(currentUser);
+        post.setEvent(event);
+        //post.setLocation(location);
+        post.setPicture(new ParseFile(photoFile));
+        post.setCaption(caption);
+
+        post.saveInBackground(new SaveCallback() { // saves in our database?
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "error while saving", e);
+                }
+                Log.i(TAG, "post save was successful!");
+                etCaption.setText("");
+                ivImage.setImageResource(0);
+            }
+        });
     }
 }

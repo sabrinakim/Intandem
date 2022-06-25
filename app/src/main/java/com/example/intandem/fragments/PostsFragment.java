@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.example.intandem.ComposeActivity;
 import com.example.intandem.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.ParseUser;
 
 public class PostsFragment extends Fragment {
 
@@ -46,14 +47,14 @@ public class PostsFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_USER = "user";
     private static final String ARG_PARAM2 = "param2";
 
     private static String TAG = "PostsFragment";
     private FloatingActionButton fabCompose;
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private ParseUser mUser;
     private String mParam2;
 
     public PostsFragment() {
@@ -64,16 +65,14 @@ public class PostsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param user
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PostsFragment newInstance(String param1, String param2) {
+    public static PostsFragment newInstance(ParseUser user) {
         PostsFragment fragment = new PostsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(ARG_USER, user);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,8 +81,7 @@ public class PostsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mUser = getArguments().getParcelable(ARG_USER);
         }
     }
 
@@ -102,6 +100,7 @@ public class PostsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getContext(), ComposeActivity.class);
+                i.putExtra("user", mUser);
                 startActivity(i);
             }
         });

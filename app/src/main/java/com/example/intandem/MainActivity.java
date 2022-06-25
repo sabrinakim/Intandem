@@ -38,6 +38,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.Arrays;
 import java.util.List;
@@ -106,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
-                Intent i = new Intent(MainActivity.this, SecondActivity.class);
-                startActivity(i);
-
+//                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+//                // pass in user through activities
+//                startActivity(i);
             }
 
             @Override
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                         .build(MainActivity.this);
 
                 // start activity result
-                startActivityForResult(intent, 100);
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
             }
         });
 
@@ -189,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                             .into(ivProfilePic);
 
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
-                    query.whereEqualTo(User.KEY_FBID, id);
+                    query.whereEqualTo("fbId", id);
                     query.findInBackground(new FindCallback<ParseUser>() {
                         @Override
                         public void done(List<ParseUser> objects, ParseException e) {
@@ -216,8 +217,19 @@ public class MainActivity extends AppCompatActivity {
                                             return;
                                         }
                                         Log.i(TAG, "user saved successfully");
+
+                                        Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                                        // pass in user through activities
+                                        i.putExtra("user", user);
+                                        startActivity(i);
                                     }
                                 });
+                            } else { // user already registered in our database
+                                Log.i(TAG, "user already exists");
+                                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                                // pass in user through activities
+                                i.putExtra("user", objects.get(0));
+                                startActivity(i);
                             }
                         }
                     });

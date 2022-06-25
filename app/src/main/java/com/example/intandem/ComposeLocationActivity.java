@@ -16,6 +16,9 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +29,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
     private EditText etLocation;
     private Button btnNext2;
+    private String event;
+    private ParseUser user;
 
 
     @Override
@@ -33,14 +38,20 @@ public class ComposeLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose_location);
 
+        etLocation = findViewById(R.id.etLocation);
+        btnNext2 = findViewById(R.id.btnNext2);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            event = extras.getString("event");
+            user = extras.getParcelable("user");
+        }
+
         // Initialize the SDK
         Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
 
         // Create a new PlacesClient instance
         PlacesClient placesClient = Places.createClient(this);
-
-        etLocation = findViewById(R.id.etLocation);
-        btnNext2 = findViewById(R.id.btnNext2);
 
         etLocation.setFocusable(false);
         etLocation.setOnClickListener(new View.OnClickListener() {
@@ -58,14 +69,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
             }
         });
-
-        btnNext2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ComposeLocationActivity.this, ComposePictureActivity.class);
-                startActivity(i);
-            }
-        });
     }
 
     @Override
@@ -76,11 +79,23 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
             // this place instance can retrieve details about the place
             Place place = Autocomplete.getPlaceFromIntent(data);
-            etLocation.setText(place.getAddress());
-            System.out.println("lat/long: " + place.getLatLng());
-            System.out.println("name: " + place.getName());
+            etLocation.setText(place.getName());
+            //System.out.println("lat/long: " + place.getLatLng());
+            //System.out.println("name: " + place.getName());
 
             Log.i(TAG, "place autocomplete success");
+
+            btnNext2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(ComposeLocationActivity.this, ComposePictureActivity.class);
+                    i.putExtra("event", event);
+                    i.putExtra("location", Parcels.wrap(place));
+                    i.putExtra("user", user);
+                    // pass in places object
+                    startActivity(i);
+                }
+            });
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
             // display toast
