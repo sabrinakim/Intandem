@@ -62,7 +62,7 @@ public class ComposePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(ParseUser.getCurrentUser(), event, placeId, etCaption.getText().toString(), photoFile);
+                savePost(user, event, placeId, etCaption.getText().toString(), photoFile);
             }
         });
     }
@@ -128,7 +128,7 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
 
-        post.saveInBackground(new SaveCallback() { // saves in our database?
+        post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {

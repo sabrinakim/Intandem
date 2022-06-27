@@ -76,20 +76,20 @@ public class MainActivity extends AppCompatActivity {
         // next, we want to define the endpoints for our api by defining an interface.
         // retrofit will be in charge of filling in the functions in the interface.
 
-        YelpService yelpService = retrofit.create(YelpService.class);
-        // search Restaurants is asynchronous
-        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
-
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.i(TAG, "on response " + response);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.i(TAG, "on failure ");
-            }
-        });
+//        YelpService yelpService = retrofit.create(YelpService.class);
+//        // search Restaurants is asynchronous
+//        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
+//
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.i(TAG, "on response " + response);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.i(TAG, "on failure ");
+//            }
+//        });
 
         ivProfilePic = findViewById(R.id.ivProfilePic);
         tvName = findViewById(R.id.tvName);

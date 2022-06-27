@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -18,6 +19,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.parse.ParseFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,6 +92,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     tvLocationFeed.setText(currPlaceName);
                 }
             });
+
+            ParseFile image = post.getPicture();
+            if (image != null) { // image is optional, so its possible that it is null
+                Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
+            }
+
+            tvCaptionFeed.setText(post.getCaption());
 
         }
     }
