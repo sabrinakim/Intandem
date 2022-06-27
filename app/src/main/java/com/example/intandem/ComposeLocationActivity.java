@@ -30,6 +30,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
     private EditText etLocation;
     private Button btnNext2;
     private String event;
+    private String placeId;
     private ParseUser user;
 
 
@@ -59,7 +60,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // initialize place field list
                 List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
-                        Place.Field.LAT_LNG, Place.Field.NAME);
+                        Place.Field.LAT_LNG, Place.Field.NAME, Place.Field.ID);
 
                 // create intent
                 Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
@@ -80,6 +81,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
             // this place instance can retrieve details about the place
             Place place = Autocomplete.getPlaceFromIntent(data);
             etLocation.setText(place.getName());
+            placeId = place.getId();
+            //Log.i(TAG, "place id: " + placeId);
             //System.out.println("lat/long: " + place.getLatLng());
             //System.out.println("name: " + place.getName());
 
@@ -90,7 +93,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Intent i = new Intent(ComposeLocationActivity.this, ComposePictureActivity.class);
                     i.putExtra("event", event);
-                    i.putExtra("location", Parcels.wrap(place));
+                    i.putExtra("placeId", placeId);
                     i.putExtra("user", user);
                     // pass in places object
                     startActivity(i);

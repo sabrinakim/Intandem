@@ -10,9 +10,10 @@ import com.parse.ParseUser;
 public class Post extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_EVENT = "event";
-    public static final String KEY_LOCATION = "location";
+    public static final String KEY_PLACEID = "placeId";
     public static final String KEY_PICTURE = "picture";
     public static final String KEY_CAPTION = "caption";
+    public static final String KEY_LOCATION = "location";
 
     // empty constructor needed by Parceler library
     public Post() {}
@@ -33,12 +34,12 @@ public class Post extends ParseObject {
         put(KEY_EVENT, event);
     }
 
-    public Place getLocation() {
-        return (Place) get(KEY_LOCATION);
+    public String getPlaceId() {
+        return getString(KEY_PLACEID);
     }
 
-    public void setLocation(Place place) {
-        put(KEY_LOCATION, place);
+    public void setPlaceId(String placeId) {
+        put(KEY_PLACEID, placeId);
     }
 
     public ParseFile getPicture() {
@@ -56,5 +57,14 @@ public class Post extends ParseObject {
     public void setCaption(String caption) {
         put(KEY_CAPTION, caption);
     }
+
+    public String getLocation() {
+        return getString(KEY_LOCATION);
+    }
+
+    public void setLocation(String location) {
+        put(KEY_LOCATION, location);
+    }
+
 }
 

@@ -37,7 +37,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     private ImageView ivImage;
     private EditText etCaption;
     private Button btnShare;
-    private Place location;
+    private String placeId;
     private String event;
     private ParseUser user;
 
@@ -53,7 +53,7 @@ public class ComposePictureActivity extends AppCompatActivity {
         launchCamera();
 
         // unwrap parcel here
-        location = Parcels.unwrap(getIntent().getParcelableExtra("location"));
+        placeId = getIntent().getExtras().getString("placeId");
         event = getIntent().getExtras().getString("event");
         user = getIntent().getExtras().getParcelable("user");
 
@@ -62,7 +62,7 @@ public class ComposePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(ParseUser.getCurrentUser(), event, etCaption.getText().toString(), photoFile);
+                savePost(ParseUser.getCurrentUser(), event, placeId, etCaption.getText().toString(), photoFile);
             }
         });
     }
@@ -120,11 +120,11 @@ public class ComposePictureActivity extends AppCompatActivity {
 
     }
 
-    private void savePost(ParseUser currentUser, String event, String caption, File photoFile) {
+    private void savePost(ParseUser currentUser, String event, String placeId, String caption, File photoFile) {
         Post post = new Post();
         post.setUser(currentUser);
         post.setEvent(event);
-        //post.setLocation(location);
+        post.setPlaceId(placeId);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
 

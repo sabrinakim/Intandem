@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
 
         ivProfilePic = findViewById(R.id.ivProfilePic);
         tvName = findViewById(R.id.tvName);
-        etSearch = findViewById(R.id.etSearch);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -125,28 +124,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
-
-        // Create a new PlacesClient instance
-        PlacesClient placesClient = Places.createClient(this);
-
-        etSearch.setFocusable(false);
-        etSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // initialize place field list
-                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
-                        Place.Field.LAT_LNG, Place.Field.NAME);
-
-                // create intent
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
-                        .build(MainActivity.this);
-
-                // start activity result
-                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            }
-        });
 
     }
 
@@ -156,21 +133,6 @@ public class MainActivity extends AppCompatActivity {
         // passes in the login results to the login manager via the callback manager
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
-            // success
-
-            // this place instance can retrieve details about the place
-            Place place = Autocomplete.getPlaceFromIntent(data);
-            etSearch.setText(place.getAddress());
-            System.out.println("lat/long: " + place.getLatLng());
-            System.out.println("name: " + place.getName());
-
-            Log.i(TAG, "place autocomplete success");
-        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-            Status status = Autocomplete.getStatusFromIntent(data);
-            // display toast
-            Log.e(TAG, "place autocomplete error");
-        }
 
         // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
         // we will use the Graph API
@@ -237,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
