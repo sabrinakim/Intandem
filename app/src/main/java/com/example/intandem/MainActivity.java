@@ -100,13 +100,7 @@ public class MainActivity extends AppCompatActivity {
     public void onLogoutAction(MenuItem mi) {
         // handle logout here
         LoginManager.getInstance().logOut();
-        goLoginActivity();
-    }
-
-    private void goLoginActivity() {
-        // return back to login activity
         Intent i = new Intent(this, LoginActivity.class);
-        i.putExtra("logged in", 0);
         startActivity(i);
         finish(); // doesn't let you go back to the main activity
     }

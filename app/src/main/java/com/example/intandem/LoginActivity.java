@@ -66,11 +66,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Intent intent = getIntent();
-
-        if ((intent.getIntExtra("logged in", 0) == 1) || ParseUser.getCurrentUser() != null) {
-            goMainActivity(); // skip login
-        }
 
         callbackManager = CallbackManager.Factory.create();
 
