@@ -66,6 +66,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Intent intent = getIntent();
+
+        if ((intent.getIntExtra("logged in", 0) == 1) || ParseUser.getCurrentUser() != null) {
+            goMainActivity(); // skip login
+        }
+
         callbackManager = CallbackManager.Factory.create();
 
         loginButton = findViewById(R.id.login_button);
@@ -189,5 +195,11 @@ public class LoginActivity extends AppCompatActivity {
         // this is the final call you receive before your activity is destroyed
         super.onDestroy();
         accessTokenTracker.stopTracking();
+    }
+
+    private void goMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+        finish(); // finishing login activity once we start main activity
     }
 }

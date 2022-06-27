@@ -5,14 +5,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.intandem.fragments.ActivityFragment;
 import com.example.intandem.fragments.ComposeFragment;
 import com.example.intandem.fragments.PostsFragment;
 import com.example.intandem.fragments.ProfileFragment;
+import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.LogOutCallback;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import retrofit2.Retrofit;
@@ -81,5 +88,26 @@ public class MainActivity extends AppCompatActivity {
         });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_home);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    public void onLogoutAction(MenuItem mi) {
+        // handle logout here
+        LoginManager.getInstance().logOut();
+        goLoginActivity();
+    }
+
+    private void goLoginActivity() {
+        // return back to login activity
+        Intent i = new Intent(this, LoginActivity.class);
+        i.putExtra("logged in", 0);
+        startActivity(i);
+        finish(); // doesn't let you go back to the main activity
     }
 }
