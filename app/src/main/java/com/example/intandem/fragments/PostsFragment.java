@@ -33,7 +33,7 @@ public class PostsFragment extends Fragment {
     public static final String ARG_USER = "user";
     public static final String TAG = "PostsFragment";
     public static final int LIMIT = 20;
-    //private ViewPager2 vp2Posts;
+    private ViewPager2 vp2Posts;
     private RecyclerView rvPosts;
     private PostsAdapter adapter;
     private List<Post> allPosts;
@@ -80,7 +80,8 @@ public class PostsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvPosts = view.findViewById(R.id.rvPosts);
+        //rvPosts = view.findViewById(R.id.rvPosts);
+        vp2Posts = view.findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(getContext(), allPosts);
         fabCompose = view.findViewById(R.id.fabAddPost);
@@ -94,14 +95,27 @@ public class PostsFragment extends Fragment {
             }
         });
 
-//        Post post = new Post();
-//        post.setEvent("hello world");
+        vp2Posts.setAdapter(adapter);
+        vp2Posts.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            // This method is triggered when there is any scrolling activity for the current page
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
 
-        rvPosts.setAdapter(adapter);
-        rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
-        //allPosts.add(post);
-        //adapter.notifyDataSetChanged();
-        //vp2Posts.setAdapter(adapter);
+            // triggered when you select a new page
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+            }
+
+            // triggered when there is
+            // scroll state will be changed
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
         queryPosts();
     }
 
