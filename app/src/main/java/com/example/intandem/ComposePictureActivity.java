@@ -57,8 +57,10 @@ public class ComposePictureActivity extends AppCompatActivity {
         // unwrap parcel here
         Bundle extras = getIntent().getExtras();
         placeId = extras.getString("placeId");
+        Log.i(TAG, placeId);
         event = extras.getString("event");
-        user = extras.getParcelable("user");
+        Log.i(TAG, event);
+        user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
         timeUnit = extras.getString("timeUnit");
 
@@ -67,7 +69,7 @@ public class ComposePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(user, event, placeId, etCaption.getText().toString(), photoFile);
+                savePost(user, event, placeId, etCaption.getText().toString(), photoFile, duration, timeUnit);
             }
         });
     }
@@ -125,13 +127,15 @@ public class ComposePictureActivity extends AppCompatActivity {
 
     }
 
-    private void savePost(ParseUser currentUser, String event, String placeId, String caption, File photoFile) {
+    private void savePost(ParseUser currentUser, String event, String placeId, String caption, File photoFile, String duration, String timeUnit) {
         Post post = new Post();
         post.setUser(currentUser);
         post.setEvent(event);
         post.setPlaceId(placeId);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
+        post.setDuration(duration);
+        post.setTimeUnit(timeUnit);
 
         post.saveInBackground(new SaveCallback() {
             @Override

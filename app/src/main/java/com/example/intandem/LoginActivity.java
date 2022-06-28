@@ -57,7 +57,7 @@ import com.facebook.appevents.AppEventsLogger;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "LoginActivity";
     private static final String FRIENDS = "user_friends";
     private CallbackManager callbackManager;
     private Button btnLogin;
@@ -67,21 +67,41 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         callbackManager = CallbackManager.Factory.create();
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken != null && accessToken.isExpired() == false) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish(); // doesn't let you go back to login activity once logged in.
+        if (accessToken != null && !accessToken.isExpired()) { // user already logged in
+            // query for users here to get current user
+            Log.i(TAG, "user alr logged in before");
+            GraphRequest meGraphRequest = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+                    try {
+                        String id = jsonObject.getString("id");
+                        ParseQuery<ParseUser> query = ParseUser.getQuery();
+                        query.whereEqualTo("fbId", id);
+                        query.findInBackground(new FindCallback<ParseUser>() {
+                            @Override
+                            public void done(List<ParseUser> objects, ParseException e) {
+                                ParseUser user = objects.get(0);
+                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                i.putExtra("user", user);
+                                startActivity(i);
+                                finish(); // doesn't let you go back to login activity once logged in.
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            meGraphRequest.executeAsync();
         }
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i(TAG, "login success");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
             }
 
             @Override

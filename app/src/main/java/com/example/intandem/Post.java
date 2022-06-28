@@ -13,7 +13,8 @@ public class Post extends ParseObject {
     public static final String KEY_PLACEID = "placeId";
     public static final String KEY_PICTURE = "picture";
     public static final String KEY_CAPTION = "caption";
-    public static final String KEY_LOCATION = "location";
+    public static final String KEY_DURATION = "duration";
+    public static final String KEY_TIMEUNIT = "timeUnit";
 
     // empty constructor needed by Parceler library
     public Post() {}
@@ -58,13 +59,20 @@ public class Post extends ParseObject {
         put(KEY_CAPTION, caption);
     }
 
-    public String getLocation() {
-        return getString(KEY_LOCATION);
+    public String getDuration() {
+        return getString(KEY_DURATION);
     }
 
-    public void setLocation(String location) {
-        put(KEY_LOCATION, location);
+    public void setDuration(String duration) {
+        put(KEY_DURATION, duration);
     }
 
+    public String getTimeUnit() {
+        return getString(KEY_TIMEUNIT);
+    }
+
+    public void setTimeUnit(String timeUnit) {
+        put(KEY_TIMEUNIT, timeUnit);
+    }
 }
 
