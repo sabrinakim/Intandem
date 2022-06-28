@@ -32,22 +32,21 @@ Through pictures & swipes, users can easily find people to go somewhere/do somet
 
 **Required Must-have Stories**
 
-* User can login, signup, and logout
-* Users can add friends
-  * Users can only interact with their friends on this app
+* User can login, signup, and logout through Facebook Authentication
 * Users can create & post event invitations so that their friends can join them if they want
   * These posts include:
     * Location: e.g. Fondren Library
-    * Time/Date: e.g. right now!
+    * Duration: e.g. "the next 3 hours"
     * Picture: e.g. (picture of homework at the library)
     * Message: e.g. "please join me at the library i'm working on comp182 hw rn T_T"
+* Post will "expire" once the duration timer runs out
+  * "expiration" will shown by a grayed out post? or the post just overall diseappearing.
 * Users can view event invitations created by their friends in their home page
-  * These posted events will be accompanied by Yelp & Google reviews (combine them?)
-* Users can reply to posted event invitations by swiping up
+* Users can reply to posted event invitations
   * Replies will consist of:
-    * picture: e.g. (selfie showing excitement)
-    * message: e.g. "omg i'm doing comp182 hw rn too i will join u"
-  * Everyone who is invited to this post can see the replies
+    * Picture: e.g. (selfie showing excitement)
+    * Message: e.g. "omg i'm doing comp182 hw rn too i will join u"
+  * Everyone who is invited to the event can see the replies
 * Users can view people's replies to the event invitation they posted
 * Users can create custom, very specific locations that are not available on the Google Places API
   * e.g. Martel Library at Rice University
@@ -59,6 +58,7 @@ Through pictures & swipes, users can easily find people to go somewhere/do somet
 * Users can create smaller circles among their friends
   * e.g. "comp182 study group"; "hiking group"
 * Users can filter invitations through a series of parameters, like location and date/time.
+* Users can add on more pictures to their post after posting (similar to Instagram stories)
 * Event invitations that are similar to ones that were replied to/interacted with before will be prioritized by being bubbled up to the top of the swiping queue.
 
 ### 2. Screen Archetypes
