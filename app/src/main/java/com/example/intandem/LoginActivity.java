@@ -1,5 +1,6 @@
 package com.example.intandem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -59,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String FRIENDS = "user_friends";
     private CallbackManager callbackManager;
     private LoginButton loginButton;
+    private Button btnLogin;
 
 
     @Override
@@ -69,29 +72,63 @@ public class LoginActivity extends AppCompatActivity {
 
         callbackManager = CallbackManager.Factory.create();
 
-        loginButton = findViewById(R.id.login_button);
-        // If you are using in a fragment, call loginButton.setFragment(this);
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && accessToken.isExpired() == false) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish(); // doesn't let you go back to login activity once logged in.
+        }
 
-        // Callback registration
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // loginResult contains parameters like the access token & granted permissions u set up
                 Log.i(TAG, "login success");
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             }
 
             @Override
             public void onCancel() {
-                // App code
                 Log.i(TAG, "login canceled");
             }
 
             @Override
-            public void onError(FacebookException exception) {
-                // App code
+            public void onError(@NonNull FacebookException e) {
                 Log.e(TAG, "login error");
             }
         });
+
+        btnLogin = findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList(FRIENDS));
+            }
+        });
+
+        //loginButton = findViewById(R.id.login_button);
+        //loginButton.setPermissions(Arrays.asList(FRIENDS));
+        // If you are using in a fragment, call loginButton.setFragment(this);
+
+//        // Callback registration
+//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                // loginResult contains parameters like the access token & granted permissions u set up
+//                Log.i(TAG, "login success");
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                // App code
+//                Log.i(TAG, "login canceled");
+//            }
+//
+//            @Override
+//            public void onError(FacebookException exception) {
+//                // App code
+//                Log.e(TAG, "login error");
+//            }
+//        });
     }
 
     @Override
@@ -173,28 +210,17 @@ public class LoginActivity extends AppCompatActivity {
 
         meGraphRequest.setParameters(bundle);
         meGraphRequest.executeAsync();
-    }
 
-    AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
-        @Override
-        // whenever the access token is changed, this method is called automatically
-        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-            if (currentAccessToken == null) {
-                LoginManager.getInstance().logOut();
-            }
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        // this is the final call you receive before your activity is destroyed
-        super.onDestroy();
-        accessTokenTracker.stopTracking();
-    }
-
-    private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
-        finish(); // finishing login activity once we start main activity
+//        GraphRequest request = GraphRequest.newGraphPathRequest(
+//                AccessToken.getCurrentAccessToken(),
+//                "/me/friends",
+//                new GraphRequest.Callback() {
+//                    @Override
+//                    public void onCompleted(GraphResponse response) {
+//                        System.out.println(response);
+//                    }
+//                });
+//
+//        request.executeAsync();
     }
 }

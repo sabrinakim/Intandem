@@ -76,7 +76,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             String placeId = post.getPlaceId();
             List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
                     Place.Field.LAT_LNG, Place.Field.NAME, Place.Field.ID);
-
             FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, fieldList);
 
             // Initialize the SDK

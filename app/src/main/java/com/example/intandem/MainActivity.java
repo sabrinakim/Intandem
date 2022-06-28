@@ -1,6 +1,7 @@
 package com.example.intandem;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -16,11 +17,17 @@ import com.example.intandem.fragments.ActivityFragment;
 import com.example.intandem.fragments.ComposeFragment;
 import com.example.intandem.fragments.PostsFragment;
 import com.example.intandem.fragments.ProfileFragment;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -39,11 +46,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
-        // next, we want to define the endpoints for our api by defining an interface.
-        // retrofit will be in charge of filling in the functions in the interface.
+//        GraphRequest request = GraphRequest.newMeRequest(accessToken,
+//                new GraphRequest.GraphJSONObjectCallback() {
+//            @Override
+//            public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+//                try {
+//                    System.out.println("name: " + jsonObject.getString("name"));
+//                    System.out.println("id: " + jsonObject.getString("id"));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        request.executeAsync();
 
+//        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+//
+//        // next, we want to define the endpoints for our api by defining an interface.
+//        // retrofit will be in charge of filling in the functions in the interface.
+//
 //        YelpService yelpService = retrofit.create(YelpService.class);
 //        // search Restaurants is asynchronous
 //        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
@@ -102,6 +126,6 @@ public class MainActivity extends AppCompatActivity {
         LoginManager.getInstance().logOut();
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
-        finish(); // doesn't let you go back to the main activity
+        finish(); // doesn't let you go back to main activity once logged out
     }
 }
