@@ -60,6 +60,7 @@ Through pictures & swipes, users can easily find people to go somewhere/do somet
 * Users can filter invitations through a series of parameters, like location and date/time.
 * Users can add on more pictures to their post after posting (similar to Instagram stories)
 * Event invitations that are similar to ones that were replied to/interacted with before will be prioritized by being bubbled up to the top of the swiping queue.
+* Users can tag other users on their posts
 
 ### 2. Screen Archetypes
 
