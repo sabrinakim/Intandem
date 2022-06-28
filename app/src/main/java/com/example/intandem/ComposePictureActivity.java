@@ -40,6 +40,8 @@ public class ComposePictureActivity extends AppCompatActivity {
     private String placeId;
     private String event;
     private ParseUser user;
+    private String duration;
+    private String timeUnit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +55,12 @@ public class ComposePictureActivity extends AppCompatActivity {
         launchCamera();
 
         // unwrap parcel here
-        placeId = getIntent().getExtras().getString("placeId");
-        event = getIntent().getExtras().getString("event");
-        user = getIntent().getExtras().getParcelable("user");
+        Bundle extras = getIntent().getExtras();
+        placeId = extras.getString("placeId");
+        event = extras.getString("event");
+        user = extras.getParcelable("user");
+        duration = extras.getString("duration");
+        timeUnit = extras.getString("timeUnit");
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override

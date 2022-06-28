@@ -5,4 +5,9 @@
     <string name="facebook_client_token">bffe434c5e6d735c70db1829d300bb4f</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="timeUnits">
+        <item>Minute(s)</item>
+        <item>Hour(s)</item>
+    </string-array>
 </resources>

@@ -82,7 +82,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
             Place place = Autocomplete.getPlaceFromIntent(data);
             etLocation.setText(place.getName());
             placeId = place.getId();
-            //Log.i(TAG, "place id: " + placeId);
+            Log.i(TAG, "place id: " + placeId);
             //System.out.println("lat/long: " + place.getLatLng());
             //System.out.println("name: " + place.getName());
 
@@ -91,7 +91,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
             btnNext2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(ComposeLocationActivity.this, ComposePictureActivity.class);
+                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
                     i.putExtra("event", event);
                     i.putExtra("placeId", placeId);
                     i.putExtra("user", user);
