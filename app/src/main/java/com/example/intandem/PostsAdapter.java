@@ -15,9 +15,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.intandem.fragments.ActivityFragment;
+import com.example.intandem.fragments.RepliesFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -81,6 +86,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public void bind(Post post) {
             tvEventFeed.setText(post.getEvent());
+
+            tvEventFeed.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // navigate to replies fragment
+                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                    Fragment fragment = new RepliesFragment();
+                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+                }
+            });
 
             // we want to extract place name from place id...
             String placeId = post.getPlaceId();
