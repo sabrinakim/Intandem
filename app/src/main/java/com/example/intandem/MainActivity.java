@@ -95,9 +95,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_home:
                         fragment = PostsFragment.newInstance(user);
                         break;
-                    case R.id.action_compose:
-                        fragment = new ComposeFragment();
-                        break;
                     case R.id.action_activity:
                         fragment = new ActivityFragment();
                         break;

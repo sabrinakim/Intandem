@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import com.parse.ParseUser;
 
-public class ComposeActivity extends AppCompatActivity {
+public class ComposeEventActivity extends AppCompatActivity {
 
     private Button btnNext;
     private EditText etEvent;
@@ -19,19 +19,18 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compose);
-
-        // unwrap parcel here
-        user = getIntent().getExtras().getParcelable("user");
+        setContentView(R.layout.activity_compose_event);
+        getSupportActionBar().setTitle("New Post");
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         etEvent = findViewById(R.id.etEvent);
         btnNext = findViewById(R.id.btnNext);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(ComposeActivity.this, ComposeLocationActivity.class);
+                Intent i = new Intent(ComposeEventActivity.this, ComposeLocationActivity.class);
+                i.putExtras(getIntent());
                 i.putExtra("event", etEvent.getText().toString());
-                i.putExtra("user", user);
                 startActivity(i);
             }
         });

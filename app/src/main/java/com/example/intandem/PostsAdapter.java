@@ -1,12 +1,18 @@
 package com.example.intandem;
 
 import android.content.Context;
+import android.content.Intent;
+import android.gesture.Gesture;
 import android.text.Layout;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +26,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +36,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public static final String TAG = "PostsAdapter";
     Context context;
     private List<Post> posts;
+    private ParseUser currUser;
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts, ParseUser currUser) {
         this.context = context;
         this.posts = posts;
+        this.currUser = currUser;
     }
 
     @NonNull
@@ -55,7 +64,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvEventFeed, tvLocationFeed, tvCaptionFeed;
         ImageView ivPictureFeed;
@@ -67,6 +76,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvLocationFeed = itemView.findViewById(R.id.tvLocationFeed);
             tvCaptionFeed = itemView.findViewById(R.id.tvCaptionFeed);
             ivPictureFeed = itemView.findViewById(R.id.ivPictureFeed);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Post post) {
@@ -98,7 +108,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
 
             tvCaptionFeed.setText(post.getCaption());
+        }
 
+
+        @Override
+        public void onClick(View v) {
+            //Toast.makeText(context, "reply", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent (context, ReplyActivity.class);
+            i.putExtra("user", currUser);
+            context.startActivity(i);
         }
     }
 }

@@ -8,11 +8,6 @@
         android:title="Home"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_compose"
-        android:icon="@drawable/ic_baseline_add_24"
-        android:title="Compose"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/action_activity"
         android:icon="@drawable/ic_baseline_favorite_24"
         android:title="Activity"

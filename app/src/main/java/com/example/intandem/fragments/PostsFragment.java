@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -13,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.intandem.ComposeActivity;
+import com.example.intandem.ComposeEventActivity;
 import com.example.intandem.Post;
 import com.example.intandem.PostsAdapter;
 import com.example.intandem.R;
@@ -34,7 +33,6 @@ public class PostsFragment extends Fragment {
     public static final String TAG = "PostsFragment";
     public static final int LIMIT = 20;
     private ViewPager2 vp2Posts;
-    private RecyclerView rvPosts;
     private PostsAdapter adapter;
     private List<Post> allPosts;
     private FloatingActionButton fabCompose;
@@ -83,13 +81,13 @@ public class PostsFragment extends Fragment {
         //rvPosts = view.findViewById(R.id.rvPosts);
         vp2Posts = view.findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), allPosts);
+        adapter = new PostsAdapter(getContext(), allPosts, mUser);
         fabCompose = view.findViewById(R.id.fabAddPost);
 
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(), ComposeActivity.class);
+                Intent i = new Intent(getContext(), ComposeEventActivity.class);
                 i.putExtra("user", mUser);
                 startActivity(i);
             }

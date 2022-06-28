@@ -42,12 +42,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
         etLocation = findViewById(R.id.etLocation);
         btnNext2 = findViewById(R.id.btnNext2);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            event = extras.getString("event");
-            user = extras.getParcelable("user");
-        }
-
         // Initialize the SDK
         Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
 
@@ -92,9 +86,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-                    i.putExtra("event", event);
+                    i.putExtras(getIntent());
                     i.putExtra("placeId", placeId);
-                    i.putExtra("user", user);
                     // pass in places object
                     startActivity(i);
                 }
