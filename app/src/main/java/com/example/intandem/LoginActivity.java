@@ -60,9 +60,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String FRIENDS = "user_friends";
     private CallbackManager callbackManager;
-    private LoginButton loginButton;
     private Button btnLogin;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
