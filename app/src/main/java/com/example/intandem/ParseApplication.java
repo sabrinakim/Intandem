@@ -13,6 +13,7 @@ public class ParseApplication extends Application {
 
         ParseObject.registerSubclass(Post.class);
         ParseObject.registerSubclass(Reply.class);
+        ParseObject.registerSubclass(PostToReply.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("xLojvhrKsyXJdPivN9v0podIw2MjQvJ9GFfmUP3i")

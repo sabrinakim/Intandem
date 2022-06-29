@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -33,21 +34,27 @@ public class ReplyActivity extends AppCompatActivity {
     private ImageView ivPictureReply;
     private Button btnReply;
     private ParseUser currUser;
+    private Post currPost;
+    private EditText etCaptionReply;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reply);
 
-        currUser = getIntent().getExtras().getParcelable("user");
+        Bundle extras = getIntent().getExtras();
+        currUser = extras.getParcelable("user");
+        currPost = extras.getParcelable("post");
 
         ivPictureReply = findViewById(R.id.ivPictureReply);
         btnReply = findViewById(R.id.btnReply);
+        etCaptionReply = findViewById(R.id.etCaptionReply);
 
         btnReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveReply(currUser, photoFile);
+                String caption = etCaptionReply.getText().toString();
+                saveReply(currUser, photoFile, caption);
             }
         });
 
@@ -107,16 +114,28 @@ public class ReplyActivity extends AppCompatActivity {
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
-    private void saveReply(ParseUser currentUser, File photoFile) {
+    private void saveReply(ParseUser currentUser, File photoFile, String caption) {
         Reply reply = new Reply();
         reply.setUser(currentUser);
         reply.setPicture(new ParseFile(photoFile));
+        reply.setCaption(caption);
 
         reply.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 ivPictureReply.setImageResource(0);
                 Log.i(TAG, "reply saved successfully");
+            }
+        });
+
+        PostToReply postToReply = new PostToReply();
+        postToReply.setPost(currPost);
+        postToReply.setReply(reply);
+
+        postToReply.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.i(TAG, "post to reply relation saved successfully");
             }
         });
     }

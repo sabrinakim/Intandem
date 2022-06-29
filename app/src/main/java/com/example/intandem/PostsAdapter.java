@@ -85,6 +85,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         public void bind(Post post) {
+
             tvEventFeed.setText(post.getEvent());
 
             tvEventFeed.setOnClickListener(new View.OnClickListener() {
@@ -131,9 +132,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             //Toast.makeText(context, "reply", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent (context, ReplyActivity.class);
-            i.putExtra("user", currUser);
-            context.startActivity(i);
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Post post = posts.get(position);
+                Intent i = new Intent (context, ReplyActivity.class);
+                i.putExtra("user", currUser);
+                i.putExtra("post", post);
+                context.startActivity(i);
+            }
         }
     }
 }

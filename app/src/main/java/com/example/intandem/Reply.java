@@ -9,6 +9,7 @@ import com.parse.ParseUser;
 public class Reply extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_PICTURE = "picture";
+    public static final String KEY_CAPTION = "caption";
 
     public Reply() {}
 
@@ -27,4 +28,14 @@ public class Reply extends ParseObject {
     public void setPicture(ParseFile picture) {
         put(KEY_PICTURE, picture);
     }
+
+    public String getCaption() {
+        return getString(KEY_CAPTION);
+    }
+
+    public void setCaption(String caption) {
+        put(KEY_CAPTION, caption);
+    }
+
+
 }
