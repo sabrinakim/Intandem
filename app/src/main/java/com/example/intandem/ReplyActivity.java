@@ -119,24 +119,26 @@ public class ReplyActivity extends AppCompatActivity {
         reply.setUser(currentUser);
         reply.setPicture(new ParseFile(photoFile));
         reply.setCaption(caption);
+        reply.setPost(currPost);
 
         reply.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 ivPictureReply.setImageResource(0);
+                etCaptionReply.setText("");
                 Log.i(TAG, "reply saved successfully");
             }
         });
 
-        PostToReply postToReply = new PostToReply();
-        postToReply.setPost(currPost);
-        postToReply.setReply(reply);
-
-        postToReply.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.i(TAG, "post to reply relation saved successfully");
-            }
-        });
+//        PostToReply postToReply = new PostToReply();
+//        postToReply.setPost(currPost);
+//        postToReply.setReply(reply);
+//
+//        postToReply.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                Log.i(TAG, "post to reply relation saved successfully");
+//            }
+//        });
     }
 }

@@ -95,7 +95,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     // navigate to replies fragment
                     AppCompatActivity activity = (AppCompatActivity) v.getContext();
                     // TODO: pass in post object as parameter instead of current user
-                    Fragment fragment = RepliesFragment.newInstance(currUser);
+                    Fragment fragment = RepliesFragment.newInstance(post);
                     activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
                 }
             });

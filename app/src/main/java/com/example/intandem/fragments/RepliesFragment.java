@@ -34,13 +34,13 @@ public class RepliesFragment extends Fragment {
 
     public static final int LIMIT = 20;
     public static final String TAG = "RepliesFragment";
-    private static final String ARG_CURR_USER = "param1";
+    private static final String ARG_CURR_POST = "param1";
     private RecyclerView rvReplies;
     private List<Reply> allReplies;
     private RepliesAdapter adapter;
 
     // TODO: Rename and change types of parameters
-    private ParseUser mCurrUser;
+    private Post mCurrPost;
 
     public RepliesFragment() {
         // Required empty public constructor
@@ -54,10 +54,10 @@ public class RepliesFragment extends Fragment {
      * @return A new instance of fragment RepliesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RepliesFragment newInstance(ParseUser param1) {
+    public static RepliesFragment newInstance(Post param1) {
         RepliesFragment fragment = new RepliesFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_CURR_USER, param1);
+        args.putParcelable(ARG_CURR_POST, param1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,7 +66,7 @@ public class RepliesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mCurrUser = getArguments().getParcelable(ARG_CURR_USER);
+            mCurrPost = getArguments().getParcelable(ARG_CURR_POST);
         }
     }
 
@@ -92,17 +92,18 @@ public class RepliesFragment extends Fragment {
 
     private void queryReplies() {
         ParseQuery<Reply> query = ParseQuery.getQuery(Reply.class);
-        // we only want to query for replies for that specific post we clicked on.
         query.setLimit(LIMIT);
+        // only grab replies for that specific post
+        query.whereEqualTo(Reply.KEY_POST, mCurrPost);
         query.findInBackground(new FindCallback<Reply>() {
             @Override
             public void done(List<Reply> replies, ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "issue getting replies");
                 }
-//                for (Reply reply : replies) {
-//                    // do something
-//                }
+                for (Reply reply : replies) {
+                    Log.i(TAG, reply.getCaption());
+                }
                 allReplies.addAll(replies);
                 adapter.notifyDataSetChanged();
             }

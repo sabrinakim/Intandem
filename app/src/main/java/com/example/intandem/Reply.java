@@ -10,6 +10,8 @@ public class Reply extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_PICTURE = "picture";
     public static final String KEY_CAPTION = "caption";
+    public static final String KEY_POST = "post";
+
 
     public Reply() {}
 
@@ -35,6 +37,14 @@ public class Reply extends ParseObject {
 
     public void setCaption(String caption) {
         put(KEY_CAPTION, caption);
+    }
+
+    public Post getPost() {
+        return (Post) getParseObject(KEY_POST);
+    }
+
+    public void setPost(Post post) {
+        put(KEY_POST, post);
     }
 
 
