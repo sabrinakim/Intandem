@@ -38,8 +38,6 @@ public class RepliesFragment extends Fragment {
     private RecyclerView rvReplies;
     private List<Reply> allReplies;
     private RepliesAdapter adapter;
-
-    // TODO: Rename and change types of parameters
     private Post mCurrPost;
 
     public RepliesFragment() {
@@ -53,7 +51,6 @@ public class RepliesFragment extends Fragment {
      * @param param1
      * @return A new instance of fragment RepliesFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RepliesFragment newInstance(Post param1) {
         RepliesFragment fragment = new RepliesFragment();
         Bundle args = new Bundle();
