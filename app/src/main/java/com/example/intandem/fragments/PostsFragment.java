@@ -23,12 +23,16 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -90,10 +94,18 @@ public class PostsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         OkHttpClient client = new OkHttpClient();
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://maps.googleapis.com/maps/api/distancematrix/json").newBuilder();
+        urlBuilder.addQueryParameter("origins", "place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo");
+        urlBuilder.addQueryParameter("destinations", "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU");
+        urlBuilder.addQueryParameter("mode", "driving");
+        urlBuilder.addQueryParameter("language", "en");
+        urlBuilder.addQueryParameter("key", BuildConfig.MAPS_API_KEY);
+        String url = urlBuilder.build().toString();
+
         Request request = new Request.Builder()
-                .url("https://maps.googleapis.com/maps/api/distancematrix/json?origins=Vancouver+BC%7CSeattle&destinations=San+Francisco%7CVictoria+BC&mode=bicycling&language=fr-FR&key=" + BuildConfig.MAPS_API_KEY)
+                .url(url)
                 .build();
 
         Call call = client.newCall(request);
@@ -105,7 +117,16 @@ public class PostsFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                System.out.println(response.body().string());
+                String responseData = response.body().string();
+                //System.out.println(responseData);
+                try {
+                    JSONObject json = new JSONObject(responseData);
+                    System.out.println(json.getJSONArray("rows").getJSONObject(0)
+                            .getJSONArray("elements").getJSONObject(0)
+                            .getJSONObject("distance").getString("text"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
