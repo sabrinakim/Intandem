@@ -94,31 +94,32 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 public void onClick(View v) {
                     // navigate to replies fragment
                     AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                    // TODO: pass in post object as parameter instead of current user
                     Fragment fragment = RepliesFragment.newInstance(post);
                     activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
                 }
             });
 
             // we want to extract place name from place id...
-            String placeId = post.getPlaceId();
-            List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
-                    Place.Field.LAT_LNG, Place.Field.NAME, Place.Field.ID);
-            FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, fieldList);
+//            String placeId = post.getPlaceId();
+//            List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
+//                    Place.Field.LAT_LNG, Place.Field.NAME, Place.Field.ID);
+//            FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, fieldList);
+//
+//            // Initialize the SDK
+//            Places.initialize(context.getApplicationContext(), BuildConfig.MAPS_API_KEY);
+//            // Create a new PlacesClient instance
+//            PlacesClient placesClient = Places.createClient(context);
+//
+//            Task<FetchPlaceResponse> fetchPlaceResponseTask = placesClient.fetchPlace(request);
+//            fetchPlaceResponseTask.addOnCompleteListener(new OnCompleteListener<FetchPlaceResponse>() {
+//                @Override
+//                public void onComplete(@NonNull Task<FetchPlaceResponse> task) {
+//                    String currPlaceName = task.getResult().getPlace().getName();
+//                    tvLocationFeed.setText(currPlaceName);
+//                }
+//            });
 
-            // Initialize the SDK
-            Places.initialize(context.getApplicationContext(), BuildConfig.MAPS_API_KEY);
-            // Create a new PlacesClient instance
-            PlacesClient placesClient = Places.createClient(context);
-
-            Task<FetchPlaceResponse> fetchPlaceResponseTask = placesClient.fetchPlace(request);
-            fetchPlaceResponseTask.addOnCompleteListener(new OnCompleteListener<FetchPlaceResponse>() {
-                @Override
-                public void onComplete(@NonNull Task<FetchPlaceResponse> task) {
-                    String currPlaceName = task.getResult().getPlace().getName();
-                    tvLocationFeed.setText(currPlaceName);
-                }
-            });
+            tvLocationFeed.setText(post.getPlaceName());
 
             ParseFile image = post.getPicture();
             if (image != null) { // image is optional, so its possible that it is null
