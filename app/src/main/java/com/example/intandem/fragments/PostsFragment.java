@@ -1,6 +1,7 @@
 package com.example.intandem.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,9 +15,11 @@ import android.view.ViewGroup;
 
 import com.example.intandem.BuildConfig;
 import com.example.intandem.ComposeEventActivity;
+import com.example.intandem.DistanceMatrixService;
 import com.example.intandem.Post;
 import com.example.intandem.PostsAdapter;
 import com.example.intandem.R;
+import com.example.intandem.dataClasses.DistanceSearchResult;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -30,14 +33,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class PostsFragment extends Fragment {
@@ -47,6 +52,7 @@ public class PostsFragment extends Fragment {
     public static final String ARG_USER = "user";
     public static final String TAG = "PostsFragment";
     public static final int LIMIT = 20;
+    private static final String BASE_URL = "https://maps.googleapis.com/";
     private ViewPager2 vp2Posts;
     private PostsAdapter adapter;
     private List<Post> allPosts;
@@ -94,41 +100,68 @@ public class PostsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        OkHttpClient client = new OkHttpClient();
-
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://maps.googleapis.com/maps/api/distancematrix/json").newBuilder();
-        urlBuilder.addQueryParameter("origins", "place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo");
-        urlBuilder.addQueryParameter("destinations", "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU");
-        urlBuilder.addQueryParameter("mode", "driving");
-        urlBuilder.addQueryParameter("language", "en");
-        urlBuilder.addQueryParameter("key", BuildConfig.MAPS_API_KEY);
-        String url = urlBuilder.build().toString();
-
-        Request request = new Request.Builder()
-                .url(url)
+        // using retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
+        DistanceMatrixService distanceMatrixService = retrofit.create(DistanceMatrixService.class);
+        distanceMatrixService.getDistanceSearchResult("place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo",
+                "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU",
+                "driving",
+                "en",
+                BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, e.toString());
+            public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+                Log.i(TAG, "on response");
+                DistanceSearchResult distanceSearchResult = response.body();
+                System.out.println("distance from place 1 to place 2: " + distanceSearchResult.getRows().get(0).getElements().get(0).getDistance().getText());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseData = response.body().string();
-                //System.out.println(responseData);
-                try {
-                    JSONObject json = new JSONObject(responseData);
-                    System.out.println(json.getJSONArray("rows").getJSONObject(0)
-                            .getJSONArray("elements").getJSONObject(0)
-                            .getJSONObject("distance").getString("text"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+                Log.e(TAG, "on failure");
             }
         });
+
+
+
+//        OkHttpClient client = new OkHttpClient();
+//
+//        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://maps.googleapis.com/maps/api/distancematrix/json").newBuilder();
+//        urlBuilder.addQueryParameter("origins", "place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo");
+//        urlBuilder.addQueryParameter("destinations", "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU");
+//        urlBuilder.addQueryParameter("mode", "driving");
+//        urlBuilder.addQueryParameter("language", "en");
+//        urlBuilder.addQueryParameter("key", BuildConfig.MAPS_API_KEY);
+//        String url = urlBuilder.build().toString();
+//
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .build();
+//
+//        Call call = client.newCall(request);
+//        call.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                Log.e(TAG, e.toString());
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                String responseData = response.body().string();
+//                //System.out.println(responseData);
+//                try {
+//                    JSONObject json = new JSONObject(responseData);
+//                    System.out.println(json.getJSONArray("rows").getJSONObject(0)
+//                            .getJSONArray("elements").getJSONObject(0)
+//                            .getJSONObject("distance").getString("text"));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
 
         vp2Posts = view.findViewById(R.id.vp2Posts);
