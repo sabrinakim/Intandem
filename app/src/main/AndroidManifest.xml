@@ -7,6 +7,9 @@
         <package android:name="com.facebook.katana" />
     </queries>
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="com.google.android.gms.permission.AD_ID"
@@ -32,6 +35,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Intandem"
         tools:targetApi="31">
+        <activity
+            android:name=".CurrentLocationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PermissionsActivity"
+            android:exported="false" />
         <activity
             android:name=".ReplyActivity"
             android:exported="false" />
