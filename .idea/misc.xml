@@ -20,6 +20,7 @@
         <entry key="app/src/main/res/layout/activity_testing.xml" value="0.12447916666666667" />
         <entry key="app/src/main/res/layout/fragment_activity.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_compose.xml" value="0.29438405797101447" />
+        <entry key="app/src/main/res/layout/fragment_filter_dialog.xml" value="0.24454956054687502" />
         <entry key="app/src/main/res/layout/fragment_posts.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_replies.xml" value="0.2472015380859375" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.27239583333333334" />

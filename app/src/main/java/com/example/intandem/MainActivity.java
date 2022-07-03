@@ -125,4 +125,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
         finish(); // doesn't let you go back to main activity once logged out
     }
+
+    public void onFilterAction(MenuItem mi) {
+        // bring up modal overlay
+        showEditDialog();
+    }
+
+    private void showEditDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
+        filterDialogFragment.show(fm, "fragment_filter_dialog");
+    }
 }

@@ -3,6 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:title="filter"
+        android:onClick="onFilterAction"
+        app:showAsAction="always" />
+    <item
         android:title="logout"
         android:onClick="onLogoutAction"
         app:showAsAction="always" />

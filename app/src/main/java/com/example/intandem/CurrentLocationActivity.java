@@ -33,7 +33,6 @@ public class CurrentLocationActivity extends AppCompatActivity {
 
     public static final String TAG = "CurrentLocationActivity";
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private PlacesClient placesClient;
     private Location lastKnownLocation;
     private LocationCallback locationCallback;
 
@@ -43,8 +42,6 @@ public class CurrentLocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_current_location);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        Places.initialize(this, BuildConfig.MAPS_API_KEY);
-        placesClient = Places.createClient(this);
 
         // check if gps is enabled or not and then request user to enable it
         LocationRequest locationRequest = LocationRequest.create();
@@ -115,7 +112,7 @@ public class CurrentLocationActivity extends AppCompatActivity {
                                         }
                                         lastKnownLocation = locationResult.getLastLocation();
                                         Log.i(TAG, "Lat: " + lastKnownLocation.getLatitude());
-                                        Log.i(TAG, "Lat: " + lastKnownLocation.getLongitude());
+                                        Log.i(TAG, "Long: " + lastKnownLocation.getLongitude());
                                         // stops us from recursively getting location updates.
                                         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
                                     }
