@@ -33,6 +33,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,6 +56,7 @@ public class FilterDialogFragment extends DialogFragment {
     private Button btnFilter;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location lastKnownLocation;
+    private Location currLocation;
     private LocationCallback locationCallback;
 
 
@@ -85,6 +88,7 @@ public class FilterDialogFragment extends DialogFragment {
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // grant permissions
                 Dexter.withActivity(getActivity())
                         .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                         .withListener(new PermissionListener() {
@@ -95,7 +99,6 @@ public class FilterDialogFragment extends DialogFragment {
                                 int numKms = Integer.parseInt(etDistance.getText().toString());
                                 // find user's current location.
                                 findCurrentLocation();
-
                             }
 
                             @Override
@@ -174,46 +177,70 @@ public class FilterDialogFragment extends DialogFragment {
                 }
             }
         });
-
     }
 
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
-        fusedLocationProviderClient.getLastLocation()
+        // TODO: change token
+        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        CancellationToken token = tokenSource.getToken();
+        fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token)
                 .addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            lastKnownLocation = task.getResult(); // this could be null...
-                            if (lastKnownLocation != null) {
-                                Log.i(TAG, "Lat: " + lastKnownLocation.getLatitude());
-                                Log.i(TAG, "Long: " + lastKnownLocation.getLongitude());
-                            } else { // getting location update
-                                final LocationRequest locationRequest = LocationRequest.create();
-                                locationRequest.setInterval(10000);
-                                locationRequest.setFastestInterval(5000);
-                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                                locationCallback = new LocationCallback() { // will execute when an updated location is received.
-                                    @Override
-                                    public void onLocationResult(LocationResult locationResult) {
-                                        super.onLocationResult(locationResult);
-                                        if (locationResult == null) {
-                                            return;
-                                        }
-                                        lastKnownLocation = locationResult.getLastLocation();
-                                        Log.i(TAG, "Lat: " + lastKnownLocation.getLatitude());
-                                        Log.i(TAG, "Long: " + lastKnownLocation.getLongitude());
-                                        // stops us from recursively getting location updates.
-                                        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-                                    }
-                                };
-                                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                            currLocation = task.getResult();
+                            if (currLocation != null) {
+                                Log.i(TAG, "Lat: " + currLocation.getLatitude());
+                                Log.i(TAG, "Long: " + currLocation.getLongitude());
+                            } else { // will execute when an updated location is received.
+                                // idk
                             }
+
                         } else {
-                            Toast.makeText(getContext(), "unable to get last location", Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "couldn't get current location");
                         }
                     }
                 });
     }
+
+//    @SuppressLint("MissingPermission")
+//    private void getDeviceLocation() {
+//        fusedLocationProviderClient.getLastLocation()
+//                .addOnCompleteListener(new OnCompleteListener<Location>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Location> task) {
+//                        if (task.isSuccessful()) {
+//                            lastKnownLocation = task.getResult(); // this could be null...
+//                            if (lastKnownLocation != null) {
+//                                Log.i(TAG, "Lat: " + lastKnownLocation.getLatitude());
+//                                Log.i(TAG, "Long: " + lastKnownLocation.getLongitude());
+//                            } else { // getting location update
+//                                final LocationRequest locationRequest = LocationRequest.create();
+//                                locationRequest.setInterval(10000);
+//                                locationRequest.setFastestInterval(5000);
+//                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//                                locationCallback = new LocationCallback() { // will execute when an updated location is received.
+//                                    @Override
+//                                    public void onLocationResult(LocationResult locationResult) {
+//                                        super.onLocationResult(locationResult);
+//                                        if (locationResult == null) {
+//                                            return;
+//                                        }
+//                                        lastKnownLocation = locationResult.getLastLocation();
+//                                        Log.i(TAG, "Lat: " + lastKnownLocation.getLatitude());
+//                                        Log.i(TAG, "Long: " + lastKnownLocation.getLongitude());
+//                                        // stops us from recursively getting location updates.
+//                                        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+//                                    }
+//                                };
+//                                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+//                            }
+//                        } else {
+//                            Toast.makeText(getContext(), "unable to get last location", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//    }
 
 }

@@ -34,7 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String TAG = "SecondActivity";
+    public static final String TAG = "MainActivity";
     private static final String BASE_URL = "https://api.yelp.com/v3/";
     private static final String API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
     final FragmentManager fragmentManager = getSupportFragmentManager();
