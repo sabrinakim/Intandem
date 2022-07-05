@@ -3,6 +3,7 @@ package com.example.intandem;
 import com.google.android.libraries.places.api.model.Place;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -16,6 +17,7 @@ public class Post extends ParseObject {
     public static final String KEY_DURATION = "duration";
     public static final String KEY_TIMEUNIT = "timeUnit";
     public static final String KEY_PLACENAME = "placeName";
+    public static final String KEY_LOCATIONPOINT = "locationPoint";
 
     // empty constructor needed by Parceler library
     public Post() {}
@@ -82,6 +84,14 @@ public class Post extends ParseObject {
 
     public void setPlaceName(String placeName) {
         put(KEY_PLACENAME, placeName);
+    }
+
+    public ParseGeoPoint getLocationPoint() {
+        return getParseGeoPoint(KEY_LOCATIONPOINT);
+    }
+
+    public void setLocationPoint(ParseGeoPoint locationPoint) {
+        put(KEY_LOCATIONPOINT, locationPoint);
     }
 }
 

@@ -45,20 +45,34 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 
 import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Headers;
 
 public class FilterDialogFragment extends DialogFragment {
     public static final String TAG = "FilterDialogFragment";
+    public static final int LIMIT = 20;
     private EditText etDistance;
     private Button btnFilter;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location lastKnownLocation;
+    //private Location lastKnownLocation;
     private Location currLocation;
-    private LocationCallback locationCallback;
+    //private LocationCallback locationCallback;
+    private Double latitude;
+    private Double longitude;
+    private List<Post> filteredPosts;
 
+    public interface FilterDialogListener {
+        void onFinishFilterDialog(List<Post> filteredPosts);
+    }
 
     public FilterDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -96,9 +110,15 @@ public class FilterDialogFragment extends DialogFragment {
                             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                                 // filter posts
                                 // record number that user inputted.
-                                int numKms = Integer.parseInt(etDistance.getText().toString());
-                                // find user's current location.
-                                findCurrentLocation();
+                                int maxDistance = Integer.parseInt(etDistance.getText().toString());
+                                findCurrentLocation(maxDistance);
+//                                ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
+//                                // find distance btwn user and all the posts
+//                                queryFilteredPosts(currPoint, maxDistance); // updates var to contain filtered posts
+//                                // triggers the parent activity to start its implemented function
+//                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+//                                listener.onFinishFilterDialog(filteredPosts);
+//                                dismiss(); // exits out of dialog fragment.
                             }
 
                             @Override
@@ -132,18 +152,39 @@ public class FilterDialogFragment extends DialogFragment {
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 51) {
-            if (resultCode == Activity.RESULT_OK) { // user accepted request and enabled gps
-                // now we can find user's current location.
-                getDeviceLocation();
+    private void queryFilteredPosts(ParseGeoPoint currPoint, double maxDistance) {
+        filteredPosts = new ArrayList<>();
+
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.setLimit(LIMIT);
+        query.whereWithinMiles("locationPoint", currPoint, maxDistance);
+        query.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> posts, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting posts", e);
+                    return;
+                }
+                for (Post post : posts) {
+                    Log.i(TAG, "Filtered Post: " + post.getCaption());
+                }
+                filteredPosts.addAll(posts);
             }
-        }
+        });
     }
 
-    private void findCurrentLocation() {
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == 51) {
+//            if (resultCode == Activity.RESULT_OK) { // user accepted request and enabled gps
+//                // now we can find user's current location.
+//                getDeviceLocation();
+//            }
+//        }
+//    }
+
+    private void findCurrentLocation(int maxDistance) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         // check if gps is enabled or not and then request user to enable it
@@ -160,7 +201,7 @@ public class FilterDialogFragment extends DialogFragment {
         task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                getDeviceLocation();
+                getDeviceLocation(maxDistance);
             }
         });
 
@@ -180,7 +221,7 @@ public class FilterDialogFragment extends DialogFragment {
     }
 
     @SuppressLint("MissingPermission")
-    private void getDeviceLocation() {
+    private void getDeviceLocation(int maxDistance) {
         // TODO: change token
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         CancellationToken token = tokenSource.getToken();
@@ -191,8 +232,18 @@ public class FilterDialogFragment extends DialogFragment {
                         if (task.isSuccessful()) {
                             currLocation = task.getResult();
                             if (currLocation != null) {
+                                latitude = currLocation.getLatitude();
+                                longitude = currLocation.getLongitude();
                                 Log.i(TAG, "Lat: " + currLocation.getLatitude());
                                 Log.i(TAG, "Long: " + currLocation.getLongitude());
+
+                                ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
+                                queryFilteredPosts(currPoint, maxDistance); // updates var to contain filtered posts
+                                // triggers the parent activity to start its implemented function
+                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+                                listener.onFinishFilterDialog(filteredPosts);
+                                dismiss(); // exits out of dialog fragment.
+
                             } else { // will execute when an updated location is received.
                                 // idk
                             }

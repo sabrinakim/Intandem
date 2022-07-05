@@ -10,12 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -31,6 +33,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
     private Button btnNext2;
     private String placeId;
     private String placeName;
+    private ParseGeoPoint locationPoint;
 
 
     @Override
@@ -52,7 +55,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // initialize place field list
-                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID);
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID, Place.Field.LAT_LNG);
 
                 // create intent
                 Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
@@ -75,6 +78,10 @@ public class ComposeLocationActivity extends AppCompatActivity {
             etLocation.setText(place.getName());
             placeId = place.getId();
             placeName = place.getName();
+            LatLng latLng = place.getLatLng();
+            if (latLng != null) {
+                locationPoint = new ParseGeoPoint(latLng.latitude, latLng.longitude);
+            }
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
             //System.out.println("lat/long: " + place.getLatLng());
@@ -89,6 +96,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     i.putExtras(getIntent());
                     i.putExtra("placeId", placeId);
                     i.putExtra("placeName", placeName);
+                    i.putExtra("locationPoint", locationPoint);
                     // pass in places object
                     startActivity(i);
                 }

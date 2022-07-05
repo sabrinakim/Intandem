@@ -7,19 +7,25 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.intandem.BuildConfig;
 import com.example.intandem.ComposeEventActivity;
 import com.example.intandem.DistanceMatrixService;
+import com.example.intandem.FilterDialogFragment;
 import com.example.intandem.Post;
 import com.example.intandem.PostsAdapter;
 import com.example.intandem.R;
@@ -58,7 +64,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class PostsFragment extends Fragment {
+public class PostsFragment extends Fragment implements FilterDialogFragment.FilterDialogListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -97,6 +103,7 @@ public class PostsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             mUser = getArguments().getParcelable(ARG_USER);
         }
@@ -176,6 +183,25 @@ public class PostsFragment extends Fragment {
         queryPosts();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.logout) {
+            return false;
+        }
+        if (item.getItemId() == R.id.filter) {
+            showEditDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showEditDialog() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
+        filterDialogFragment.setTargetFragment(this, 300);
+        filterDialogFragment.show(fm, "fragment_filter_dialog");
+    }
+
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
@@ -195,4 +221,10 @@ public class PostsFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onFinishFilterDialog(List<Post> filteredPosts) {
+        allPosts.clear();
+        allPosts.addAll(filteredPosts);
+        adapter.notifyDataSetChanged();
+    }
 }

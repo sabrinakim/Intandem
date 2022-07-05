@@ -29,6 +29,8 @@ import com.parse.ParseUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -118,22 +120,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void onLogoutAction(MenuItem mi) {
-        // handle logout here
-        LoginManager.getInstance().logOut();
-        Intent i = new Intent(this, LoginActivity.class);
-        startActivity(i);
-        finish(); // doesn't let you go back to main activity once logged out
-    }
-
-    public void onFilterAction(MenuItem mi) {
-        // bring up modal overlay
-        showEditDialog();
-    }
-
-    private void showEditDialog() {
-        FragmentManager fm = getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
-        filterDialogFragment.show(fm, "fragment_filter_dialog");
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.logout) {
+            LoginManager.getInstance().logOut();
+            Intent i = new Intent(this, LoginActivity.class);
+            startActivity(i);
+            finish(); // doesn't let you go back to main activity once logged out
+            return true;
+        }
+        if (item.getItemId() == R.id.filter) {
+            return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

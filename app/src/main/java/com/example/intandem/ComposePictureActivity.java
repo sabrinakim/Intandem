@@ -19,8 +19,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.libraries.places.api.model.Place;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -43,6 +45,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     private String duration;
     private String timeUnit;
     private String placeName;
+    private ParseGeoPoint locationPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +69,16 @@ public class ComposePictureActivity extends AppCompatActivity {
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
         timeUnit = extras.getString("timeUnit");
+        locationPoint = extras.getParcelable("locationPoint");
+        Log.i(TAG, locationPoint.toString());
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(user, event, placeId, etCaption.getText().toString(), photoFile, duration, timeUnit, placeName);
+                savePost(user, event, placeId, etCaption.getText().toString(), photoFile, duration,
+                        timeUnit, placeName, locationPoint);
             }
         });
     }
@@ -130,7 +136,9 @@ public class ComposePictureActivity extends AppCompatActivity {
 
     }
 
-    private void savePost(ParseUser currentUser, String event, String placeId, String caption, File photoFile, String duration, String timeUnit, String placeName) {
+    private void savePost(ParseUser currentUser, String event, String placeId, String caption,
+                          File photoFile, String duration, String timeUnit, String placeName,
+                          ParseGeoPoint locationPoint) {
         Post post = new Post();
         post.setUser(currentUser);
         post.setEvent(event);
@@ -140,6 +148,7 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setDuration(duration);
         post.setTimeUnit(timeUnit);
         post.setPlaceName(placeName);
+        post.setLocationPoint(locationPoint);
 
         post.saveInBackground(new SaveCallback() {
             @Override
