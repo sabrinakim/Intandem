@@ -165,25 +165,6 @@ public class FilterDialogFragment extends DialogFragment {
     private void queryFilteredPosts() {
         filteredPosts = new ArrayList<>();
 
-//        OkHttpClient client = new OkHttpClient();
-//        Request request = new Request.Builder()
-//                .url("https://maps.googleapis.com/maps/api/distancematrix/json?origins=40.6655101%2C-73.89188969999998&destinations=40.659569%2C-73.933783%7C40.729029%2C-73.851524%7C40.6860072%2C-73.6334271%7C40.598566%2C-73.7527626&mode=bicycling&language=fr-FR&key=" + BuildConfig.MAPS_API_KEY)
-//                .build();
-//
-//        Call call = client.newCall(request);
-//        call.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                Log.e(TAG, e.toString());
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                System.out.println(response.body().string());
-//            }
-//
-//        });
-
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
         //query.whereWithinMiles("locationPoint", currPoint, maxDistance);
@@ -221,8 +202,14 @@ public class FilterDialogFragment extends DialogFragment {
                         for (int i = 0; i < elements.size(); i++) {
                             if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
                                 Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
+                                filteredPosts.add(posts.get(i));
                             }
                         }
+
+                        // triggers the parent activity to start its implemented function
+                        FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+                        listener.onFinishFilterDialog(filteredPosts);
+                        dismiss(); // exits out of dialog fragment.
                     }
 
                     @Override
@@ -300,10 +287,10 @@ public class FilterDialogFragment extends DialogFragment {
 
                                 //ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
                                 queryFilteredPosts(); // updates var to contain filtered posts
-                                // triggers the parent activity to start its implemented function
-                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-                                listener.onFinishFilterDialog(filteredPosts);
-                                dismiss(); // exits out of dialog fragment.
+//                                // triggers the parent activity to start its implemented function
+//                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+//                                listener.onFinishFilterDialog(filteredPosts);
+//                                dismiss(); // exits out of dialog fragment.
 
                             } else { // will execute when an updated location is received.
                                 // idk
