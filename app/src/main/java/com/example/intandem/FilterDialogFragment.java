@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.intandem.dataClasses.DistanceSearchResult;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -33,6 +34,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -52,13 +54,25 @@ import com.parse.ParseQuery;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Headers;
+//import okhttp3.Call;
+//import okhttp3.Callback;
+//import okhttp3.Headers;
+//import okhttp3.OkHttpClient;
+//import okhttp3.Request;
+//import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FilterDialogFragment extends DialogFragment {
     public static final String TAG = "FilterDialogFragment";
+    private static final String BASE_URL = "https://maps.googleapis.com/";
     public static final int LIMIT = 20;
     private EditText etDistance;
     private Button btnFilter;
@@ -69,6 +83,7 @@ public class FilterDialogFragment extends DialogFragment {
     private Double latitude;
     private Double longitude;
     private List<Post> filteredPosts;
+    private int maxDistance;
 
     public interface FilterDialogListener {
         void onFinishFilterDialog(List<Post> filteredPosts);
@@ -110,15 +125,8 @@ public class FilterDialogFragment extends DialogFragment {
                             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                                 // filter posts
                                 // record number that user inputted.
-                                int maxDistance = Integer.parseInt(etDistance.getText().toString());
-                                findCurrentLocation(maxDistance);
-//                                ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
-//                                // find distance btwn user and all the posts
-//                                queryFilteredPosts(currPoint, maxDistance); // updates var to contain filtered posts
-//                                // triggers the parent activity to start its implemented function
-//                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-//                                listener.onFinishFilterDialog(filteredPosts);
-//                                dismiss(); // exits out of dialog fragment.
+                                maxDistance = Integer.parseInt(etDistance.getText().toString());
+                                findCurrentLocation();
                             }
 
                             @Override
@@ -152,12 +160,31 @@ public class FilterDialogFragment extends DialogFragment {
         });
     }
 
-    private void queryFilteredPosts(ParseGeoPoint currPoint, double maxDistance) {
+    private void queryFilteredPosts() {
         filteredPosts = new ArrayList<>();
+
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder()
+//                .url("https://maps.googleapis.com/maps/api/distancematrix/json?origins=40.6655101%2C-73.89188969999998&destinations=40.659569%2C-73.933783%7C40.729029%2C-73.851524%7C40.6860072%2C-73.6334271%7C40.598566%2C-73.7527626&mode=bicycling&language=fr-FR&key=" + BuildConfig.MAPS_API_KEY)
+//                .build();
+//
+//        Call call = client.newCall(request);
+//        call.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                Log.e(TAG, e.toString());
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                System.out.println(response.body().string());
+//            }
+//
+//        });
 
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
-        query.whereWithinMiles("locationPoint", currPoint, maxDistance);
+        //query.whereWithinMiles("locationPoint", currPoint, maxDistance);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
@@ -165,10 +192,36 @@ public class FilterDialogFragment extends DialogFragment {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                for (Post post : posts) {
-                    Log.i(TAG, "Filtered Post: " + post.getCaption());
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                // building destinations query parameter
+                StringBuilder destinations = new StringBuilder();
+                for (int i = 0; i < posts.size() - 1; i++) {
+                    destinations.append("place_id:").append(posts.get(i).getPlaceId()).append("|");
                 }
-                filteredPosts.addAll(posts);
+                destinations.append("place_id:").append(posts.get(posts.size() - 1).getPlaceId());
+
+                DistanceMatrixService distanceMatrixService = retrofit.create(DistanceMatrixService.class);
+                distanceMatrixService.getDistanceSearchResult(latitude + "," + longitude,
+                        destinations.toString(),
+                        "driving",
+                        "en",
+                        BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
+                    @Override
+                    public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+                        DistanceSearchResult distanceSearchResult = response.body();
+                        Log.i(TAG, distanceSearchResult.toString());
+                    }
+
+                    @Override
+                    public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+                        Log.e(TAG, "error getting distance");
+                    }
+                });
             }
         });
     }
@@ -184,7 +237,7 @@ public class FilterDialogFragment extends DialogFragment {
 //        }
 //    }
 
-    private void findCurrentLocation(int maxDistance) {
+    private void findCurrentLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         // check if gps is enabled or not and then request user to enable it
@@ -201,7 +254,7 @@ public class FilterDialogFragment extends DialogFragment {
         task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                getDeviceLocation(maxDistance);
+                getDeviceLocation();
             }
         });
 
@@ -221,7 +274,7 @@ public class FilterDialogFragment extends DialogFragment {
     }
 
     @SuppressLint("MissingPermission")
-    private void getDeviceLocation(int maxDistance) {
+    private void getDeviceLocation() {
         // TODO: change token
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         CancellationToken token = tokenSource.getToken();
@@ -237,8 +290,8 @@ public class FilterDialogFragment extends DialogFragment {
                                 Log.i(TAG, "Lat: " + currLocation.getLatitude());
                                 Log.i(TAG, "Long: " + currLocation.getLongitude());
 
-                                ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
-                                queryFilteredPosts(currPoint, maxDistance); // updates var to contain filtered posts
+                                //ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
+                                queryFilteredPosts(); // updates var to contain filtered posts
                                 // triggers the parent activity to start its implemented function
                                 FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
                                 listener.onFinishFilterDialog(filteredPosts);

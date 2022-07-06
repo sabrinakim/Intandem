@@ -122,31 +122,6 @@ public class LoginActivity extends AppCompatActivity {
                 LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList(FRIENDS));
             }
         });
-
-        //loginButton = findViewById(R.id.login_button);
-        //loginButton.setPermissions(Arrays.asList(FRIENDS));
-        // If you are using in a fragment, call loginButton.setFragment(this);
-
-//        // Callback registration
-//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                // loginResult contains parameters like the access token & granted permissions u set up
-//                Log.i(TAG, "login success");
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                // App code
-//                Log.i(TAG, "login canceled");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException exception) {
-//                // App code
-//                Log.e(TAG, "login error");
-//            }
-//        });
     }
 
     @Override
@@ -199,10 +174,22 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         Log.i(TAG, "user saved successfully");
 
-                                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                        // pass in user through activities
-                                        i.putExtra("user", user);
-                                        startActivity(i);
+                                        // each time a new user logs in, we want to record their friends list.
+                                        GraphRequest requestFriendsList = GraphRequest.newGraphPathRequest(
+                                                AccessToken.getCurrentAccessToken(),
+                                                "/" + id + "/friends",
+                                                new GraphRequest.Callback() {
+                                                    @Override
+                                                    public void onCompleted(GraphResponse response) {
+                                                        Log.i(TAG, response.toString());
+                                                        // move on to the main activity ONLY after we store friend data in our database.
+                                                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                                        i.putExtra("user", user);
+                                                        startActivity(i);
+                                                    }
+                                                });
+
+                                        requestFriendsList.executeAsync();
                                     }
                                 });
                             } else { // user already registered in our database
@@ -212,6 +199,8 @@ public class LoginActivity extends AppCompatActivity {
                                 i.putExtra("user", objects.get(0));
                                 startActivity(i);
                             }
+
+
                         }
                     });
 
@@ -228,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
 
         meGraphRequest.setParameters(bundle);
         meGraphRequest.executeAsync();
+
 
 //        GraphRequest request = GraphRequest.newGraphPathRequest(
 //                AccessToken.getCurrentAccessToken(),
