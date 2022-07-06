@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.intandem.dataClasses.DistanceInfo;
 import com.example.intandem.dataClasses.DistanceSearchResult;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,6 +49,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
@@ -214,7 +216,13 @@ public class FilterDialogFragment extends DialogFragment {
                     @Override
                     public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
                         DistanceSearchResult distanceSearchResult = response.body();
-                        Log.i(TAG, distanceSearchResult.toString());
+                        Log.i(TAG, "success getting all the distances");
+                        List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
+                        for (int i = 0; i < elements.size(); i++) {
+                            if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
+                                Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
+                            }
+                        }
                     }
 
                     @Override
@@ -226,16 +234,16 @@ public class FilterDialogFragment extends DialogFragment {
         });
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 51) {
-//            if (resultCode == Activity.RESULT_OK) { // user accepted request and enabled gps
-//                // now we can find user's current location.
-//                getDeviceLocation();
-//            }
-//        }
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 51) {
+            if (resultCode == Activity.RESULT_OK) { // user accepted request and enabled gps
+                // now we can find user's current location.
+                getDeviceLocation();
+            }
+        }
+    }
 
     private void findCurrentLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
