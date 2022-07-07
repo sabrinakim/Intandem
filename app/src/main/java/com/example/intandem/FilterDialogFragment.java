@@ -180,8 +180,8 @@ public class FilterDialogFragment extends DialogFragment {
                 }
                 destinations.append("place_id:").append(posts.get(posts.size() - 1).getPlaceId());
 
-                DistanceMatrixService distanceMatrixService = retrofit.create(DistanceMatrixService.class);
-                distanceMatrixService.getDistanceSearchResult(latitude + "," + longitude,
+                GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+                googleMapsService.getDistanceSearchResult(latitude + "," + longitude,
                         destinations.toString(),
                         "driving",
                         "en",

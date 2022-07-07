@@ -7,14 +7,14 @@ public class GoogleReview {
     @SerializedName("author_name")
     String authorName;
 
-    int rating;
+    double rating;
     String text;
 
     public String getAuthorName() {
         return authorName;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 

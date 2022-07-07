@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.intandem.ComposeEventActivity;
-import com.example.intandem.DistanceMatrixService;
+import com.example.intandem.GoogleMapsService;
 import com.example.intandem.FilterDialogFragment;
 import com.example.intandem.models.Post;
 import com.example.intandem.PostsAdapter;
@@ -95,7 +95,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        DistanceMatrixService distanceMatrixService = retrofit.create(DistanceMatrixService.class);
+        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
 //        distanceMatrixService.getDistanceSearchResult("place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo",
 //                "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU",
 //                "driving",
