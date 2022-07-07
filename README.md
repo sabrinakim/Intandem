@@ -39,24 +39,24 @@ Through pictures & swipes, users can easily find people to go somewhere/do somet
     * Duration: e.g. "the next 3 hours"
     * Picture: e.g. (picture of homework at the library)
     * Message: e.g. "please join me at the library i'm working on comp182 hw rn T_T"
-* [] Users can view event invitations created by their FB friends in their home page
+* [ ] Users can view event invitations created by their FB friends in their home page
 * [x] Users can reply to posted event invitations
   * Replies will consist of:
     * Picture: e.g. (selfie showing excitement)
     * Message: e.g. "omg i'm doing comp182 hw rn too i will join u"
-  * [] Everyone who is invited to the event can see the replies
+  * [ ] Everyone who is invited to the event can see the replies
 * [x] Users can view people's replies to the event invitation they posted
-* [] FILTERING (1st technically ambiguous problem)
+* [ ] FILTERING (1st technically ambiguous problem)
   * [x] Users can filter posts through a series of parameters, like location.
-  * [] "expired" posts will be shown as grayed out, or will just disappear
-  * [] Users can only see posts from their friends in their home feed, and users posts will only be shown to their friends
-  * [] posts that are similar to ones that were replied to/interacted with before will be prioritized by being bubbled up to the top of the swiping queue (stretch goal)
-* [] MERGING 2 APIS (2nd technically ambiguous problem)
-  * [] Users can create custom, very specific locations that are not available on the Google Places API
+  * [ ] "expired" posts will be shown as grayed out, or will just disappear
+  * [ ] Users can only see posts from their friends in their home feed, and users posts will only be shown to their friends
+  * [ ] posts that are similar to ones that were replied to/interacted with before will be prioritized by being bubbled up to the top of the swiping queue (stretch goal)
+* [ ] MERGING 2 APIS (2nd technically ambiguous problem)
+  * [ ] Users can create custom, very specific locations that are not available on the Google Places API
     * e.g. Martel Library at Rice University
     * these custom locations will be stored in a database
-  * [] make own autocomplete text box where app makes queries to 2 different APIs
-  * [] app merges 2 API responses into one response to make a custom "place" object
+  * [ ] make own autocomplete text box where app makes queries to 2 different APIs
+  * [ ] app merges 2 API responses into one response to make a custom "place" object
   
 
 **Optional Nice-to-have Stories**
