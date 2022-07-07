@@ -3,12 +3,14 @@ package com.example.intandem;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.intandem.dataModels.PlaceDetailsSearchResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
@@ -25,15 +27,22 @@ import org.parceler.Parcels;
 import java.util.Arrays;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ComposeLocationActivity extends AppCompatActivity {
 
     private static String TAG = "ComposeLocationActivity";
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
+    public static final String GOOGLE_BASE_URL = "https://maps.googleapis.com/";
     private EditText etLocation;
     private Button btnNext2;
     private String placeId;
     private String placeName;
-    private ParseGeoPoint locationPoint;
+    private LatLng latLng;
 
 
     @Override
@@ -72,19 +81,23 @@ public class ComposeLocationActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
             // success
+            Log.i(TAG, "place autocomplete success");
 
             // this place instance can retrieve details about the place
             Place place = Autocomplete.getPlaceFromIntent(data);
             etLocation.setText(place.getName());
             placeId = place.getId();
             placeName = place.getName();
+            latLng = place.getLatLng();
+
+            // TODO: query yelp & places details here and merge responses.
+            merging();
+
 
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
-            //System.out.println("lat/long: " + place.getLatLng());
-            //System.out.println("name: " + place.getName());
 
-            Log.i(TAG, "place autocomplete success");
+
 
             btnNext2.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,5 +115,28 @@ public class ComposeLocationActivity extends AppCompatActivity {
             // display toast
             Log.e(TAG, "place autocomplete error");
         }
+    }
+
+    private void merging() {
+        // querying google places
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GOOGLE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+        googleMapsService.getPlaceDetailsSearchResult(placeId, BuildConfig.MAPS_API_KEY)
+                .enqueue(new Callback<PlaceDetailsSearchResult>() {
+                    @Override
+                    public void onResponse(Call<PlaceDetailsSearchResult> call, Response<PlaceDetailsSearchResult> response) {
+                        Log.i(TAG, "success getting the place details");
+                    }
+
+                    @Override
+                    public void onFailure(Call<PlaceDetailsSearchResult> call, Throwable t) {
+                        Log.e(TAG, "error occurred while getting place details");
+                    }
+                });
+
     }
 }

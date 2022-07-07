@@ -12,7 +12,7 @@ public class PlaceDetails {
     String name;
     @SerializedName("place_id")
     String placeId;
-    int rating;
+    double rating;
     List<GoogleReview> reviews;
 
     public PlaceDetails() {
@@ -32,7 +32,7 @@ public class PlaceDetails {
         return placeId;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
