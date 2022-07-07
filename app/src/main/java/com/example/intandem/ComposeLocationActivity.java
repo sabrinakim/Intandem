@@ -78,10 +78,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
             etLocation.setText(place.getName());
             placeId = place.getId();
             placeName = place.getName();
-            LatLng latLng = place.getLatLng();
-            if (latLng != null) {
-                locationPoint = new ParseGeoPoint(latLng.latitude, latLng.longitude);
-            }
+
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
             //System.out.println("lat/long: " + place.getLatLng());
@@ -96,7 +93,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     i.putExtras(getIntent());
                     i.putExtra("placeId", placeId);
                     i.putExtra("placeName", placeName);
-                    i.putExtra("locationPoint", locationPoint);
                     // pass in places object
                     startActivity(i);
                 }

@@ -42,7 +42,6 @@ public class ComposePictureActivity extends AppCompatActivity {
     private String duration;
     private String timeUnit;
     private String placeName;
-    private ParseGeoPoint locationPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +65,6 @@ public class ComposePictureActivity extends AppCompatActivity {
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
         timeUnit = extras.getString("timeUnit");
-        locationPoint = extras.getParcelable("locationPoint");
-        Log.i(TAG, locationPoint.toString());
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +72,7 @@ public class ComposePictureActivity extends AppCompatActivity {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
                 savePost(user, event, placeId, etCaption.getText().toString(), photoFile, duration,
-                        timeUnit, placeName, locationPoint);
+                        timeUnit, placeName);
             }
         });
     }
@@ -134,8 +131,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     }
 
     private void savePost(ParseUser currentUser, String event, String placeId, String caption,
-                          File photoFile, String duration, String timeUnit, String placeName,
-                          ParseGeoPoint locationPoint) {
+                          File photoFile, String duration, String timeUnit, String placeName) {
         Post post = new Post();
         post.setUser(currentUser);
         post.setEvent(event);
@@ -145,7 +141,6 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setDuration(duration);
         post.setTimeUnit(timeUnit);
         post.setPlaceName(placeName);
-        post.setLocationPoint(locationPoint);
 
         post.saveInBackground(new SaveCallback() {
             @Override
