@@ -5,13 +5,13 @@ import java.util.List;
 
 public class ReviewSearchResult {
 
-    List<Review> reviews;
+    List<YelpReview> reviews;
 
     public ReviewSearchResult() {
         reviews = new ArrayList<>();
     }
 
-    public List<Review> getReviews() {
+    public List<YelpReview> getReviews() {
         return reviews;
     }
 }
