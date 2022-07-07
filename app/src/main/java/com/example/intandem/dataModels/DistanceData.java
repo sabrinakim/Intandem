@@ -1,6 +1,6 @@
-package com.example.intandem.dataClasses;
+package com.example.intandem.dataModels;
 
-public class DurationData {
+public class DistanceData {
 
     String text;
     long value;

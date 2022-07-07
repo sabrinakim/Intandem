@@ -1,10 +1,7 @@
-package com.example.intandem.dataClasses;
+package com.example.intandem.dataModels;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 

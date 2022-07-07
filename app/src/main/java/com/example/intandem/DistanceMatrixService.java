@@ -1,6 +1,6 @@
 package com.example.intandem;
 
-import com.example.intandem.dataClasses.DistanceSearchResult;
+import com.example.intandem.dataModels.DistanceSearchResult;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
