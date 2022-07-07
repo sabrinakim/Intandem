@@ -167,6 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                                                                     .getJSONArray("data");
 
                                                             for (int i = 0; i < friends.length(); i++) {
+                                                                // testing pr
                                                                 String friendsId = friends.getJSONObject(i).getString("id");
                                                                 Friendship friendship = new Friendship();
                                                                 friendship.setUser1Id(id);
