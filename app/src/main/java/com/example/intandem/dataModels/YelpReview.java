@@ -2,7 +2,7 @@ package com.example.intandem.dataModels;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Review {
+public class YelpReview {
     String id;
     int rating;
     ReviewUser user;
