@@ -66,23 +66,23 @@ public class MainActivity extends AppCompatActivity {
         // retrofit will be in charge of filling in the functions in the interface.
 
         YelpService yelpService = retrofit.create(YelpService.class);
-        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York")
-                .enqueue(new Callback<ResponseBody>() {
-
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
-                        Log.i(TAG, "on response " + response.body().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.i(TAG, "on failure ");
-                }
-            });
+//        yelpService.searchBusinesses("Bearer " + API_KEY, "Avocado Toast", "New York")
+//                .enqueue(new Callback<ResponseBody>() {
+//
+//                @Override
+//                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                    try {
+//                        Log.i(TAG, "on response " + response.body().string());
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                    Log.i(TAG, "on failure ");
+//                }
+//            });
 
 //        yelpService.searchAutocomplete("Bearer " + API_KEY, "McD")
 //                .enqueue(new Callback<ResponseBody>() {

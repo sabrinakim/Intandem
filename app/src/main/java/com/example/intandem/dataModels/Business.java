@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Business {
 
-    int rating;
+    double rating;
     String price;
     String phone;
     String id;
@@ -16,7 +16,7 @@ public class Business {
 
     double distance;
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 

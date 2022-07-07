@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class YelpReview {
     String id;
-    int rating;
+    double rating;
     ReviewUser user;
     String text;
     @SerializedName("time_created")
@@ -15,7 +15,7 @@ public class YelpReview {
         return id;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 

@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.intandem.dataModels.BusinessSearchResult;
 import com.example.intandem.dataModels.PlaceDetailsSearchResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,6 +28,7 @@ import org.parceler.Parcels;
 import java.util.Arrays;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,6 +40,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
     private static String TAG = "ComposeLocationActivity";
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
     public static final String GOOGLE_BASE_URL = "https://maps.googleapis.com/";
+    public static final String YELP_BASE_URL = "https://api.yelp.com/v3/";
+    private static final String YELP_API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
     private EditText etLocation;
     private Button btnNext2;
     private String placeId;
@@ -119,12 +123,12 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
     private void merging() {
         // querying google places
-        Retrofit retrofit = new Retrofit.Builder()
+        Retrofit googleRetrofit = new Retrofit.Builder()
                 .baseUrl(GOOGLE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+        GoogleMapsService googleMapsService = googleRetrofit.create(GoogleMapsService.class);
         googleMapsService.getPlaceDetailsSearchResult(placeId, BuildConfig.MAPS_API_KEY)
                 .enqueue(new Callback<PlaceDetailsSearchResult>() {
                     @Override
@@ -137,6 +141,26 @@ public class ComposeLocationActivity extends AppCompatActivity {
                         Log.e(TAG, "error occurred while getting place details");
                     }
                 });
+
+        // querying yelp business search
+        Retrofit yelpRetrofit = new Retrofit.Builder()
+                .baseUrl(YELP_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YelpService yelpService = yelpRetrofit.create(YelpService.class);
+        yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName,
+                latLng.latitude, latLng.longitude).enqueue(new Callback<BusinessSearchResult>() {
+            @Override
+            public void onResponse(Call<BusinessSearchResult> call, Response<BusinessSearchResult> response) {
+                Log.i(TAG, "success getting yelp businesses");
+            }
+
+            @Override
+            public void onFailure(Call<BusinessSearchResult> call, Throwable t) {
+                Log.i(TAG, "error occured while getting yelp businesses");
+            }
+        });
 
     }
 }
