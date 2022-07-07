@@ -1,4 +1,4 @@
-package com.example.intandem.dataClasses;
+package com.example.intandem.dataModels;
 
 public class DistanceInfo {
 

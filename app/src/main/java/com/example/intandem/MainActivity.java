@@ -29,8 +29,20 @@ import com.parse.ParseUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.List;
 
+//import okhttp3.Call;
+//import okhttp3.Callback;
+//import okhttp3.HttpUrl;
+//import okhttp3.OkHttpClient;
+//import okhttp3.Request;
+//import okhttp3.Response;
+//import okhttp3.ResponseBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -48,42 +60,42 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
-//        GraphRequest request = GraphRequest.newMeRequest(accessToken,
-//                new GraphRequest.GraphJSONObjectCallback() {
-//            @Override
-//            public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
-//                try {
-//                    System.out.println("name: " + jsonObject.getString("name"));
-//                    System.out.println("id: " + jsonObject.getString("id"));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//        request.executeAsync();
+        // next, we want to define the endpoints for our api by defining an interface.
+        // retrofit will be in charge of filling in the functions in the interface.
 
-//        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        YelpService yelpService = retrofit.create(YelpService.class);
+        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York")
+                .enqueue(new Callback<ResponseBody>() {
+
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        Log.i(TAG, "on response " + response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.i(TAG, "on failure ");
+                }
+            });
+
+//        yelpService.searchAutocomplete("Bearer " + API_KEY, "McD")
+//                .enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                        Log.i(TAG, "on response " + response);
+//                    }
 //
-//        // next, we want to define the endpoints for our api by defining an interface.
-//        // retrofit will be in charge of filling in the functions in the interface.
-//
-//        YelpService yelpService = retrofit.create(YelpService.class);
-//        // search Restaurants is asynchronous
-//        yelpService.searchRestaurants("Bearer " + API_KEY, "Avocado Toast", "New York").enqueue(new Callback<ResponseBody>() {
-//
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                Log.i(TAG, "on response " + response);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Log.i(TAG, "on failure ");
-//            }
-//        });
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                        Log.i(TAG, "on failure ");
+//                    }
+//                });
 
         // unwrap parcel here
         user = getIntent().getParcelableExtra("user");

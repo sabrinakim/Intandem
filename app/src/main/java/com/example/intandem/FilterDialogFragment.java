@@ -23,8 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.intandem.dataClasses.DistanceInfo;
-import com.example.intandem.dataClasses.DistanceSearchResult;
+import com.example.intandem.dataModels.DistanceInfo;
+import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.Post;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
