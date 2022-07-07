@@ -4,13 +4,13 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-@ParseClassName("Friendships")
-public class Friendships extends ParseObject {
+@ParseClassName("Friendship")
+public class Friendship extends ParseObject {
     public static final String KEY_USER1Id = "user1Id";
     public static final String KEY_USER2Id = "user2Id";
 
     // empty constructor needed by Parceler library
-    public Friendships() {}
+    public Friendship() {}
 
     public String getUser1Id() {
         return getString(KEY_USER1Id);

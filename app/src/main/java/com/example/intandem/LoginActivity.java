@@ -9,12 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.example.intandem.models.Friendship;
 import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -22,38 +19,19 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.common.api.Status;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.util.Arrays;
 import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -182,6 +160,32 @@ public class LoginActivity extends AppCompatActivity {
                                                     @Override
                                                     public void onCompleted(GraphResponse response) {
                                                         Log.i(TAG, response.toString());
+
+                                                        try {
+                                                            JSONArray friends = response.getJSONObject()
+                                                                    .getJSONObject("friends")
+                                                                    .getJSONArray("data");
+
+                                                            for (int i = 0; i < friends.length(); i++) {
+                                                                String friendsId = friends.getJSONObject(i).getString("id");
+                                                                Friendship friendship = new Friendship();
+                                                                friendship.setUser1Id(id);
+                                                                friendship.setUser2Id(friendsId);
+                                                                friendship.saveInBackground(new SaveCallback() {
+                                                                    @Override
+                                                                    public void done(ParseException e) {
+                                                                        if (e != null) {
+                                                                            Log.e(TAG, "error saving friendship");
+                                                                        }
+                                                                        Log.i(TAG, "friendship saved successfully");
+                                                                    }
+                                                                });
+                                                            }
+
+                                                        } catch (JSONException ex) {
+                                                            ex.printStackTrace();
+                                                        }
+
                                                         // move on to the main activity ONLY after we store friend data in our database.
                                                         Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                                         i.putExtra("user", user);

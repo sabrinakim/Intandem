@@ -1,5 +1,6 @@
-package com.example.intandem;
+package com.example.intandem.models;
 
+import com.example.intandem.models.Post;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;

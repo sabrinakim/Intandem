@@ -1,4 +1,4 @@
-package com.example.intandem;
+package com.example.intandem.models;
 
 import com.google.android.libraries.places.api.model.Place;
 import com.parse.ParseClassName;

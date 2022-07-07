@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.intandem.models.Reply;
 import com.parse.ParseFile;
-import com.parse.ParseUser;
 
 import java.util.List;
 

@@ -13,14 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.intandem.Post;
+import com.example.intandem.models.Post;
 import com.example.intandem.R;
 import com.example.intandem.RepliesAdapter;
-import com.example.intandem.Reply;
+import com.example.intandem.models.Reply;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;

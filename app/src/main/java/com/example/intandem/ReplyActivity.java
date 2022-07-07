@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.intandem.models.Post;
+import com.example.intandem.models.Reply;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
