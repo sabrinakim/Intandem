@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import com.example.intandem.dataModels.BusinessSearchResult;
 import com.example.intandem.dataModels.PlaceDetailsSearchResult;
+import com.example.intandem.dataModels.ReviewSearchResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
@@ -39,6 +40,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
     private static String TAG = "ComposeLocationActivity";
     private static int AUTOCOMPLETE_REQUEST_CODE = 100;
+    private static int YELP_LIMIT = 5;
     public static final String GOOGLE_BASE_URL = "https://maps.googleapis.com/";
     public static final String YELP_BASE_URL = "https://api.yelp.com/v3/";
     private static final String YELP_API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
@@ -123,17 +125,22 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
     private void merging() {
         // querying google places
+        final String[] formattedAddress = new String[1];
+
         Retrofit googleRetrofit = new Retrofit.Builder()
                 .baseUrl(GOOGLE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         GoogleMapsService googleMapsService = googleRetrofit.create(GoogleMapsService.class);
-        googleMapsService.getPlaceDetailsSearchResult(placeId, BuildConfig.MAPS_API_KEY)
+        googleMapsService.getPlaceDetailsSearchResult(placeId,
+                        "formatted_address,name,place_id,rating,reviews",
+                        BuildConfig.MAPS_API_KEY)
                 .enqueue(new Callback<PlaceDetailsSearchResult>() {
                     @Override
                     public void onResponse(Call<PlaceDetailsSearchResult> call, Response<PlaceDetailsSearchResult> response) {
                         Log.i(TAG, "success getting the place details");
+                        formattedAddress[0] = response.body().getResult().getFormattedAddress();
                     }
 
                     @Override
@@ -149,16 +156,31 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 .build();
 
         YelpService yelpService = yelpRetrofit.create(YelpService.class);
-        yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName,
-                latLng.latitude, latLng.longitude).enqueue(new Callback<BusinessSearchResult>() {
+        yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName, formattedAddress[0],
+                latLng.latitude, latLng.longitude, YELP_LIMIT).enqueue(new Callback<BusinessSearchResult>() {
             @Override
             public void onResponse(Call<BusinessSearchResult> call, Response<BusinessSearchResult> response) {
                 Log.i(TAG, "success getting yelp businesses");
+                // TODO: find matching yelp business and get its id so that we can query for yelp reviews
+                // for now, assume matching business is the first one.
+                String yelpBusinessId = response.body().getBusinesses().get(0).getId();
+                yelpService.searchReviews("Bearer " + YELP_API_KEY, yelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
+                    @Override
+                    public void onResponse(Call<ReviewSearchResult> call, Response<ReviewSearchResult> response) {
+                        Log.i(TAG, "success getting yelp reviews");
+                    }
+
+                    @Override
+                    public void onFailure(Call<ReviewSearchResult> call, Throwable t) {
+                        Log.i(TAG, "failure getting yelp reviews");
+                    }
+                });
+
             }
 
             @Override
             public void onFailure(Call<BusinessSearchResult> call, Throwable t) {
-                Log.i(TAG, "error occured while getting yelp businesses");
+                Log.i(TAG, "error occurred while getting yelp businesses");
             }
         });
 

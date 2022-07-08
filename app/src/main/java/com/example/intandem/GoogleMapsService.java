@@ -21,6 +21,7 @@ public interface GoogleMapsService {
     @GET("maps/api/place/details/json")
     Call<PlaceDetailsSearchResult> getPlaceDetailsSearchResult(
             @Query("place_id") String placeId,
+            @Query("fields") String fields,
             @Query("key") String key
     );
 }
