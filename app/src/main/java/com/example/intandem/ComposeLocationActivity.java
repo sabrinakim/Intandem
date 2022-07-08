@@ -11,8 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.intandem.dataModels.BusinessSearchResult;
+import com.example.intandem.dataModels.GoogleReview;
 import com.example.intandem.dataModels.PlaceDetailsSearchResult;
 import com.example.intandem.dataModels.ReviewSearchResult;
+import com.example.intandem.models.CustomPlace;
+import com.example.intandem.models.Post;
+import com.example.intandem.models.Review;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
@@ -21,8 +25,12 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
@@ -47,6 +55,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
     private EditText etLocation;
     private Button btnNext2;
     private String placeId;
+    private String placeAddress;
     private String placeName;
     private LatLng latLng;
 
@@ -70,7 +79,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // initialize place field list
-                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID, Place.Field.LAT_LNG);
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID,
+                        Place.Field.LAT_LNG, Place.Field.ADDRESS);
 
                 // create intent
                 Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
@@ -94,16 +104,29 @@ public class ComposeLocationActivity extends AppCompatActivity {
             etLocation.setText(place.getName());
             placeId = place.getId();
             placeName = place.getName();
+            placeAddress = place.getAddress();
             latLng = place.getLatLng();
 
-            // TODO: query yelp & places details here and merge responses.
-            merging();
-
+            // query yelp & places details here and merge responses
+            // ONLY IF a merged one doesn't already exist in database
+            ParseQuery<CustomPlace> query = ParseQuery.getQuery(CustomPlace.class);
+            query.whereEqualTo("gPlaceId", placeId);
+            query.findInBackground(new FindCallback<CustomPlace>() {
+                @Override
+                public void done(List<CustomPlace> objects, ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, "error querying custom places");
+                    } else {
+                        Log.i(TAG, "success querying custom places");
+                        if (objects.size() == 0) { // we did not create a custom place object before.
+                            createCustomPlace(placeId);
+                        }
+                    }
+                }
+            });
 
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
-
-
 
             btnNext2.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -123,9 +146,14 @@ public class ComposeLocationActivity extends AppCompatActivity {
         }
     }
 
-    private void merging() {
+    private void createCustomPlace(String placeId) {
+        CustomPlace customPlace = new CustomPlace();
+        customPlace.setGPlaceId(placeId);
+        performQueries();
+    }
+
+    private void performQueries() {
         // querying google places
-        final String[] formattedAddress = new String[1];
 
         Retrofit googleRetrofit = new Retrofit.Builder()
                 .baseUrl(GOOGLE_BASE_URL)
@@ -140,7 +168,31 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<PlaceDetailsSearchResult> call, Response<PlaceDetailsSearchResult> response) {
                         Log.i(TAG, "success getting the place details");
-                        formattedAddress[0] = response.body().getResult().getFormattedAddress();
+                        // get reviews and save them ONLY IF they are not saved already.
+                        List<GoogleReview> googleReviews = response.body().getResult().getReviews();
+                        for (GoogleReview googleReview : googleReviews) {
+                            String name = googleReview.getAuthorName();
+                            double rating = googleReview.getRating();
+                            String text = googleReview.getText();
+
+                            Review review = new Review();
+                            review.putName(name);
+                            review.putRating(rating);
+                            review.putText(text);
+
+                            review.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.e(TAG, "error saving review");
+                                        return;
+                                    }
+                                    Log.i(TAG, "success saving review");
+                                }
+                            });
+                        }
+
+                        //queryYelp(); // queries could execute in parallel, but i have to figure out a way to wait for both to finish
                     }
 
                     @Override
@@ -149,19 +201,21 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     }
                 });
 
-        // querying yelp business search
+    }
+
+
+    private void queryYelp() {
         Retrofit yelpRetrofit = new Retrofit.Builder()
                 .baseUrl(YELP_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         YelpService yelpService = yelpRetrofit.create(YelpService.class);
-        yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName, formattedAddress[0],
+        yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName, placeAddress,
                 latLng.latitude, latLng.longitude, YELP_LIMIT).enqueue(new Callback<BusinessSearchResult>() {
             @Override
             public void onResponse(Call<BusinessSearchResult> call, Response<BusinessSearchResult> response) {
                 Log.i(TAG, "success getting yelp businesses");
-                // TODO: find matching yelp business and get its id so that we can query for yelp reviews
                 // for now, assume matching business is the first one.
                 String yelpBusinessId = response.body().getBusinesses().get(0).getId();
                 yelpService.searchReviews("Bearer " + YELP_API_KEY, yelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
@@ -183,6 +237,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 Log.i(TAG, "error occurred while getting yelp businesses");
             }
         });
-
     }
+
 }
