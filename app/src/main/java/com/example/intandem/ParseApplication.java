@@ -3,6 +3,7 @@ package com.example.intandem;
 import android.app.Application;
 
 import com.example.intandem.models.CustomPlace;
+import com.example.intandem.models.CustomPlaceToReview;
 import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
 import com.example.intandem.models.PostToReply;
@@ -23,6 +24,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(Friendship.class);
         ParseObject.registerSubclass(Review.class);
         ParseObject.registerSubclass(CustomPlace.class);
+        ParseObject.registerSubclass(CustomPlaceToReview.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("xLojvhrKsyXJdPivN9v0podIw2MjQvJ9GFfmUP3i")

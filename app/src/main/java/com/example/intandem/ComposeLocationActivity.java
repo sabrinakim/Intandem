@@ -3,19 +3,20 @@ package com.example.intandem;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.intandem.dataModels.Business;
 import com.example.intandem.dataModels.BusinessSearchResult;
 import com.example.intandem.dataModels.GoogleReview;
 import com.example.intandem.dataModels.PlaceDetailsSearchResult;
 import com.example.intandem.dataModels.ReviewSearchResult;
+import com.example.intandem.dataModels.YelpReview;
 import com.example.intandem.models.CustomPlace;
-import com.example.intandem.models.Post;
+import com.example.intandem.models.CustomPlaceToReview;
 import com.example.intandem.models.Review;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,17 +28,13 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import org.parceler.Parcels;
 
 import java.util.Arrays;
 import java.util.List;
 
-import okhttp3.ResponseBody;
+import bolts.Task;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -119,7 +116,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     } else {
                         Log.i(TAG, "success querying custom places");
                         if (objects.size() == 0) { // we did not create a custom place object before.
-                            createCustomPlace(placeId);
+                            createCustomPlace(placeId, placeName);
                         }
                     }
                 }
@@ -146,13 +143,14 @@ public class ComposeLocationActivity extends AppCompatActivity {
         }
     }
 
-    private void createCustomPlace(String placeId) {
+    private void createCustomPlace(String placeId, String placeName) {
         CustomPlace customPlace = new CustomPlace();
         customPlace.setGPlaceId(placeId);
-        performQueries();
+        customPlace.setName(placeName);
+        performQueries(customPlace);
     }
 
-    private void performQueries() {
+    private void performQueries(CustomPlace customPlace) {
         // querying google places
 
         Retrofit googleRetrofit = new Retrofit.Builder()
@@ -168,8 +166,10 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<PlaceDetailsSearchResult> call, Response<PlaceDetailsSearchResult> response) {
                         Log.i(TAG, "success getting the place details");
+                        PlaceDetailsSearchResult responseBody = response.body();
+                        double gRating = responseBody.getResult().getRating();
                         // get reviews and save them ONLY IF they are not saved already.
-                        List<GoogleReview> googleReviews = response.body().getResult().getReviews();
+                        List<GoogleReview> googleReviews = responseBody.getResult().getReviews();
                         for (GoogleReview googleReview : googleReviews) {
                             String name = googleReview.getAuthorName();
                             double rating = googleReview.getRating();
@@ -184,15 +184,28 @@ public class ComposeLocationActivity extends AppCompatActivity {
                                 @Override
                                 public void done(ParseException e) {
                                     if (e != null) {
-                                        Log.e(TAG, "error saving review");
+                                        Log.e(TAG, "error saving google review");
                                         return;
                                     }
-                                    Log.i(TAG, "success saving review");
+                                    Log.i(TAG, "success saving google review");
+                                    CustomPlaceToReview placeToReview = new CustomPlaceToReview();
+                                    placeToReview.setCustomPlace(customPlace);
+                                    placeToReview.setReview(review);
+                                    placeToReview.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e != null) {
+                                                Log.e(TAG, "error saving placeToReview");
+                                                return;
+                                            }
+                                            Log.i(TAG, "success saving placeToReview");
+                                        }
+                                    });
                                 }
                             });
                         }
-
-                        //queryYelp(); // queries could execute in parallel, but i have to figure out a way to wait for both to finish
+                        // we want to make sure we have gRating first, so we call this
+                        queryYelp(customPlace, gRating);
                     }
 
                     @Override
@@ -203,8 +216,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
     }
 
-
-    private void queryYelp() {
+    private void queryYelp(CustomPlace customPlace, double gRating) {
         Retrofit yelpRetrofit = new Retrofit.Builder()
                 .baseUrl(YELP_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -217,11 +229,61 @@ public class ComposeLocationActivity extends AppCompatActivity {
             public void onResponse(Call<BusinessSearchResult> call, Response<BusinessSearchResult> response) {
                 Log.i(TAG, "success getting yelp businesses");
                 // for now, assume matching business is the first one.
-                String yelpBusinessId = response.body().getBusinesses().get(0).getId();
-                yelpService.searchReviews("Bearer " + YELP_API_KEY, yelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
+                Business matchingYelpBusiness = response.body().getBusinesses().get(0);
+                double yRating = matchingYelpBusiness.getRating();
+                String yPrice = matchingYelpBusiness.getPrice();
+                double avgRating = (gRating + yRating) / 2;
+                customPlace.setRating(avgRating);
+                customPlace.setPrice(yPrice);
+                String matchingYelpBusinessId = matchingYelpBusiness.getId();
+                yelpService.searchReviews("Bearer " + YELP_API_KEY, matchingYelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
                     @Override
                     public void onResponse(Call<ReviewSearchResult> call, Response<ReviewSearchResult> response) {
                         Log.i(TAG, "success getting yelp reviews");
+                        List<YelpReview> yelpReviews = response.body().getReviews();
+                        for (YelpReview yelpReview : yelpReviews) {
+                            String name = yelpReview.getUser().getName();
+                            double rating = yelpReview.getRating();
+                            String text = yelpReview.getText();
+
+                            Review review = new Review();
+                            review.putName(name);
+                            review.putRating(rating);
+                            review.putText(text);
+
+                            review.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.e(TAG, "error saving yelp review");
+                                    }
+                                    Log.i(TAG, "success saving yelp review");
+                                    CustomPlaceToReview placeToReview = new CustomPlaceToReview();
+                                    placeToReview.setCustomPlace(customPlace);
+                                    placeToReview.setReview(review);
+                                    placeToReview.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e != null) {
+                                                Log.e(TAG, "error saving placeToReview");
+                                                return;
+                                            }
+                                            Log.i(TAG, "success saving placeToReview");
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        customPlace.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.e(TAG, "error saving custom place object");
+                                    return;
+                                }
+                                Log.i(TAG, "success saving custom place object");
+                            }
+                        });
                     }
 
                     @Override
