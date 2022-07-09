@@ -176,9 +176,9 @@ public class FilterDialogFragment extends DialogFragment {
                 // building destinations query parameter
                 StringBuilder destinations = new StringBuilder();
                 for (int i = 0; i < posts.size() - 1; i++) {
-                    destinations.append("place_id:").append(posts.get(i).getPlaceId()).append("|");
+                    destinations.append("place_id:").append(posts.get(i).getCustomPlace().getGPlaceId()).append("|");
                 }
-                destinations.append("place_id:").append(posts.get(posts.size() - 1).getPlaceId());
+                destinations.append("place_id:").append(posts.get(posts.size() - 1).getCustomPlace().getGPlaceId());
 
                 GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
                 googleMapsService.getDistanceSearchResult(latitude + "," + longitude,

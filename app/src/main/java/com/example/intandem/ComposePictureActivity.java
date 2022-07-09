@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -36,12 +37,11 @@ public class ComposePictureActivity extends AppCompatActivity {
     private ImageView ivImage;
     private EditText etCaption;
     private Button btnShare;
-    private String placeId;
     private String event;
     private ParseUser user;
     private String duration;
     private String timeUnit;
-    private String placeName;
+    private CustomPlace customPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +56,9 @@ public class ComposePictureActivity extends AppCompatActivity {
 
         // unwrap parcel here
         Bundle extras = getIntent().getExtras();
-        placeId = extras.getString("placeId");
-        Log.i(TAG, placeId);
+        customPlace = extras.getParcelable("customPlace");
         event = extras.getString("event");
         Log.i(TAG, event);
-        placeName = extras.getString("placeName");
-        Log.i(TAG, placeName);
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
         timeUnit = extras.getString("timeUnit");
@@ -71,8 +68,8 @@ public class ComposePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(user, event, placeId, etCaption.getText().toString(), photoFile, duration,
-                        timeUnit, placeName);
+                savePost(user, event, customPlace, etCaption.getText().toString(), photoFile, duration,
+                        timeUnit);
             }
         });
     }
@@ -130,17 +127,16 @@ public class ComposePictureActivity extends AppCompatActivity {
 
     }
 
-    private void savePost(ParseUser currentUser, String event, String placeId, String caption,
-                          File photoFile, String duration, String timeUnit, String placeName) {
+    private void savePost(ParseUser currentUser, String event, CustomPlace customPlace, String caption,
+                          File photoFile, String duration, String timeUnit) {
         Post post = new Post();
         post.setUser(currentUser);
         post.setEvent(event);
-        post.setPlaceId(placeId);
+        post.setCustomPlace(customPlace);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
         post.setDuration(duration);
         post.setTimeUnit(timeUnit);
-        post.setPlaceName(placeName);
 
         post.saveInBackground(new SaveCallback() {
             @Override

@@ -11,12 +11,11 @@ import com.parse.ParseUser;
 public class Post extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_EVENT = "event";
-    public static final String KEY_PLACEID = "placeId";
+    public static final String KEY_CUSTOMPLACE = "customPlace";
     public static final String KEY_PICTURE = "picture";
     public static final String KEY_CAPTION = "caption";
     public static final String KEY_DURATION = "duration";
     public static final String KEY_TIMEUNIT = "timeUnit";
-    public static final String KEY_PLACENAME = "placeName";
 
     // empty constructor needed by Parceler library
     public Post() {}
@@ -37,12 +36,12 @@ public class Post extends ParseObject {
         put(KEY_EVENT, event);
     }
 
-    public String getPlaceId() {
-        return getString(KEY_PLACEID);
+    public CustomPlace getCustomPlace() {
+        return (CustomPlace) getParseObject(KEY_CUSTOMPLACE);
     }
 
-    public void setPlaceId(String placeId) {
-        put(KEY_PLACEID, placeId);
+    public void setCustomPlace(CustomPlace customPlace) {
+        put(KEY_CUSTOMPLACE, customPlace);
     }
 
     public ParseFile getPicture() {
@@ -75,14 +74,6 @@ public class Post extends ParseObject {
 
     public void setTimeUnit(String timeUnit) {
         put(KEY_TIMEUNIT, timeUnit);
-    }
-
-    public String getPlaceName() {
-        return getString(KEY_PLACENAME);
-    }
-
-    public void setPlaceName(String placeName) {
-        put(KEY_PLACENAME, placeName);
     }
 
 }

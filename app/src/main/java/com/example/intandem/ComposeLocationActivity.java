@@ -117,6 +117,16 @@ public class ComposeLocationActivity extends AppCompatActivity {
                         Log.i(TAG, "success querying custom places");
                         if (objects.size() == 0) { // we did not create a custom place object before.
                             createCustomPlace(placeId, placeName);
+                        } else {
+                            btnNext2.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+                                    i.putExtras(getIntent());
+                                    i.putExtra("customPlace", objects.get(0));
+                                    startActivity(i);
+                                }
+                            });
                         }
                     }
                 }
@@ -125,17 +135,17 @@ public class ComposeLocationActivity extends AppCompatActivity {
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
 
-            btnNext2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-                    i.putExtras(getIntent());
-                    i.putExtra("placeId", placeId);
-                    i.putExtra("placeName", placeName);
-                    // pass in places object
-                    startActivity(i);
-                }
-            });
+//            btnNext2.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+//                    i.putExtras(getIntent());
+//                    i.putExtra("placeId", placeId);
+//                    i.putExtra("placeName", placeName);
+//                    // pass in places object
+//                    startActivity(i);
+//                }
+//            });
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
             // display toast
@@ -168,7 +178,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
                         Log.i(TAG, "success getting the place details");
                         PlaceDetailsSearchResult responseBody = response.body();
                         double gRating = responseBody.getResult().getRating();
-                        // get reviews and save them ONLY IF they are not saved already.
+                        queryYelp(customPlace, gRating); // querying google & yelp apis occur in parallel
+                        // get reviews and save them
                         List<GoogleReview> googleReviews = responseBody.getResult().getReviews();
                         for (GoogleReview googleReview : googleReviews) {
                             String name = googleReview.getAuthorName();
@@ -204,8 +215,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        // we want to make sure we have gRating first, so we call this
-                        queryYelp(customPlace, gRating);
                     }
 
                     @Override
@@ -235,6 +244,27 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 double avgRating = (gRating + yRating) / 2;
                 customPlace.setRating(avgRating);
                 customPlace.setPrice(yPrice);
+                customPlace.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error saving custom place object");
+                            return;
+                        }
+                        Log.i(TAG, "success saving custom place object");
+
+                        // custom place exists in database, so we can now attach it to the post
+                        btnNext2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+                                i.putExtras(getIntent());
+                                i.putExtra("customPlace", customPlace);
+                                startActivity(i);
+                            }
+                        });
+                    }
+                });
                 String matchingYelpBusinessId = matchingYelpBusiness.getId();
                 yelpService.searchReviews("Bearer " + YELP_API_KEY, matchingYelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
                     @Override
@@ -274,16 +304,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        customPlace.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e != null) {
-                                    Log.e(TAG, "error saving custom place object");
-                                    return;
-                                }
-                                Log.i(TAG, "success saving custom place object");
-                            }
-                        });
                     }
 
                     @Override
@@ -291,7 +311,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                         Log.i(TAG, "failure getting yelp reviews");
                     }
                 });
-
             }
 
             @Override
