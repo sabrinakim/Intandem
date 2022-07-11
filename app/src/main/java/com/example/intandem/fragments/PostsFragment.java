@@ -171,16 +171,17 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                             friendIds.add(friendship.getUser2Id());
                         }
                         for (Post post : posts) {
-                            post.getUser().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-                                @Override
-                                public void done(ParseObject user, ParseException e) {
-                                    if (friendIds.contains(user.get("fbId"))) {
-                                        allPosts.add(0, post);
-                                        adapter.notifyItemChanged(0);
-                                    }
+                            try {
+                                ParseUser user = post.getUser().fetchIfNeeded();
+                                if (friendIds.contains(user.get("fbId")) || user.get("fbId").equals(mUser.get("fbId"))) {
+                                    allPosts.add(post);
                                 }
-                            });
+
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
                         }
+                        adapter.notifyDataSetChanged();
                     }
                 });
             }
