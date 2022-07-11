@@ -25,6 +25,6 @@ public class Friendship extends ParseObject {
     }
 
     public void setUser2Id(String user2Id) {
-        put(KEY_USER1Id, user2Id);
+        put(KEY_USER2Id, user2Id);
     }
 }
