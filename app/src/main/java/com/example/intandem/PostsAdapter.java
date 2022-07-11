@@ -2,6 +2,7 @@ package com.example.intandem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,10 @@ import com.bumptech.glide.Glide;
 import com.example.intandem.fragments.RepliesFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -85,10 +89,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
             });
 
-//            CustomPlace c = post.getCustomPlace();
-//            String name = c.getName();
-//            String price = c.getPrice();
-//            tvLocationFeed.setText(post.getCustomPlace().getName());
+            CustomPlace c = post.getCustomPlace();
+            c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, "error fetching if needed in background");
+                    }
+                    //String gPlaceId = ((CustomPlace) object).getGPlaceId();
+                    tvLocationFeed.setText(post.getCustomPlace().getName());
+                }
+            });
 
             ParseFile image = post.getPicture();
             if (image != null) { // image is optional, so its possible that it is null
