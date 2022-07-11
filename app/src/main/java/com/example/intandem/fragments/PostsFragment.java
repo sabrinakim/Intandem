@@ -89,31 +89,6 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // using retrofit
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
-//        distanceMatrixService.getDistanceSearchResult("place_id:ChIJ98rot0a_j4AR1IjYiTsx2oo",
-//                "place_id:ChIJhXcepTW7j4ARkdzoQMZEBoU",
-//                "driving",
-//                "en",
-//                BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
-//            @Override
-//            public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
-//                Log.i(TAG, "on response");
-//                DistanceSearchResult distanceSearchResult = response.body();
-//                System.out.println("distance from place 1 to place 2: " + distanceSearchResult.getRows().get(0).getElements().get(0).getDistance().getText());
-//            }
-//
-//            @Override
-//            public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
-//                Log.e(TAG, "on failure");
-//            }
-//        });
-
         vp2Posts = view.findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(getContext(), allPosts, mUser);
