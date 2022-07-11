@@ -212,6 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             Set<String> currFriendsList = new HashSet<>();
                             HashMap<String, Friendship> storedFriendsMap = new HashMap<>();
+                            Set<Friendship> toDelete = new HashSet<>();
 
                             JSONArray friends = response.getJSONObject()
                                     .getJSONArray("data");
@@ -237,6 +238,37 @@ public class LoginActivity extends AppCompatActivity {
                                         deletedFriendsMap.putAll(storedFriendsMap);
                                         for (String currFriend : currFriendsList) {
                                             deletedFriendsMap.remove(currFriend);
+                                        }
+
+                                        if (deletedFriendsMap.size() > 0) {
+                                            ParseQuery<Friendship> query = ParseQuery.getQuery(Friendship.class);
+                                            query.whereEqualTo("user2Id", id);
+                                            query.findInBackground(new FindCallback<Friendship>() {
+                                                @Override
+                                                public void done(List<Friendship> friendships, ParseException e) {
+                                                    if (e != null) {
+                                                        Log.e(TAG, "error getting inverse friendships");
+                                                        return;
+                                                    }
+                                                    for (Friendship friendship : friendships) {
+                                                        if (deletedFriendsMap.containsKey(friendship.getUser1Id())) {
+                                                            toDelete.add(friendship);
+                                                        }
+                                                    }
+                                                    for (Friendship deletedFriend : toDelete) {
+                                                        deletedFriend.deleteInBackground(new DeleteCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                if (e != null) {
+                                                                    Log.e(TAG, "error deleting friendship inverse");
+                                                                } else {
+                                                                    Log.i(TAG, "success deleting friendship inverse");
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
                                         }
 
                                         Set<String> newFriends = new HashSet<>();
