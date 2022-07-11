@@ -17,17 +17,22 @@ import android.view.ViewGroup;
 import com.example.intandem.ComposeEventActivity;
 import com.example.intandem.GoogleMapsService;
 import com.example.intandem.FilterDialogFragment;
+import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
 import com.example.intandem.PostsAdapter;
 import com.example.intandem.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -156,11 +161,28 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                for (Post post : posts) {
-                    Log.i(TAG, "Post: " + post.getCaption());
-                }
-                allPosts.addAll(posts);
-                adapter.notifyDataSetChanged();
+                ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
+                queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
+                queryFriends.findInBackground(new FindCallback<Friendship>() {
+                    @Override
+                    public void done(List<Friendship> friendships, ParseException e) {
+                        Set<String> friendIds = new HashSet<>();
+                        for (Friendship friendship : friendships) {
+                            friendIds.add(friendship.getUser2Id());
+                        }
+                        for (Post post : posts) {
+                            post.getUser().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                                @Override
+                                public void done(ParseObject user, ParseException e) {
+                                    if (friendIds.contains(user.get("fbId"))) {
+                                        allPosts.add(0, post);
+                                        adapter.notifyItemChanged(0);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
     }
