@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.intandem.fragments.PostsFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.parse.ParseException;
@@ -147,6 +148,7 @@ public class ComposePictureActivity extends AppCompatActivity {
                 Log.i(TAG, "post save was successful!");
                 etCaption.setText("");
                 ivImage.setImageResource(0);
+                startActivity(new Intent(ComposePictureActivity.this, PostsFragment.class));
             }
         });
     }
