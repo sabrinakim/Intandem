@@ -19,6 +19,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -31,7 +32,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -44,6 +49,18 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+//        Set<Integer> a = new HashSet<>();
+//        Set<Integer> b = new HashSet<>();
+//
+//        a.add(1);
+//        a.add(2);
+//        a.add(3);
+//        b.add(1);
+//        b.add(4);
+//        b.add(3);
+//
+//        a.removeAll(b);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -152,52 +169,12 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         Log.i(TAG, "user saved successfully");
 
-                                        // each time a new user logs in, we want to record their friends list.
-                                        GraphRequest requestFriendsList = GraphRequest.newGraphPathRequest(
-                                                AccessToken.getCurrentAccessToken(),
-                                                "/" + id + "/friends",
-                                                new GraphRequest.Callback() {
-                                                    @Override
-                                                    public void onCompleted(GraphResponse response) {
-                                                        Log.i(TAG, response.toString());
-
-                                                        try {
-                                                            JSONArray friends = response.getJSONObject()
-                                                                    .getJSONObject("friends")
-                                                                    .getJSONArray("data");
-
-                                                            for (int i = 0; i < friends.length(); i++) {
-                                                                String friendsId = friends.getJSONObject(i).getString("id");
-                                                                Friendship friendship = new Friendship();
-                                                                friendship.setUser1Id(id);
-                                                                friendship.setUser2Id(friendsId);
-                                                                friendship.saveInBackground(new SaveCallback() {
-                                                                    @Override
-                                                                    public void done(ParseException e) {
-                                                                        if (e != null) {
-                                                                            Log.e(TAG, "error saving friendship");
-                                                                        }
-                                                                        Log.i(TAG, "friendship saved successfully");
-                                                                    }
-                                                                });
-                                                            }
-
-                                                        } catch (JSONException ex) {
-                                                            ex.printStackTrace();
-                                                        }
-
-                                                        // move on to the main activity ONLY after we store friend data in our database.
-                                                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                                        i.putExtra("user", user);
-                                                        startActivity(i);
-                                                    }
-                                                });
-
-                                        requestFriendsList.executeAsync();
+                                        recordFriendsList(id, user);
                                     }
                                 });
                             } else { // user already registered in our database
                                 Log.i(TAG, "user already exists");
+                                updateFriendsList(id);
                                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                 // pass in user through activities
                                 i.putExtra("user", objects.get(0));
@@ -221,18 +198,167 @@ public class LoginActivity extends AppCompatActivity {
 
         meGraphRequest.setParameters(bundle);
         meGraphRequest.executeAsync();
+    }
+
+    private void updateFriendsList(String id) {
+
+        GraphRequest request = GraphRequest.newGraphPathRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + id + "/friends",
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        Log.i(TAG, response.toString());
+                        try {
+                            Set<String> currFriendsList = new HashSet<>();
+                            HashMap<String, Friendship> storedFriendsMap = new HashMap<>();
+
+                            JSONArray friends = response.getJSONObject()
+                                    .getJSONArray("data");
+                            for (int i = 0; i < friends.length(); i++) {
+                                currFriendsList.add(friends.getJSONObject(i).getString("id"));
+                            }
+                            ParseQuery<Friendship> query = ParseQuery.getQuery(Friendship.class);
+                            query.whereEqualTo("user1Id", id);
+                            query.findInBackground(new FindCallback<Friendship>() {
+                                @Override
+                                public void done(List<Friendship> friends, ParseException e) {
+                                    if (e != null) {
+                                        Log.e(TAG, "error querying friends data");
+                                    } else {
+                                        for (Friendship friend : friends) {
+                                            storedFriendsMap.put(friend.getUser2Id(), friend);
+                                        }
+                                        // find difference btwn sets.
+                                        // {1, 2, 3} storedFriendsMap
+                                        // {1, 4, 3} currFriendsList
+
+                                        HashMap<String, Friendship> deletedFriendsMap = new HashMap<>();
+                                        deletedFriendsMap.putAll(storedFriendsMap);
+                                        for (String currFriend : currFriendsList) {
+                                            deletedFriendsMap.remove(currFriend);
+                                        }
+
+                                        Set<String> newFriends = new HashSet<>();
+                                        newFriends.addAll(currFriendsList);
+                                        newFriends.removeAll(storedFriendsMap.keySet());
+
+                                        for (Map.Entry<String, Friendship> deletedFriend : deletedFriendsMap.entrySet()) {
+                                            deletedFriend.getValue().deleteInBackground(new DeleteCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e != null) {
+                                                        Log.e(TAG, "error deleting friendship");
+                                                    } else {
+                                                        Log.i(TAG, "success deleting friendship");
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        for (String newFriend : newFriends) {
+                                            Friendship friendship = new Friendship();
+                                            friendship.setUser1Id(id);
+                                            friendship.setUser2Id(newFriend);
+
+                                            Friendship friendshipInverse = new Friendship();
+                                            friendshipInverse.setUser1Id(newFriend);
+                                            friendshipInverse.setUser2Id(id);
+
+                                            friendship.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e != null) {
+                                                        Log.e(TAG, "error saving new friend");
+                                                    } else {
+                                                        Log.i(TAG, "success saving new friend");
+                                                    }
+                                                }
+                                            });
+
+                                            friendshipInverse.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e != null) {
+                                                        Log.e(TAG, "error saving new friend inverse");
+                                                    } else {
+                                                        Log.i(TAG, "success saving new friend inverse");
+                                                    }
+                                                }
+                                            });
+                                        }
 
 
-//        GraphRequest request = GraphRequest.newGraphPathRequest(
-//                AccessToken.getCurrentAccessToken(),
-//                "/me/friends",
-//                new GraphRequest.Callback() {
-//                    @Override
-//                    public void onCompleted(GraphResponse response) {
-//                        System.out.println(response);
-//                    }
-//                });
-//
-//        request.executeAsync();
+                                    }
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        request.executeAsync();
+
+
+
+
+    }
+
+    private void recordFriendsList(String id, ParseUser user) {
+        // each time a new user logs in, we want to record their friends list.
+        GraphRequest requestFriendsList = GraphRequest.newGraphPathRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + id + "/friends",
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        Log.i(TAG, response.toString());
+
+                        try {
+                            JSONArray friends = response.getJSONObject()
+                                    .getJSONArray("data");
+
+                            for (int i = 0; i < friends.length(); i++) {
+                                String friendsId = friends.getJSONObject(i).getString("id");
+                                Friendship friendship = new Friendship();
+                                friendship.setUser1Id(id);
+                                friendship.setUser2Id(friendsId);
+                                friendship.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "error saving friendship");
+                                        }
+                                        Log.i(TAG, "friendship saved successfully");
+                                    }
+                                });
+
+                                // friendship is bidirectional
+                                Friendship friendshipInverse = new Friendship();
+                                friendshipInverse.setUser1Id(friendsId);
+                                friendshipInverse.setUser2Id(id);
+                                friendshipInverse.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "error saving friendship inverse");
+                                        }
+                                        Log.i(TAG, "friendship inverse saved successfully");
+                                    }
+                                });
+                            }
+
+                        } catch (JSONException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                        i.putExtra("user", user);
+                        startActivity(i);
+                    }
+                });
+
+        requestFriendsList.executeAsync();
     }
 }
