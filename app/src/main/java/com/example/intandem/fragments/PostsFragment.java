@@ -33,6 +33,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -171,6 +172,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
         query.addDescendingOrder(Post.KEY_CREATEDAT);
+        //query.addAscendingOrder("expiration");
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
@@ -178,37 +180,50 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
-                queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
-                queryFriends.findInBackground(new FindCallback<Friendship>() {
-                    @Override
-                    public void done(List<Friendship> friendships, ParseException e) {
-                        Set<String> friendIds = new HashSet<>();
-                        for (Friendship friendship : friendships) {
-                            friendIds.add(friendship.getUser2Id());
-                        }
-                        for (Post post : posts) {
-                            try {
-                                ParseUser user = post.getUser().fetchIfNeeded();
-                                if (friendIds.contains(user.get("fbId")) || user.get("fbId").equals(mUser.get("fbId"))) {
-                                    allPosts.add(post);
-                                }
-
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                Log.i(TAG, "success getting posts");
+                filterPostsAndNotify(posts);
             }
         });
     }
 
     @Override
     public void onFinishFilterDialog(List<Post> filteredPosts) {
+        Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
         allPosts.clear();
-        allPosts.addAll(filteredPosts);
-        adapter.notifyDataSetChanged();
+        filterPostsAndNotify(filteredPosts);
+    }
+
+    private void filterPostsAndNotify(List<Post> postsToFilter) {
+        ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
+        queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
+        queryFriends.findInBackground(new FindCallback<Friendship>() {
+            @Override
+            public void done(List<Friendship> friendships, ParseException e) {
+                Set<String> friendIds = new HashSet<>();
+                for (Friendship friendship : friendships) {
+                    friendIds.add(friendship.getUser2Id());
+                }
+                for (Post post : postsToFilter) {
+                    try {
+                        ParseUser user = post.getUser().fetchIfNeeded();
+                        if (friendIds.contains(user.get("fbId")) || user.get("fbId").equals(mUser.get("fbId"))) {
+                            Calendar rightNow = Calendar.getInstance();
+                            if (rightNow.getTime().before(post.getExpiration())) {
+                                Log.d(TAG, "exp :" + post.getExpiration().toString());
+                                allPosts.add(post);
+                            }
+                        }
+
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                for (Post post : allPosts) {
+                    Log.d(TAG, "user: " + post.getUser().getUsername());
+                    Log.d(TAG, "caption: " + post.getCaption());
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 }

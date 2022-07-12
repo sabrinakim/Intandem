@@ -25,6 +25,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.intandem.dataModels.DistanceInfo;
 import com.example.intandem.dataModels.DistanceSearchResult;
+import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -176,9 +177,23 @@ public class FilterDialogFragment extends DialogFragment {
                 // building destinations query parameter
                 StringBuilder destinations = new StringBuilder();
                 for (int i = 0; i < posts.size() - 1; i++) {
-                    destinations.append("place_id:").append(posts.get(i).getCustomPlace().getGPlaceId()).append("|");
+                    CustomPlace customPlace = posts.get(i).getCustomPlace();
+                    try {
+                        customPlace.fetchIfNeeded();
+                        destinations.append("place_id:").append(customPlace.getGPlaceId()).append("|");
+                    } catch (ParseException ex) {
+                        Log.e(TAG, ex.toString());
+                        ex.printStackTrace();
+                    }
                 }
-                destinations.append("place_id:").append(posts.get(posts.size() - 1).getCustomPlace().getGPlaceId());
+                CustomPlace customPlace = posts.get(posts.size() - 1).getCustomPlace();
+                try {
+                    customPlace.fetchIfNeeded();
+                    destinations.append("place_id:").append(customPlace.getGPlaceId());
+                } catch (ParseException ex) {
+                    Log.e(TAG, ex.toString());
+                    ex.printStackTrace();
+                }
 
                 GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
                 googleMapsService.getDistanceSearchResult(latitude + "," + longitude,
@@ -192,8 +207,9 @@ public class FilterDialogFragment extends DialogFragment {
                         Log.i(TAG, "success getting all the distances");
                         List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
                         for (int i = 0; i < elements.size(); i++) {
+                            Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
                             if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
-                                Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
+                                Log.d(TAG, "accepted: " + elements.get(i).getDistance().getValue() / 1000.0);
                                 filteredPosts.add(posts.get(i));
                             }
                         }
