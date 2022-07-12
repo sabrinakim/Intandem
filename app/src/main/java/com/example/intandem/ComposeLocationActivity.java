@@ -294,6 +294,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                                 public void done(ParseException e) {
                                     if (e != null) {
                                         Log.e(TAG, "error saving yelp review");
+                                        return;
                                     }
                                     Log.i(TAG, "success saving yelp review");
                                     CustomPlaceToReview placeToReview = new CustomPlaceToReview();
