@@ -111,6 +111,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
             @Override
             public void onRefresh() {
                 allPosts.clear();
+                adapter.notifyDataSetChanged();
                 queryPosts();
                 swipeContainer.setRefreshing(false);
             }
@@ -171,8 +172,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
-        query.addDescendingOrder(Post.KEY_CREATEDAT);
-        //query.addAscendingOrder("expiration");
+        query.addAscendingOrder("expiration");
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
