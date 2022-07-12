@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.intandem.fragments.RepliesFragment;
+import com.example.intandem.fragments.ReviewsFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.parse.GetCallback;
@@ -77,7 +78,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void bind(Post post) {
 
             tvEventFeed.setText(post.getEvent());
-
             tvEventFeed.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -96,8 +96,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     if (e != null) {
                         Log.e(TAG, "error fetching if needed in background");
                     }
-                    //String gPlaceId = ((CustomPlace) object).getGPlaceId();
                     tvLocationFeed.setText(post.getCustomPlace().getName());
+                    tvLocationFeed.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                            Fragment fragment = ReviewsFragment.newInstance(post);
+                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+                        }
+                    });
                 }
             });
 
