@@ -1,11 +1,14 @@
 package com.example.intandem.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
@@ -50,6 +53,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     private PostsAdapter adapter;
     private List<Post> allPosts;
     private FloatingActionButton fabCompose;
+    private SwipeRefreshLayout swipeContainer;
 
     // TODO: Rename and change types of parameters
     private ParseUser mUser;
@@ -98,6 +102,18 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(getContext(), allPosts, mUser);
         fabCompose = view.findViewById(R.id.fabAddPost);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                allPosts.clear();
+                queryPosts();
+                swipeContainer.setRefreshing(false);
+            }
+        });
 
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +170,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.setLimit(LIMIT);
+        query.addDescendingOrder(Post.KEY_CREATEDAT);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
