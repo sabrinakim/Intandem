@@ -28,6 +28,9 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ComposePictureActivity extends AppCompatActivity {
 
@@ -136,8 +139,16 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setCustomPlace(customPlace);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
-        post.setDuration(duration);
-        post.setTimeUnit(timeUnit);
+
+        Calendar rightNow = Calendar.getInstance();
+        if (timeUnit.equals("Minute(s)")) {
+            rightNow.add(Calendar.MINUTE, Integer.parseInt(duration));
+        } else {
+            rightNow.add(Calendar.HOUR, Integer.parseInt(duration));
+        }
+
+        Date expiration = rightNow.getTime();
+        post.setExpiration(expiration);
 
         post.saveInBackground(new SaveCallback() {
             @Override
@@ -149,7 +160,7 @@ public class ComposePictureActivity extends AppCompatActivity {
                 etCaption.setText("");
                 ivImage.setImageResource(0);
                 Intent i = new Intent(ComposePictureActivity.this, MainActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.putExtra("post", post);
                 startActivity(i);
             }
         });
