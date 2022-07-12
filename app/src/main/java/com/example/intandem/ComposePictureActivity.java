@@ -148,7 +148,9 @@ public class ComposePictureActivity extends AppCompatActivity {
                 Log.i(TAG, "post save was successful!");
                 etCaption.setText("");
                 ivImage.setImageResource(0);
-                startActivity(new Intent(ComposePictureActivity.this, PostsFragment.class));
+                Intent i = new Intent(ComposePictureActivity.this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
             }
         });
     }
