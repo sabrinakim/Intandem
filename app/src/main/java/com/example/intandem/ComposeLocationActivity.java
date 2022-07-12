@@ -185,11 +185,15 @@ public class ComposeLocationActivity extends AppCompatActivity {
                             String name = googleReview.getAuthorName();
                             double rating = googleReview.getRating();
                             String text = googleReview.getText();
+                            String profilePicUrl = googleReview.getProfilePhotoUrl();
 
                             Review review = new Review();
                             review.putName(name);
                             review.putRating(rating);
                             review.putText(text);
+                            if (profilePicUrl != null) {
+                                review.putProfilePicUrl(profilePicUrl);
+                            }
 
                             review.saveInBackground(new SaveCallback() {
                                 @Override
@@ -275,11 +279,15 @@ public class ComposeLocationActivity extends AppCompatActivity {
                             String name = yelpReview.getUser().getName();
                             double rating = yelpReview.getRating();
                             String text = yelpReview.getText();
+                            String profilePicUrl = yelpReview.getUser().getImageUrl();
 
                             Review review = new Review();
                             review.putName(name);
                             review.putRating(rating);
                             review.putText(text);
+                            if (profilePicUrl != null) {
+                                review.putProfilePicUrl(profilePicUrl);
+                            }
 
                             review.saveInBackground(new SaveCallback() {
                                 @Override

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.intandem.models.Post;
 import com.example.intandem.models.Review;
 
@@ -65,6 +66,8 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
             tvReviewUserName.setText(review.getName());
             tvReviewText.setText(review.getText());
             rbReview.setRating(((Double) review.getRating()).floatValue());
+            Glide.with(context).load(review.getProfilePicUrl())
+                    .into(ivReviewProfilePic);
         }
     }
 }

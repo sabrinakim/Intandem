@@ -12,6 +12,7 @@ public class Review extends ParseObject {
     public static final String KEY_DATE = "date";
     public static final String KEY_TEXT = "text";
     public static final String KEY_RATING = "rating";
+    public static final String KEY_PROFILE_PIC_URL = "profilePicUrl";
 
     public Review() {}
 
@@ -38,5 +39,11 @@ public class Review extends ParseObject {
     }
     public void putRating(double rating) {
         put(KEY_RATING, rating);
+    }
+    public String getProfilePicUrl() {
+        return getString(KEY_PROFILE_PIC_URL);
+    }
+    public void putProfilePicUrl(String profilePicUrl) {
+        put(KEY_PROFILE_PIC_URL, profilePicUrl);
     }
 }
