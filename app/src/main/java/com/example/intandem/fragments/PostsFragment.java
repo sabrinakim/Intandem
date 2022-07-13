@@ -27,6 +27,7 @@ import com.example.intandem.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -164,66 +165,59 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
 
     private void showEditDialog() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(allPosts);
         filterDialogFragment.setTargetFragment(this, 300);
         filterDialogFragment.show(fm, "fragment_filter_dialog");
     }
 
     private void queryPosts() {
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.setLimit(LIMIT);
-        query.addAscendingOrder("expiration");
-        query.findInBackground(new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> posts, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
-                    return;
-                }
-                Log.i(TAG, "success getting posts");
-                filterPostsAndNotify(posts);
-            }
-        });
-    }
-
-    @Override
-    public void onFinishFilterDialog(List<Post> filteredPosts) {
-        Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
-        allPosts.clear();
-        filterPostsAndNotify(filteredPosts);
-    }
-
-    private void filterPostsAndNotify(List<Post> postsToFilter) {
         ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
         queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
         queryFriends.findInBackground(new FindCallback<Friendship>() {
             @Override
             public void done(List<Friendship> friendships, ParseException e) {
                 Set<String> friendIds = new HashSet<>();
+                friendIds.add((String) mUser.get("fbId"));
                 for (Friendship friendship : friendships) {
                     friendIds.add(friendship.getUser2Id());
                 }
-                for (Post post : postsToFilter) {
-                    try {
-                        ParseUser user = post.getUser().fetchIfNeeded();
-                        if (friendIds.contains(user.get("fbId")) || user.get("fbId").equals(mUser.get("fbId"))) {
-                            Calendar rightNow = Calendar.getInstance();
-                            if (rightNow.getTime().before(post.getExpiration())) {
-                                Log.d(TAG, "exp :" + post.getExpiration().toString());
-                                allPosts.add(post);
+                ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
+                queryPosts.setLimit(LIMIT);
+                queryPosts.whereContainedIn(Post.KEY_USER_FB_ID, friendIds);
+                Calendar rightNow = Calendar.getInstance();
+                queryPosts.whereGreaterThan(Post.KEY_EXPIRATION, rightNow.getTime());
+                queryPosts.findInBackground(new FindCallback<Post>() {
+                    @Override
+                    public void done(List<Post> posts, ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error getting posts");
+                            return;
+                        }
+                        Log.i(TAG, "success getting posts");
+                        for (Post post : posts) {
+                            ParseUser user = post.getUser();
+                            try {
+                                user.fetchIfNeeded();
+                                Log.d(TAG, user.getUsername());
+                                Log.d(TAG, post.getExpiration().toString());
+                                Log.d(TAG, post.getCaption());
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
                             }
                         }
-
-                    } catch (ParseException ex) {
-                        ex.printStackTrace();
+                        allPosts.addAll(posts);
+                        adapter.notifyDataSetChanged();
                     }
-                }
-                for (Post post : allPosts) {
-                    Log.d(TAG, "user: " + post.getUser().getUsername());
-                    Log.d(TAG, "caption: " + post.getCaption());
-                }
-                adapter.notifyDataSetChanged();
+                });
             }
         });
+    }
+
+    @Override
+    public void onFinishFilterDialog(List<Post> filteredDistancePosts) {
+        Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
+        allPosts.clear();
+        allPosts.addAll(filteredDistancePosts);
+        adapter.notifyDataSetChanged();
     }
 }
