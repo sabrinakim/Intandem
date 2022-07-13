@@ -9,6 +9,7 @@ import android.content.IntentSender;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +50,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +70,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FilterDialogFragment extends DialogFragment {
     public static final String TAG = "FilterDialogFragment";
     private static final String BASE_URL = "https://maps.googleapis.com/";
+    public static final String ARG_ALL_POSTS = "allPosts";
     public static final int LIMIT = 20;
     private EditText etDistance;
     private Button btnFilter;
@@ -77,8 +80,9 @@ public class FilterDialogFragment extends DialogFragment {
     //private LocationCallback locationCallback;
     private Double latitude;
     private Double longitude;
-    private List<Post> filteredPosts;
+    private List<Post> filteredDistancePosts;
     private int maxDistance;
+    private List<Post> mAllPosts;
 
     public interface FilterDialogListener {
         void onFinishFilterDialog(List<Post> filteredPosts);
@@ -90,9 +94,20 @@ public class FilterDialogFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static FilterDialogFragment newInstance() {
-        FilterDialogFragment frag = new FilterDialogFragment();
-        return frag;
+    public static FilterDialogFragment newInstance(List<Post> allPosts) {
+        FilterDialogFragment fragment = new FilterDialogFragment();
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(ARG_ALL_POSTS, (ArrayList<? extends Parcelable>) allPosts);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mAllPosts = getArguments().getParcelableArrayList(ARG_ALL_POSTS);
+        }
     }
 
     @Override
@@ -156,77 +171,65 @@ public class FilterDialogFragment extends DialogFragment {
     }
 
     private void queryFilteredPosts() {
-        filteredPosts = new ArrayList<>();
+        filteredDistancePosts = new ArrayList<>();
 
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.setLimit(LIMIT);
-        //query.whereWithinMiles("locationPoint", currPoint, maxDistance);
-        query.findInBackground(new FindCallback<Post>() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        // building destinations query parameter
+        StringBuilder destinations = new StringBuilder();
+        for (int i = 0; i < mAllPosts.size() - 1; i++) {
+            CustomPlace customPlace = mAllPosts.get(i).getCustomPlace();
+            try {
+                customPlace.fetchIfNeeded();
+                destinations.append("place_id:").append(customPlace.getGPlaceId()).append("|");
+            } catch (ParseException ex) {
+                Log.e(TAG, ex.toString());
+                ex.printStackTrace();
+            }
+        }
+        CustomPlace customPlace = mAllPosts.get(mAllPosts.size() - 1).getCustomPlace();
+        try {
+            customPlace.fetchIfNeeded();
+            destinations.append("place_id:").append(customPlace.getGPlaceId());
+        } catch (ParseException ex) {
+            Log.e(TAG, ex.toString());
+            ex.printStackTrace();
+        }
+
+        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+        googleMapsService.getDistanceSearchResult(latitude + "," + longitude,
+                destinations.toString(),
+                "driving",
+                "en",
+                BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
             @Override
-            public void done(List<Post> posts, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
-                    return;
-                }
-
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-
-                // building destinations query parameter
-                StringBuilder destinations = new StringBuilder();
-                for (int i = 0; i < posts.size() - 1; i++) {
-                    CustomPlace customPlace = posts.get(i).getCustomPlace();
-                    try {
-                        customPlace.fetchIfNeeded();
-                        destinations.append("place_id:").append(customPlace.getGPlaceId()).append("|");
-                    } catch (ParseException ex) {
-                        Log.e(TAG, ex.toString());
-                        ex.printStackTrace();
+            public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+                DistanceSearchResult distanceSearchResult = response.body();
+                Log.i(TAG, "success getting all the distances");
+                List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
+                for (int i = 0; i < elements.size(); i++) {
+                    Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
+                    if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
+                        Log.d(TAG, "accepted: " + elements.get(i).getDistance().getValue() / 1000.0);
+                        filteredDistancePosts.add(mAllPosts.get(i));
                     }
                 }
-                CustomPlace customPlace = posts.get(posts.size() - 1).getCustomPlace();
-                try {
-                    customPlace.fetchIfNeeded();
-                    destinations.append("place_id:").append(customPlace.getGPlaceId());
-                } catch (ParseException ex) {
-                    Log.e(TAG, ex.toString());
-                    ex.printStackTrace();
-                }
+                // we created the list of filtered posts now.
+                // triggers the parent activity to start its implemented function
+                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+                listener.onFinishFilterDialog(filteredDistancePosts);
+                dismiss(); // exits out of dialog fragment.
+            }
 
-                GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
-                googleMapsService.getDistanceSearchResult(latitude + "," + longitude,
-                        destinations.toString(),
-                        "driving",
-                        "en",
-                        BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
-                    @Override
-                    public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
-                        DistanceSearchResult distanceSearchResult = response.body();
-                        Log.i(TAG, "success getting all the distances");
-                        List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
-                        for (int i = 0; i < elements.size(); i++) {
-                            Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
-                            if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
-                                Log.d(TAG, "accepted: " + elements.get(i).getDistance().getValue() / 1000.0);
-                                filteredPosts.add(posts.get(i));
-                            }
-                        }
-                        // we created the list of filtered posts now.
-                        // triggers the parent activity to start its implemented function
-                        FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-                        listener.onFinishFilterDialog(filteredPosts);
-                        dismiss(); // exits out of dialog fragment.
-                    }
-
-                    @Override
-                    public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
-                        Log.e(TAG, "error getting distance");
-                    }
-                });
+            @Override
+            public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+                Log.e(TAG, "error getting distance");
             }
         });
+
     }
 
     @Override
@@ -293,12 +296,7 @@ public class FilterDialogFragment extends DialogFragment {
                                 Log.i(TAG, "Lat: " + currLocation.getLatitude());
                                 Log.i(TAG, "Long: " + currLocation.getLongitude());
 
-                                //ParseGeoPoint currPoint = new ParseGeoPoint(latitude, longitude);
                                 queryFilteredPosts(); // updates var to contain filtered posts
-//                                // triggers the parent activity to start its implemented function
-//                                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-//                                listener.onFinishFilterDialog(filteredPosts);
-//                                dismiss(); // exits out of dialog fragment.
 
                             } else { // will execute when an updated location is received.
                                 // idk

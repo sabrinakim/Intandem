@@ -12,6 +12,7 @@ import java.util.Date;
 @ParseClassName("Post")
 public class Post extends ParseObject {
     public static final String KEY_USER = "user";
+    public static final String KEY_USER_FB_ID = "userFbId";
     public static final String KEY_EVENT = "event";
     public static final String KEY_CREATEDAT = "createdAt";
     public static final String KEY_CUSTOMPLACE = "customPlace";
@@ -30,6 +31,14 @@ public class Post extends ParseObject {
 
     public void setUser(ParseUser user) {
         put(KEY_USER, user);
+    }
+
+    public String getUserFbId() {
+        return getString(KEY_USER_FB_ID);
+    }
+
+    public void setUserFbId(String userFbId) {
+        put(KEY_USER_FB_ID, userFbId);
     }
 
     public String getEvent() {
