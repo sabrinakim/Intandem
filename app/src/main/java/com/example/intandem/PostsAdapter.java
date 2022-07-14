@@ -2,6 +2,7 @@ package com.example.intandem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.RoundedCorner;
@@ -37,7 +38,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private List<Post> posts;
     private ParseUser currUser;
 
-    public PostsAdapter(Context context, List<Post> posts, ParseUser currUser) {
+    public PostsAdapter(Context context, List<Post> posts, ParseUser currUser, Location currLocation) {
         this.context = context;
         this.posts = posts;
         this.currUser = currUser;
