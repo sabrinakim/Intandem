@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2971014492753623" />
         <entry key="app/src/main/res/layout/activity_compose_event.xml" value="0.2547118290337869" />
         <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.29297036433565443" />

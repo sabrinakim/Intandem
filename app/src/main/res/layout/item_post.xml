@@ -9,9 +9,6 @@
         android:id="@+id/ivPictureFeed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="70dp"
-        android:layout_marginEnd="15dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,13 +23,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
         android:text="location"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/ivPictureFeed"
-        app:layout_constraintStart_toStartOf="@+id/ivPictureFeed" />
+        app:layout_constraintStart_toStartOf="@+id/ivPictureFeed"
+        app:layout_constraintTop_toTopOf="@+id/ivPictureFeed" />
 
     <TextView
         android:id="@+id/tvCaptionFeed"
@@ -48,10 +45,10 @@
         android:id="@+id/ivProfilePic"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/ivPictureFeed"
-        app:layout_constraintEnd_toEndOf="@+id/ivPictureFeed"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="380dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPictureFeed"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -70,9 +67,9 @@
         android:id="@+id/tvExpiration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:text="TextView"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/tvLocationFeed"
         app:layout_constraintStart_toEndOf="@+id/tvLocationFeed"
         app:layout_constraintTop_toTopOf="@+id/tvLocationFeed" />

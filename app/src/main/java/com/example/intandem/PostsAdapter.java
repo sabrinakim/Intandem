@@ -119,14 +119,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             ParseFile image = post.getPicture();
             if (image != null) { // image is optional, so its possible that it is null
-                Glide.with(context).load(image.getUrl())
-                        .transform(new RoundedCorners(50))
-                        .into(ivPictureFeed);
+                Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
             }
 
-//            Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
-//                    .transform(new CircleCrop())
-//                    .into(ivProfilePicture);
+            Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
+                    .transform(new CircleCrop())
+                    .into(ivProfilePicture);
 
             tvCaptionFeed.setText(post.getCaption());
         }
