@@ -3,23 +3,28 @@ package com.example.intandem.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.intandem.BuildConfig;
 import com.example.intandem.ComposeEventActivity;
@@ -141,6 +146,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();
         fabCompose = view.findViewById(R.id.fabAddPost);
+        maxDistance = -1;
         adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
@@ -151,7 +157,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
             public void onRefresh() {
                 allPosts.clear();
                 adapter.notifyDataSetChanged();
-                queryPosts();
+                queryPosts(maxDistance);
                 swipeContainer.setRefreshing(false);
             }
         });
@@ -199,12 +205,29 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-
+                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Permission Denied")
+                                    .setMessage("Permission to access device location is permanently denied." +
+                                            "You need to go to settings to allow the permission")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent i = new Intent();
+                                            i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            // idk what this part does
+                                            i.setData(Uri.fromParts("package", getContext().getPackageName(), null));
+                                        }
+                                    }).show();
+                        } else {
+                            Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
                     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-
+                        permissionToken.continuePermissionRequest();
                     }
                 }).check();
     }
@@ -261,7 +284,6 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
         // TODO: change token
-//        queryPosts();
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         CancellationToken token = tokenSource.getToken();
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token)
@@ -269,18 +291,14 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-//                            queryPosts();
                             currLocation = task.getResult();
                             if (currLocation != null) {
-//                                queryPosts();
-//                                adapter used to be set here
-//                                adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
                                 latitude = currLocation.getLatitude();
                                 longitude = currLocation.getLongitude();
                                 Log.i(TAG, "Lat: " + currLocation.getLatitude());
                                 Log.i(TAG, "Long: " + currLocation.getLongitude());
 
-                                queryPosts();
+                                queryPosts(maxDistance);
 
                             } else { // will execute when an updated location is received.
                                 // idk
@@ -336,7 +354,10 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                             }
                         }
                         allPosts.addAll(posts);
-//                        adapter.notifyDataSetChanged();
+                        if (maxDistance == -1) {
+                            adapter.notifyDataSetChanged();
+                            return;
+                        }
                         // FILTERING BY DISTANCE
                         filteredDistancePosts.clear();
 
@@ -386,7 +407,6 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                                 allPosts.addAll(filteredDistancePosts);
                                 // we created the list of filtered posts now.
                                 adapter.notifyDataSetChanged();
-                                //adapter.notifyItemInserted(0);
                             }
 
                             @Override
@@ -400,13 +420,16 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         });
     }
 
-    private void queryPosts() {
-        queryPosts(Integer.MAX_VALUE);
-    }
+//    private void queryPosts() {
+//        queryPosts(-1);
+//    }
 
     @Override
     public void onFinishFilterDialog(int maxDistance) {
         Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
-        queryPosts(maxDistance);
+        this.maxDistance = maxDistance;
+        allPosts.clear();
+        adapter.notifyDataSetChanged();
+        queryPosts(this.maxDistance);
     }
 }
