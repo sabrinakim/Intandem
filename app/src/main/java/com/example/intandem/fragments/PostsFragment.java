@@ -1,31 +1,63 @@
 package com.example.intandem.fragments;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.intandem.BuildConfig;
 import com.example.intandem.ComposeEventActivity;
 import com.example.intandem.ComposeLocationActivity;
 import com.example.intandem.GoogleMapsService;
 import com.example.intandem.FilterDialogFragment;
+import com.example.intandem.dataModels.DistanceInfo;
+import com.example.intandem.dataModels.DistanceSearchResult;
+import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
 import com.example.intandem.PostsAdapter;
 import com.example.intandem.R;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -40,6 +72,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -52,9 +87,15 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     public static final String TAG = "PostsFragment";
     public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Location currLocation;
+    private Double latitude;
+    private Double longitude;
+    private int maxDistance;
     private ViewPager2 vp2Posts;
     private PostsAdapter adapter;
     private List<Post> allPosts;
+    private List<Post> filteredDistancePosts;
     private FloatingActionButton fabCompose;
     private SwipeRefreshLayout swipeContainer;
 
@@ -103,8 +144,10 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
 
         vp2Posts = view.findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), allPosts, mUser);
+        filteredDistancePosts = new ArrayList<>();
         fabCompose = view.findViewById(R.id.fabAddPost);
+        maxDistance = -1;
+        adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
 
@@ -114,7 +157,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
             public void onRefresh() {
                 allPosts.clear();
                 adapter.notifyDataSetChanged();
-                queryPosts();
+                queryPosts(maxDistance);
                 swipeContainer.setRefreshing(false);
             }
         });
@@ -149,7 +192,44 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                 super.onPageScrollStateChanged(state);
             }
         });
-        queryPosts();
+
+//        queryPosts();
+
+        Dexter.withActivity(getActivity())
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                        findCurrentLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Permission Denied")
+                                    .setMessage("Permission to access device location is permanently denied." +
+                                            "You need to go to settings to allow the permission")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent i = new Intent();
+                                            i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            // idk what this part does
+                                            i.setData(Uri.fromParts("package", getContext().getPackageName(), null));
+                                        }
+                                    }).show();
+                        } else {
+                            Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                        permissionToken.continuePermissionRequest();
+                    }
+                }).check();
     }
 
     @Override
@@ -164,14 +244,81 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         return super.onOptionsItemSelected(item);
     }
 
+    private void findCurrentLocation() {
+//        queryPosts();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        // check if gps is enabled or not and then request user to enable it
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(getActivity());
+        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                getDeviceLocation();
+            }
+        });
+
+        task.addOnFailureListener(getActivity(), new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    try {
+                        resolvable.startResolutionForResult(getActivity(), 51);
+                    } catch (IntentSender.SendIntentException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getDeviceLocation() {
+        // TODO: change token
+        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        CancellationToken token = tokenSource.getToken();
+        fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token)
+                .addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            currLocation = task.getResult();
+                            if (currLocation != null) {
+                                latitude = currLocation.getLatitude();
+                                longitude = currLocation.getLongitude();
+                                Log.i(TAG, "Lat: " + currLocation.getLatitude());
+                                Log.i(TAG, "Long: " + currLocation.getLongitude());
+
+                                queryPosts(maxDistance);
+
+                            } else { // will execute when an updated location is received.
+                                // idk
+                            }
+
+                        } else {
+                            Log.e(TAG, "couldn't get current location");
+                        }
+                    }
+                });
+    }
+
     private void showEditDialog() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(allPosts);
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
         filterDialogFragment.setTargetFragment(this, 300);
         filterDialogFragment.show(fm, "fragment_filter_dialog");
     }
 
-    private void queryPosts() {
+    private void queryPosts(int maxDistance) {
         ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
         queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
         queryFriends.findInBackground(new FindCallback<Friendship>() {
@@ -207,18 +354,82 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                             }
                         }
                         allPosts.addAll(posts);
-                        adapter.notifyDataSetChanged();
+                        if (maxDistance == -1) {
+                            adapter.notifyDataSetChanged();
+                            return;
+                        }
+                        // FILTERING BY DISTANCE
+                        filteredDistancePosts.clear();
+
+                        Retrofit retrofit = new Retrofit.Builder()
+                                .baseUrl(BASE_URL)
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .build();
+                        StringBuilder destinations = new StringBuilder();
+                        for (int i = 0; i < allPosts.size() - 1; i++) {
+                            CustomPlace customPlace = allPosts.get(i).getCustomPlace();
+                            try {
+                                customPlace.fetchIfNeeded();
+                                destinations.append("place_id:").append(customPlace.getGPlaceId()).append("|");
+                            } catch (ParseException ex) {
+                                Log.e(TAG, ex.toString());
+                                ex.printStackTrace();
+                            }
+                        }
+                        CustomPlace customPlace = allPosts.get(allPosts.size() - 1).getCustomPlace();
+                        try {
+                            customPlace.fetchIfNeeded();
+                            destinations.append("place_id:").append(customPlace.getGPlaceId());
+                        } catch (ParseException ex) {
+                            Log.e(TAG, ex.toString());
+                            ex.printStackTrace();
+                        }
+
+                        GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+                        googleMapsService.getDistanceSearchResult(latitude + "," + longitude,
+                                destinations.toString(),
+                                "driving",
+                                "en",
+                                BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
+                            @Override
+                            public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+                                DistanceSearchResult distanceSearchResult = response.body();
+                                Log.i(TAG, "success getting all the distances");
+                                List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
+                                for (int i = 0; i < elements.size(); i++) {
+                                    Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
+                                    if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
+                                        Log.d(TAG, "accepted: " + elements.get(i).getDistance().getValue() / 1000.0);
+                                        filteredDistancePosts.add(allPosts.get(i));
+                                    }
+                                }
+                                allPosts.clear();
+                                allPosts.addAll(filteredDistancePosts);
+                                // we created the list of filtered posts now.
+                                adapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+                                Log.e(TAG, "error getting distance");
+                            }
+                        });
                     }
                 });
             }
         });
     }
 
+//    private void queryPosts() {
+//        queryPosts(-1);
+//    }
+
     @Override
-    public void onFinishFilterDialog(List<Post> filteredDistancePosts) {
+    public void onFinishFilterDialog(int maxDistance) {
         Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
+        this.maxDistance = maxDistance;
         allPosts.clear();
-        allPosts.addAll(filteredDistancePosts);
         adapter.notifyDataSetChanged();
+        queryPosts(this.maxDistance);
     }
 }

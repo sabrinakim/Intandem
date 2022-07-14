@@ -85,20 +85,13 @@ public class FilterDialogFragment extends DialogFragment {
     private List<Post> mAllPosts;
 
     public interface FilterDialogListener {
-        void onFinishFilterDialog(List<Post> filteredPosts);
+        void onFinishFilterDialog(int maxDistance);
     }
 
-    public FilterDialogFragment() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
-    }
+    public FilterDialogFragment() {}
 
-    public static FilterDialogFragment newInstance(List<Post> allPosts) {
+    public static FilterDialogFragment newInstance() {
         FilterDialogFragment fragment = new FilterDialogFragment();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_ALL_POSTS, (ArrayList<? extends Parcelable>) allPosts);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -127,45 +120,48 @@ public class FilterDialogFragment extends DialogFragment {
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
+                listener.onFinishFilterDialog(Integer.parseInt(etDistance.getText().toString()));
+                dismiss();
                 // grant permissions
-                Dexter.withActivity(getActivity())
-                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                        .withListener(new PermissionListener() {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                                // filter posts
-                                // record number that user inputted.
-                                maxDistance = Integer.parseInt(etDistance.getText().toString());
-                                findCurrentLocation();
-                            }
-
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                                if (permissionDeniedResponse.isPermanentlyDenied()) {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                    builder.setTitle("Permission Denied")
-                                            .setMessage("Permission to access device location is permanently denied." +
-                                                    "You need to go to settings to allow the permission")
-                                            .setNegativeButton("Cancel", null)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    Intent i = new Intent();
-                                                    i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                                    // idk what this part does
-                                                    i.setData(Uri.fromParts("package", getContext().getPackageName(), null));
-                                                }
-                                            }).show();
-                                } else {
-                                    Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                                permissionToken.continuePermissionRequest();
-                            }
-                        }).check();
+//                Dexter.withActivity(getActivity())
+//                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+//                        .withListener(new PermissionListener() {
+//                            @Override
+//                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+//                                // filter posts
+//                                // record number that user inputted.
+//                                maxDistance = Integer.parseInt(etDistance.getText().toString());
+//                                findCurrentLocation();
+//                            }
+//
+//                            @Override
+//                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+//                                if (permissionDeniedResponse.isPermanentlyDenied()) {
+//                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                                    builder.setTitle("Permission Denied")
+//                                            .setMessage("Permission to access device location is permanently denied." +
+//                                                    "You need to go to settings to allow the permission")
+//                                            .setNegativeButton("Cancel", null)
+//                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                                @Override
+//                                                public void onClick(DialogInterface dialog, int which) {
+//                                                    Intent i = new Intent();
+//                                                    i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                                                    // idk what this part does
+//                                                    i.setData(Uri.fromParts("package", getContext().getPackageName(), null));
+//                                                }
+//                                            }).show();
+//                                } else {
+//                                    Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+//                                permissionToken.continuePermissionRequest();
+//                            }
+//                        }).check();
             }
         });
     }
@@ -220,7 +216,7 @@ public class FilterDialogFragment extends DialogFragment {
                 // we created the list of filtered posts now.
                 // triggers the parent activity to start its implemented function
                 FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-                listener.onFinishFilterDialog(filteredDistancePosts);
+                //listener.onFinishFilterDialog(filteredDistancePosts);
                 dismiss(); // exits out of dialog fragment.
             }
 
