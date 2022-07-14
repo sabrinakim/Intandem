@@ -41,7 +41,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     private ImageView ivImage;
     private EditText etCaption;
     private Button btnShare;
-    private String event;
+//    private String event;
     private ParseUser user;
     private String duration;
     private String timeUnit;
@@ -61,8 +61,8 @@ public class ComposePictureActivity extends AppCompatActivity {
         // unwrap parcel here
         Bundle extras = getIntent().getExtras();
         customPlace = extras.getParcelable("customPlace");
-        event = extras.getString("event");
-        Log.i(TAG, event);
+//        event = extras.getString("event");
+//        Log.i(TAG, event);
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
         timeUnit = extras.getString("timeUnit");
@@ -72,7 +72,7 @@ public class ComposePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(user, event, customPlace, etCaption.getText().toString(), photoFile, duration,
+                savePost(user, customPlace, etCaption.getText().toString(), photoFile, duration,
                         timeUnit);
             }
         });
@@ -131,11 +131,11 @@ public class ComposePictureActivity extends AppCompatActivity {
 
     }
 
-    private void savePost(ParseUser currentUser, String event, CustomPlace customPlace, String caption,
+    private void savePost(ParseUser currentUser, CustomPlace customPlace, String caption,
                           File photoFile, String duration, String timeUnit) {
         Post post = new Post();
         post.setUser(currentUser);
-        post.setEvent(event);
+//        post.setEvent(event);
         post.setCustomPlace(customPlace);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.RoundedCorner;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.intandem.fragments.RepliesFragment;
 import com.example.intandem.fragments.ReviewsFragment;
 import com.example.intandem.models.CustomPlace;
@@ -62,32 +65,38 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView tvEventFeed, tvLocationFeed, tvCaptionFeed;
-        ImageView ivPictureFeed;
+        TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration;
+        ImageView ivPictureFeed, ivProfilePicture;
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvEventFeed = itemView.findViewById(R.id.tvEventFeed);
+//            tvEventFeed = itemView.findViewById(R.id.tvEventFeed);
             tvLocationFeed = itemView.findViewById(R.id.tvLocationFeed);
             tvCaptionFeed = itemView.findViewById(R.id.tvCaptionFeed);
             ivPictureFeed = itemView.findViewById(R.id.ivPictureFeed);
+            ivProfilePicture = itemView.findViewById(R.id.ivProfilePic);
+            tvName = itemView.findViewById(R.id.tvName);
+            tvExpiration = itemView.findViewById(R.id.tvExpiration);
             itemView.setOnClickListener(this);
         }
 
         public void bind(Post post) {
 
-            tvEventFeed.setText(post.getEvent());
-            tvEventFeed.setOnClickListener(new View.OnClickListener() {
+//            tvEventFeed.setText(post.getEvent());
+//            tvEventFeed.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View v) {
+//                    // navigate to replies fragment
+//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+//                    Fragment fragment = RepliesFragment.newInstance(post);
+//                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+//                }
+//            });
 
-                @Override
-                public void onClick(View v) {
-                    // navigate to replies fragment
-                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                    Fragment fragment = RepliesFragment.newInstance(post);
-                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
-                }
-            });
+            tvName.setText(post.getUser().getUsername());
+            tvExpiration.setText("3 hr Left");
 
             CustomPlace c = post.getCustomPlace();
             c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
@@ -112,6 +121,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if (image != null) { // image is optional, so its possible that it is null
                 Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
             }
+
+            Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
+                    .transform(new CircleCrop())
+                    .into(ivProfilePicture);
 
             tvCaptionFeed.setText(post.getCaption());
         }

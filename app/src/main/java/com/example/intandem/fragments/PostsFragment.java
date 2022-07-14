@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.intandem.ComposeEventActivity;
+import com.example.intandem.ComposeLocationActivity;
 import com.example.intandem.GoogleMapsService;
 import com.example.intandem.FilterDialogFragment;
 import com.example.intandem.models.Friendship;
@@ -121,7 +122,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(), ComposeEventActivity.class);
+                Intent i = new Intent(getContext(), ComposeLocationActivity.class);
                 i.putExtra("user", mUser);
                 startActivity(i);
             }
