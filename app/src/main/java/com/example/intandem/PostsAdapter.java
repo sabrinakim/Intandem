@@ -2,10 +2,6 @@ package com.example.intandem;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,8 +29,6 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import java.io.File;
-import java.util.Calendar;
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
@@ -125,27 +119,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             });
 
             ParseFile image = post.getPicture();
-//            if (image != null) {
-//                Calendar rightNow = Calendar.getInstance();
-//                if (rightNow.getTime().after(post.getExpiration())) {
-//                    try {
-//                        File photoFile = image.getFile();
-//                        Bitmap postPhoto = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-//                        Bitmap grayedPostPhoto = grayOutImage(postPhoto);
-//                        ivPictureFeed.setImageBitmap(grayedPostPhoto);
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
-//                }
-//            }
-
-
             if (image != null) { // image is optional, so its possible that it is null
                 Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
             }
-
 
             Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
                     .transform(new CircleCrop())
@@ -167,39 +143,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 context.startActivity(i);
             }
         }
-    }
-
-    private Bitmap grayOutImage(Bitmap src) {
-        // constant factors
-        final double G_RED = 0.299;
-        final double G_GREEN = 0.587;
-        final double G_BLUE = 0.114;
-        // create output bitmap
-        Bitmap bmOut = Bitmap.createBitmap(src.getWidth(), src.getHeight(), src.getConfig());
-        // pixel information
-        int A, R, G, B;
-        int pixel;
-        // get image size
-        int width = src.getWidth();
-        int height = src.getHeight();
-        // scan through every single pixel
-        for(int x = 0; x < width; ++x) {
-            for(int y = 0; y < height; ++y) {
-                // get one pixel color
-                pixel = src.getPixel(x, y);
-                // retrieve color of all channels
-                A = Color.alpha(pixel);
-                R = Color.red(pixel);
-                G = Color.green(pixel);
-                B = Color.blue(pixel);
-                // take conversion up to one single value
-                R = G = B = (int)(G_RED * R + G_GREEN * G + G_BLUE * B);
-                // set new pixel color to output bitmap
-                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
-            }
-        }
-        // return final image
-        return bmOut;
     }
 
 }
