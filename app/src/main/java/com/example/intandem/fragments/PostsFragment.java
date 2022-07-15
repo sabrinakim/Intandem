@@ -79,7 +79,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_USER = "user";
     public static final String TAG = "PostsFragment";
-    public static final int LIMIT = 2;
+    public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location currLocation;
@@ -143,7 +143,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         vp2Posts = view.findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();
-        fabCompose = view.findViewById(R.id.fabAddPost);
+        //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
         adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
 

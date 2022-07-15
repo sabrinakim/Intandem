@@ -3,6 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:title="Item"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/filter"
         android:title="filter"
         app:showAsAction="always" />
@@ -10,4 +13,6 @@
         android:id="@+id/logout"
         android:title="logout"
         app:showAsAction="always" />
+
+
 </menu>

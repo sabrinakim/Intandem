@@ -14,11 +14,9 @@
         <!-- Customize your theme here. -->
         <item name="android:actionMenuTextColor">@color/black</item>
     </style>
-
-    <style name="FullScreen" parent="Theme.Intandem">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
+    <style name="CustomTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/white</item>
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetEnd">0dp</item>
     </style>
 </resources>
