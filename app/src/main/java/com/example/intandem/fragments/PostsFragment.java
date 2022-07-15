@@ -94,6 +94,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     private SwipeRefreshLayout swipeContainer;
     private Set<String> friendIds = new HashSet<>();
     private int currPage;
+    private int numPostsFetched;
 
 
     // TODO: Rename and change types of parameters
@@ -192,7 +193,8 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
             @Override
             public void onPageScrollStateChanged(int state) {
                 super.onPageScrollStateChanged(state);
-                if (previousState == ViewPager2.SCROLL_STATE_DRAGGING && state == ViewPager2.SCROLL_STATE_IDLE) {
+                if (previousState == ViewPager2.SCROLL_STATE_DRAGGING && state == ViewPager2.SCROLL_STATE_IDLE
+                        && numPostsFetched > 0) {
                     Log.d(TAG, "OVERSCROLLED");
                     Log.i(TAG, "curr page " + currPage);
                     getMorePosts(currPage);
@@ -240,6 +242,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     }
 
     private void getMorePosts(int currPage) {
+        numPostsFetched = 0;
         ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
         queryPosts.setLimit(LIMIT);
         queryPosts.whereContainedIn(Post.KEY_USER_FB_ID, friendIds);
@@ -357,6 +360,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
 
     private void queryPosts() {
         currPage = 1;
+        numPostsFetched = 0;
         ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
         queryFriends.whereEqualTo("user1Id", mUser.get("fbId"));
         queryFriends.findInBackground(new FindCallback<Friendship>() {
@@ -409,6 +413,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     private void filterPosts(List<Post> posts) {
         allPosts.addAll(posts);
         if (maxDistance == -1) {
+            numPostsFetched = posts.size();
             adapter.notifyDataSetChanged();
             return;
         }
@@ -458,6 +463,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                     }
                 }
                 allPosts.clear();
+                numPostsFetched = filteredDistancePosts.size();
                 allPosts.addAll(filteredDistancePosts);
                 // we created the list of filtered posts now.
                 adapter.notifyDataSetChanged();
