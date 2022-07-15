@@ -2,13 +2,16 @@ package com.example.intandem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.intandem.models.Friendship;
 import com.facebook.AccessToken;
@@ -26,12 +29,14 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
+import com.parse.facebook.ParseFacebookUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,18 +54,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-//        Set<Integer> a = new HashSet<>();
-//        Set<Integer> b = new HashSet<>();
-//
-//        a.add(1);
-//        a.add(2);
-//        a.add(3);
-//        b.add(1);
-//        b.add(4);
-//        b.add(3);
-//
-//        a.removeAll(b);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -93,111 +86,177 @@ public class LoginActivity extends AppCompatActivity {
             meGraphRequest.executeAsync();
         }
 
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.i(TAG, "login success");
-            }
+//        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                Log.i(TAG, "login success");
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Log.i(TAG, "login canceled");
+//            }
+//
+//            @Override
+//            public void onError(@NonNull FacebookException e) {
+//                Log.e(TAG, "login error");
+//            }
+//        });
 
-            @Override
-            public void onCancel() {
-                Log.i(TAG, "login canceled");
-            }
+//        btnLogin = findViewById(R.id.btnLogin);
+//        btnLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList(FRIENDS));
+//            }
+//        });
 
-            @Override
-            public void onError(@NonNull FacebookException e) {
-                Log.e(TAG, "login error");
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setTitle("Please, wait a moment.");
+        dialog.setMessage("Logging in...");
+        dialog.show();
+        Collection<String> permissions = Arrays.asList(FRIENDS);
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, (user, err) -> {
+            dialog.dismiss();
+            if (err != null) {
+                Log.e("FacebookLoginExample", "done: ", err);
+                Toast.makeText(this, err.getMessage(), Toast.LENGTH_LONG).show();
+            } else if (user == null) {
+                Toast.makeText(this, "The user cancelled the Facebook login.", Toast.LENGTH_LONG).show();
+                Log.d("FacebookLoginExample", "Uh oh. The user cancelled the Facebook login.");
+            } else if (user.isNew()) {
+                Toast.makeText(this, "User signed up and logged in through Facebook.", Toast.LENGTH_LONG).show();
+                Log.d("FacebookLoginExample", "User signed up and logged in through Facebook!");
+                getUserDetailFromFB();
+            } else {
+                Toast.makeText(this, "User logged in through Facebook.", Toast.LENGTH_LONG).show();
+                Log.d("FacebookLoginExample", "User logged in through Facebook!");
+                showAlert("Oh, you!", "Welcome back!");
             }
         });
 
-        btnLogin = findViewById(R.id.btnLogin);
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList(FRIENDS));
-            }
-        });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        // passes in the login results to the login manager via the callback manager
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-        // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
-        // we will use the Graph API
-
-        GraphRequest meGraphRequest = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-            @Override
-            public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
-                Log.i(TAG, jsonObject.toString());
-
-                try {
-                    String name = jsonObject.getString("name");
-                    String id = jsonObject.getString("id");
-                    String first_name = jsonObject.getString("first_name");
-                    String last_name = jsonObject.getString("last_name");
-
-                    ParseQuery<ParseUser> query = ParseUser.getQuery();
-                    query.whereEqualTo("fbId", id);
-                    query.findInBackground(new FindCallback<ParseUser>() {
-                        @Override
-                        public void done(List<ParseUser> objects, ParseException e) {
-                            if (e != null) {
-                                Log.e(TAG, "Issue with getting user", e);
-                                return;
-                            }
-
-                            if (objects.size() == 0) {
-                                Log.i(TAG, "new user");
-                                ParseUser user = new ParseUser();
-                                user.put("firstName", first_name);
-                                user.put("lastName", last_name);
-                                // username and password is just their name
-                                user.put("username", name);
-                                user.put("password", name);
-                                user.put("fbId", id);
-
-                                user.signUpInBackground(new SignUpCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            Log.e(TAG, "something went wrong with saving user: " + e);
-                                            return;
-                                        }
-                                        Log.i(TAG, "user saved successfully");
-
-                                        recordFriendsList(id, user);
-                                    }
-                                });
-                            } else { // user already registered in our database
-                                Log.i(TAG, "user already exists");
-                                updateFriendsList(id);
-                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                // pass in user through activities
-                                i.putExtra("user", objects.get(0));
-                                startActivity(i);
-                            }
-
-
-                        }
-                    });
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+    private void getUserDetailFromFB() {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), (object, response) -> {
+            ParseUser user = ParseUser.getCurrentUser();
+            try {
+                if (object.has("name"))
+                    user.setUsername(object.getString("name"));
+                if (object.has("email"))
+                    user.setEmail(object.getString("email"));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            user.saveInBackground(e -> {
+                if (e == null) {
+                    showAlert("First Time Login!", "Welcome!");
+                } else
+                    showAlert("Error", e.getMessage());
+            });
         });
 
-        Bundle bundle = new Bundle();
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "name,email");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
 
-        // change later: these are what you are requesting from the graph api
-        bundle.putString("fields", "name, id, first_name, last_name");
 
-        meGraphRequest.setParameters(bundle);
-        meGraphRequest.executeAsync();
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        callbackManager.onActivityResult(requestCode, resultCode, data);
+//        // passes in the login results to the login manager via the callback manager
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//
+//        // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
+//        // we will use the Graph API
+//
+//        GraphRequest meGraphRequest = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+//            @Override
+//            public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+//                Log.i(TAG, jsonObject.toString());
+//
+//                try {
+//                    String name = jsonObject.getString("name");
+//                    String id = jsonObject.getString("id");
+//                    String first_name = jsonObject.getString("first_name");
+//                    String last_name = jsonObject.getString("last_name");
+//
+//                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+//                    query.whereEqualTo("fbId", id);
+//                    query.findInBackground(new FindCallback<ParseUser>() {
+//                        @Override
+//                        public void done(List<ParseUser> objects, ParseException e) {
+//                            if (e != null) {
+//                                Log.e(TAG, "Issue with getting user", e);
+//                                return;
+//                            }
+//
+//                            if (objects.size() == 0) {
+//                                Log.i(TAG, "new user");
+//                                ParseUser user = new ParseUser();
+//                                user.put("firstName", first_name);
+//                                user.put("lastName", last_name);
+//                                // username and password is just their name
+//                                user.put("username", name);
+//                                user.put("password", name);
+//                                user.put("fbId", id);
+//
+//                                user.signUpInBackground(new SignUpCallback() {
+//                                    @Override
+//                                    public void done(ParseException e) {
+//                                        if (e != null) {
+//                                            Log.e(TAG, "something went wrong with saving user: " + e);
+//                                            return;
+//                                        }
+//                                        Log.i(TAG, "user saved successfully");
+//
+//                                        recordFriendsList(id, user);
+//                                    }
+//                                });
+//                            } else { // user already registered in our database
+//                                Log.i(TAG, "user already exists");
+//                                updateFriendsList(id);
+//                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+//                                // pass in user through activities
+//                                i.putExtra("user", objects.get(0));
+//                                startActivity(i);
+//                            }
+//
+//
+//                        }
+//                    });
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        Bundle bundle = new Bundle();
+//
+//        // change later: these are what you are requesting from the graph api
+//        bundle.putString("fields", "name, id, first_name, last_name");
+//
+//        meGraphRequest.setParameters(bundle);
+//        meGraphRequest.executeAsync();
+//    }
+
+    private void showAlert(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                });
+        AlertDialog ok = builder.create();
+        ok.show();
     }
 
     private void updateFriendsList(String id) {
@@ -331,8 +390,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
 
         request.executeAsync();
-
-
 
 
     }

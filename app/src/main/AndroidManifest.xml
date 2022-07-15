@@ -117,6 +117,12 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider611099576692463"
+            android:exported="true"/>
+
     </application>
 
 </manifest>

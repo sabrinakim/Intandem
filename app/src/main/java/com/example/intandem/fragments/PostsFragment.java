@@ -79,7 +79,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_USER = "user";
     public static final String TAG = "PostsFragment";
-    public static final int LIMIT = 2;
+    public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location currLocation;
@@ -369,8 +369,8 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
                 ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
                 queryPosts.setLimit(LIMIT);
                 queryPosts.whereContainedIn(Post.KEY_USER_FB_ID, friendIds);
-                Calendar rightNow = Calendar.getInstance();
-                queryPosts.whereGreaterThan(Post.KEY_EXPIRATION, rightNow.getTime());
+                //Calendar rightNow = Calendar.getInstance();
+                //queryPosts.whereGreaterThan(Post.KEY_EXPIRATION, rightNow.getTime());
                 queryPosts.findInBackground(new FindCallback<Post>() {
                     @Override
                     public void done(List<Post> posts, ParseException e) {

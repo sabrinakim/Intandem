@@ -3,10 +3,12 @@ package com.example.intandem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -116,10 +118,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.logout) {
+            //LoginManager.getInstance().logOut();
+
+            final ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setTitle("Please, wait a moment.");
+            dialog.setMessage("Logging out...");
+            dialog.show();
             LoginManager.getInstance().logOut();
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
-            finish(); // doesn't let you go back to main activity once logged out
+            ParseUser.logOutInBackground(e -> {
+                if (e == null)
+                    Log.i(TAG, "successfully logged out");
+                else
+                    Log.e(TAG, "error logging out");
+            });
+
+//            Intent i = new Intent(this, LoginActivity.class);
+//            startActivity(i);
+//            finish(); // doesn't let you go back to main activity once logged out
             return true;
         }
         if (item.getItemId() == R.id.filter) {
@@ -127,4 +142,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
