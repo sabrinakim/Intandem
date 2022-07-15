@@ -3,13 +3,16 @@ package com.example.intandem;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -81,7 +84,6 @@ public class FilterDialogFragment extends DialogFragment {
     private Double latitude;
     private Double longitude;
     private List<Post> filteredDistancePosts;
-    private int maxDistance;
     private List<Post> mAllPosts;
 
     public interface FilterDialogListener {
@@ -121,50 +123,15 @@ public class FilterDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 FilterDialogListener listener = (FilterDialogListener) getTargetFragment();
-                listener.onFinishFilterDialog(Integer.parseInt(etDistance.getText().toString()));
+                // saving user's entered distance
+                int currMaxDistance = Integer.parseInt(etDistance.getText().toString());
+                listener.onFinishFilterDialog(currMaxDistance);
                 dismiss();
-                // grant permissions
-//                Dexter.withActivity(getActivity())
-//                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-//                        .withListener(new PermissionListener() {
-//                            @Override
-//                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-//                                // filter posts
-//                                // record number that user inputted.
-//                                maxDistance = Integer.parseInt(etDistance.getText().toString());
-//                                findCurrentLocation();
-//                            }
-//
-//                            @Override
-//                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-//                                if (permissionDeniedResponse.isPermanentlyDenied()) {
-//                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                                    builder.setTitle("Permission Denied")
-//                                            .setMessage("Permission to access device location is permanently denied." +
-//                                                    "You need to go to settings to allow the permission")
-//                                            .setNegativeButton("Cancel", null)
-//                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    Intent i = new Intent();
-//                                                    i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//                                                    // idk what this part does
-//                                                    i.setData(Uri.fromParts("package", getContext().getPackageName(), null));
-//                                                }
-//                                            }).show();
-//                                } else {
-//                                    Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-//                                permissionToken.continuePermissionRequest();
-//                            }
-//                        }).check();
             }
         });
     }
+
+    // TODO: GET RID OF BELOW FUNCTIONS EVENTUALLY
 
     private void queryFilteredPosts() {
         filteredDistancePosts = new ArrayList<>();
@@ -208,7 +175,7 @@ public class FilterDialogFragment extends DialogFragment {
                 List<DistanceInfo> elements = distanceSearchResult.getRows().get(0).getElements();
                 for (int i = 0; i < elements.size(); i++) {
                     Log.d(TAG, "" + elements.get(i).getDistance().getValue() / 1000.0);
-                    if ((elements.get(i).getDistance().getValue() / 1000.0) <= maxDistance) {
+                    if ((elements.get(i).getDistance().getValue() / 1000.0) <= 0) {
                         Log.d(TAG, "accepted: " + elements.get(i).getDistance().getValue() / 1000.0);
                         filteredDistancePosts.add(mAllPosts.get(i));
                     }
