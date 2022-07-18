@@ -1,6 +1,8 @@
 package com.example.intandem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.example.intandem.dataModels.Business;
 import com.example.intandem.dataModels.BusinessSearchResult;
@@ -25,6 +28,8 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -50,20 +55,83 @@ public class ComposeLocationActivity extends AppCompatActivity {
     public static final String YELP_BASE_URL = "https://api.yelp.com/v3/";
     private static final String YELP_API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
     private EditText etLocation;
-    private Button btnNext2;
+    private Button btnNext2, textBNext;
     private String placeId;
     private String placeAddress;
     private String placeName;
     private LatLng latLng;
-
+    private Toolbar composeLocationToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose_location);
 
-        etLocation = findViewById(R.id.etLocation);
-        btnNext2 = findViewById(R.id.btnNext2);
+        //etLocation = findViewById(R.id.etLocation);
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.LAT_LNG, Place.Field.ADDRESS));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Log.i(TAG, "place autocomplete success");
+                //etLocation.setText(place.getName());
+                placeId = place.getId();
+                placeName = place.getName();
+                placeAddress = place.getAddress();
+                latLng = place.getLatLng();
+
+                // query yelp & places details here and merge responses
+                // ONLY IF a merged one doesn't already exist in database
+                ParseQuery<CustomPlace> query = ParseQuery.getQuery(CustomPlace.class);
+                query.whereEqualTo("gPlaceId", placeId);
+                query.findInBackground(new FindCallback<CustomPlace>() {
+                    @Override
+                    public void done(List<CustomPlace> objects, ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error querying custom places");
+                        } else {
+                            Log.i(TAG, "success querying custom places");
+                            if (objects.size() == 0) { // we did not create a custom place object before.
+                                createCustomPlace(placeId, placeName);
+                            } else {
+                                textBNext.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+                                        i.putExtras(getIntent());
+                                        i.putExtra("customPlace", objects.get(0));
+                                        startActivity(i);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+                Log.i(TAG, "place id: " + placeId);
+                Log.i(TAG, "place name: " + placeName);
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+
+        textBNext = findViewById(R.id.textBNext);
+
+        composeLocationToolbar = findViewById(R.id.composeLocationToolbar);
+        setSupportActionBar(composeLocationToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_close_24);
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
@@ -71,75 +139,75 @@ public class ComposeLocationActivity extends AppCompatActivity {
         // Create a new PlacesClient instance
         PlacesClient placesClient = Places.createClient(this);
 
-        etLocation.setFocusable(false);
-        etLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // initialize place field list
-                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID,
-                        Place.Field.LAT_LNG, Place.Field.ADDRESS);
-
-                // create intent
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
-                        .build(ComposeLocationActivity.this);
-
-                // start activity result
-                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            }
-        });
+        //etLocation.setFocusable(false);
+//        search.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // initialize place field list
+//                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID,
+//                        Place.Field.LAT_LNG, Place.Field.ADDRESS);
+//
+//                // create intent
+//                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
+//                        .build(ComposeLocationActivity.this);
+//
+//                // start activity result
+//                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+//            }
+//        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
-            // success
-            Log.i(TAG, "place autocomplete success");
-
-            // this place instance can retrieve details about the place
-            Place place = Autocomplete.getPlaceFromIntent(data);
-            etLocation.setText(place.getName());
-            placeId = place.getId();
-            placeName = place.getName();
-            placeAddress = place.getAddress();
-            latLng = place.getLatLng();
-
-            // query yelp & places details here and merge responses
-            // ONLY IF a merged one doesn't already exist in database
-            ParseQuery<CustomPlace> query = ParseQuery.getQuery(CustomPlace.class);
-            query.whereEqualTo("gPlaceId", placeId);
-            query.findInBackground(new FindCallback<CustomPlace>() {
-                @Override
-                public void done(List<CustomPlace> objects, ParseException e) {
-                    if (e != null) {
-                        Log.e(TAG, "error querying custom places");
-                    } else {
-                        Log.i(TAG, "success querying custom places");
-                        if (objects.size() == 0) { // we did not create a custom place object before.
-                            createCustomPlace(placeId, placeName);
-                        } else {
-                            btnNext2.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-                                    i.putExtras(getIntent());
-                                    i.putExtra("customPlace", objects.get(0));
-                                    startActivity(i);
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-
-            Log.i(TAG, "place id: " + placeId);
-            Log.i(TAG, "place name: " + placeName);
-
-        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-            Status status = Autocomplete.getStatusFromIntent(data);
-            // display toast
-            Log.e(TAG, "place autocomplete error");
-        }
+//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
+//            // success
+//            Log.i(TAG, "place autocomplete success");
+//
+//            // this place instance can retrieve details about the place
+//            Place place = Autocomplete.getPlaceFromIntent(data);
+//            etLocation.setText(place.getName());
+//            placeId = place.getId();
+//            placeName = place.getName();
+//            placeAddress = place.getAddress();
+//            latLng = place.getLatLng();
+//
+//            // query yelp & places details here and merge responses
+//            // ONLY IF a merged one doesn't already exist in database
+//            ParseQuery<CustomPlace> query = ParseQuery.getQuery(CustomPlace.class);
+//            query.whereEqualTo("gPlaceId", placeId);
+//            query.findInBackground(new FindCallback<CustomPlace>() {
+//                @Override
+//                public void done(List<CustomPlace> objects, ParseException e) {
+//                    if (e != null) {
+//                        Log.e(TAG, "error querying custom places");
+//                    } else {
+//                        Log.i(TAG, "success querying custom places");
+//                        if (objects.size() == 0) { // we did not create a custom place object before.
+//                            createCustomPlace(placeId, placeName);
+//                        } else {
+//                            btnNext2.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+//                                    i.putExtras(getIntent());
+//                                    i.putExtra("customPlace", objects.get(0));
+//                                    startActivity(i);
+//                                }
+//                            });
+//                        }
+//                    }
+//                }
+//            });
+//
+//            Log.i(TAG, "place id: " + placeId);
+//            Log.i(TAG, "place name: " + placeName);
+//
+//        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+//            Status status = Autocomplete.getStatusFromIntent(data);
+//            // display toast
+//            Log.e(TAG, "place autocomplete error");
+//        }
     }
 
     private void createCustomPlace(String placeId, String placeName) {
