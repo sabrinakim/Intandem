@@ -135,17 +135,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
             Log.i(TAG, "place id: " + placeId);
             Log.i(TAG, "place name: " + placeName);
 
-//            btnNext2.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-//                    i.putExtras(getIntent());
-//                    i.putExtra("placeId", placeId);
-//                    i.putExtra("placeName", placeName);
-//                    // pass in places object
-//                    startActivity(i);
-//                }
-//            });
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
             // display toast
