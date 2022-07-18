@@ -43,10 +43,12 @@
         android:layout_marginStart="300dp"
         android:layout_marginEnd="10dp"
         android:background="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/ibSearch"
         app:layout_constraintEnd_toStartOf="@+id/ibFilter"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/ibSearch"
-        app:srcCompat="@drawable/ic_baseline_add_circle_24" />
+        app:layout_constraintTop_toTopOf="@+id/ibSearch"
+        app:srcCompat="@drawable/ic_baseline_add_circle_outline_24" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

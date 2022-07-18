@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.intandem.dataModels.DistanceInfo;
@@ -107,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location currLocation;
+    private Location currLocation = new Location("");
+//    private Location currLocation;
     private Double latitude;
     private Double longitude;
     private int maxDistance;
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
     private int currPage;
     private int numPostsFetched;
     private CircleImageView currUserProfileImage;
+    private ImageButton ibAddPost, ibFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +141,23 @@ public class MainActivity extends AppCompatActivity {
         View action_bar_view = layoutInflater.inflate(R.layout.custom_bar, null);
         actionBar.setCustomView(action_bar_view);
 
+        ibAddPost = findViewById(R.id.ibAddPost);
+        ibAddPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
+
+        ibFilter = findViewById(R.id.ibFilter);
+        ibFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditDialog();
+            }
+        });
 
         // unwrap parcel here
         user = getIntent().getParcelableExtra("user");
@@ -162,16 +182,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-//        fabCompose.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
-//                i.putExtra("user", user);
-//                startActivity(i);
-//            }
-//        });
 
         vp2Posts.setAdapter(adapter);
         vp2Posts.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -344,12 +354,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            currLocation = task.getResult();
-                            if (currLocation != null) {
-                                latitude = currLocation.getLatitude();
-                                longitude = currLocation.getLongitude();
-                                Log.i(TAG, "Lat: " + currLocation.getLatitude());
-                                Log.i(TAG, "Long: " + currLocation.getLongitude());
+                            Location fetchedLocation = task.getResult();
+                            if (fetchedLocation != null) {
+                                latitude = fetchedLocation.getLatitude();
+                                longitude = fetchedLocation.getLongitude();
+                                Log.i(TAG, "Lat: " + fetchedLocation.getLatitude());
+                                Log.i(TAG, "Long: " + fetchedLocation.getLongitude());
+
+                                currLocation.setLatitude(latitude);
+                                currLocation.setLongitude(longitude);
 
                                 queryPosts();
 
