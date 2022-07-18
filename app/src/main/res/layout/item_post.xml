@@ -76,10 +76,11 @@
         app:layout_constraintTop_toTopOf="@+id/tvLocationFeed" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tvMoreData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="3.2 km | $$"
+        android:text="distance | price"
+        android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="@+id/tvLocationFeed"
         app:layout_constraintTop_toBottomOf="@+id/tvLocationFeed" />
 

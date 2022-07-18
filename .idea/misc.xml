@@ -9,14 +9,15 @@
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2971014492753623" />
+        <entry key="app/src/main/res/layout/activity_compose_duration.xml" value="0.25903472900390623" />
         <entry key="app/src/main/res/layout/activity_compose_event.xml" value="0.2547118290337869" />
-        <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.29297036433565443" />
+        <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.26976205701025846" />
         <entry key="app/src/main/res/layout/activity_compose_picture.xml" value="0.22885766513105757" />
         <entry key="app/src/main/res/layout/activity_current_location.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.18659420289855072" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3197013553135391" />
         <entry key="app/src/main/res/layout/activity_permissions.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_replies_adapter.xml" value="0.21105072463768115" />
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />

@@ -1,12 +1,10 @@
 package com.example.intandem;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
@@ -28,21 +26,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.intandem.dataModels.DistanceInfo;
 import com.example.intandem.dataModels.DistanceSearchResult;
-import com.example.intandem.fragments.ActivityFragment;
-import com.example.intandem.fragments.ComposeFragment;
-import com.example.intandem.fragments.PostsFragment;
-import com.example.intandem.fragments.ProfileFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -56,7 +47,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -65,20 +55,14 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.parse.FindCallback;
-import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 //import okhttp3.Call;
@@ -89,7 +73,6 @@ import java.util.Set;
 //import okhttp3.Response;
 //import okhttp3.ResponseBody;
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -107,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location currLocation;
+    private Location currLocation = new Location("");
+//    private Location currLocation;
     private Double latitude;
     private Double longitude;
     private int maxDistance;
@@ -121,23 +105,37 @@ public class MainActivity extends AppCompatActivity {
     private int currPage;
     private int numPostsFetched;
     private CircleImageView currUserProfileImage;
+    private ImageButton ibAddPost, ibFilter;
+    private Toolbar homeToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        currUserProfileImage = findViewById(R.id.custom_profile_image);
+        currUserProfileImage = findViewById(R.id.toolbarProfileImage);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#FFFFFF"));
-        actionBar.setBackgroundDrawable(colorDrawable);
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View action_bar_view = layoutInflater.inflate(R.layout.custom_bar, null);
-        actionBar.setCustomView(action_bar_view);
+        homeToolbar = findViewById(R.id.homeToolbar);
+        setSupportActionBar(homeToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        ibAddPost = findViewById(R.id.ibAddPost);
+        ibAddPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
+
+        ibFilter = findViewById(R.id.ibFilter);
+        ibFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditDialog();
+            }
+        });
 
         // unwrap parcel here
         user = getIntent().getParcelableExtra("user");
@@ -162,16 +160,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-//        fabCompose.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
-//                i.putExtra("user", user);
-//                startActivity(i);
-//            }
-//        });
 
         vp2Posts.setAdapter(adapter);
         vp2Posts.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -344,12 +332,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            currLocation = task.getResult();
-                            if (currLocation != null) {
-                                latitude = currLocation.getLatitude();
-                                longitude = currLocation.getLongitude();
-                                Log.i(TAG, "Lat: " + currLocation.getLatitude());
-                                Log.i(TAG, "Long: " + currLocation.getLongitude());
+                            Location fetchedLocation = task.getResult();
+                            if (fetchedLocation != null) {
+                                latitude = fetchedLocation.getLatitude();
+                                longitude = fetchedLocation.getLongitude();
+                                Log.i(TAG, "Lat: " + fetchedLocation.getLatitude());
+                                Log.i(TAG, "Long: " + fetchedLocation.getLongitude());
+
+                                currLocation.setLatitude(latitude);
+                                currLocation.setLongitude(longitude);
 
                                 queryPosts();
 

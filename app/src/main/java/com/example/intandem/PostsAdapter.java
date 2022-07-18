@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.fragments.RepliesFragment;
 import com.example.intandem.fragments.ReviewsFragment;
 import com.example.intandem.models.CustomPlace;
@@ -31,17 +32,27 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     public static final String TAG = "PostsAdapter";
+    private static final String BASE_URL = "https://maps.googleapis.com/";
     Context context;
     private List<Post> posts;
     private ParseUser currUser;
+    private Location currLocation;
+    private boolean duration_flag = false;
 
     public PostsAdapter(Context context, List<Post> posts, ParseUser currUser, Location currLocation) {
         this.context = context;
         this.posts = posts;
         this.currUser = currUser;
+        this.currLocation = currLocation;
     }
 
     @NonNull
@@ -66,7 +77,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration;
+        TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
         ImageView ivPictureFeed, ivProfilePicture;
 
 
@@ -79,6 +90,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivProfilePicture = itemView.findViewById(R.id.ivProfilePic);
             tvName = itemView.findViewById(R.id.tvName);
             tvExpiration = itemView.findViewById(R.id.tvExpiration);
+            tvMoreData = itemView.findViewById(R.id.tvMoreData);
             itemView.setOnClickListener(this);
         }
 
@@ -99,6 +111,62 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvName.setText(post.getUser().getUsername());
             tvExpiration.setText("3 hr Left");
 
+            //Log.i(TAG, "" + currLocation.getLatitude());
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+            CustomPlace customPlace = post.getCustomPlace();
+            try {
+                customPlace.fetchIfNeeded();
+                googleMapsService.getDistanceSearchResult(currLocation.getLatitude() + "," + currLocation.getLongitude(),
+                        "place_id:" + post.getCustomPlace().getGPlaceId(),
+                        "driving",
+                        "en",
+                        BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
+                    @Override
+                    public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+                        DistanceSearchResult distanceSearchResult = response.body();
+                        Log.i(TAG, "success getting the distance");
+                        StringBuilder moreInfo = new StringBuilder();
+                        moreInfo.append(distanceSearchResult.getRows().get(0).getElements().get(0)
+                                .getDistance().getText());
+                        String price = customPlace.getPrice();
+                        if (price != null) {
+                            moreInfo.append(" | ");
+                            moreInfo.append(customPlace.getPrice());
+                        }
+                        tvMoreData.setText(moreInfo);
+
+                        tvMoreData.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (!duration_flag) {
+                                    duration_flag = true;
+                                    String duration = distanceSearchResult.getRows().get(0).getElements()
+                                            .get(0).getDuration().getText() + " by car";
+                                    tvMoreData.setText(duration);
+                                } else {
+                                    duration_flag = false;
+                                    tvMoreData.setText(moreInfo);
+                                }
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+                        Log.e(TAG, "error getting the distance");
+                    }
+                });
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
             CustomPlace c = post.getCustomPlace();
             c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
                 @Override
@@ -110,6 +178,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     tvLocationFeed.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            // TODO: make reviews activity
 //                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
 //                            Fragment fragment = ReviewsFragment.newInstance(post);
 //                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();

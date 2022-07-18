@@ -50,18 +50,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-//        Set<Integer> a = new HashSet<>();
-//        Set<Integer> b = new HashSet<>();
-//
-//        a.add(1);
-//        a.add(2);
-//        a.add(3);
-//        b.add(1);
-//        b.add(4);
-//        b.add(3);
-//
-//        a.removeAll(b);
-
         callbackManager = CallbackManager.Factory.create();
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
