@@ -110,9 +110,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     tvLocationFeed.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                            Fragment fragment = ReviewsFragment.newInstance(post);
-                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+//                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+//                            Fragment fragment = ReviewsFragment.newInstance(post);
+//                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
                         }
                     });
                 }
