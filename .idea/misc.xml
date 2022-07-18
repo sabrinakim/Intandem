@@ -9,6 +9,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2971014492753623" />
+        <entry key="app/src/main/res/layout/activity_compose_duration.xml" value="0.25903472900390623" />
         <entry key="app/src/main/res/layout/activity_compose_event.xml" value="0.2547118290337869" />
         <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.26976205701025846" />
         <entry key="app/src/main/res/layout/activity_compose_picture.xml" value="0.22885766513105757" />

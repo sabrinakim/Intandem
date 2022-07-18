@@ -54,8 +54,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
     public static final String GOOGLE_BASE_URL = "https://maps.googleapis.com/";
     public static final String YELP_BASE_URL = "https://api.yelp.com/v3/";
     private static final String YELP_API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
-    private EditText etLocation;
-    private Button btnNext2, textBNext;
+    private boolean locationChosen = false;
+    private Button textBNext;
     private String placeId;
     private String placeAddress;
     private String placeName;
@@ -67,7 +67,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose_location);
 
-        //etLocation = findViewById(R.id.etLocation);
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -80,7 +79,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 Log.i(TAG, "place autocomplete success");
-                //etLocation.setText(place.getName());
                 placeId = place.getId();
                 placeName = place.getName();
                 placeAddress = place.getAddress();
@@ -315,7 +313,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                         Log.i(TAG, "success saving custom place object");
 
                         // custom place exists in database, so we can now attach it to the post
-                        btnNext2.setOnClickListener(new View.OnClickListener() {
+                        textBNext.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
