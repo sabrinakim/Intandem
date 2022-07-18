@@ -36,8 +36,8 @@ public class ComposeDurationActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(ComposeDurationActivity.this,
-                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.timeUnits));
+//        ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(ComposeDurationActivity.this,
+//                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.timeUnits));
 
 //        // we want to make this list a dropdown list, not a simple list
 //        myAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
