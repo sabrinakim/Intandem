@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#000000"));
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#FFFFFF"));
         actionBar.setBackgroundDrawable(colorDrawable);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = layoutInflater.inflate(R.layout.custom_bar, null);
@@ -252,17 +252,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.logout) {
-            LoginManager.getInstance().logOut();
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
-            finish(); // doesn't let you go back to main activity once logged out
-            return true;
-        }
-        if (item.getItemId() == R.id.filter) {
-            showEditDialog();
-            return true;
-        }
+//        if (item.getItemId() == R.id.logout) {
+//            LoginManager.getInstance().logOut();
+//            Intent i = new Intent(this, LoginActivity.class);
+//            startActivity(i);
+//            finish(); // doesn't let you go back to main activity once logged out
+//            return true;
+//        }
+//        if (item.getItemId() == R.id.filter) {
+//            showEditDialog();
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
     private void getMorePosts(int currPage) {

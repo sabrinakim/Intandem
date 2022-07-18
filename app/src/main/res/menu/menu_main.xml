@@ -1,18 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:title="Item"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/filter"
-        android:title="filter"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/logout"
-        android:title="logout"
-        app:showAsAction="always" />
-
-
-</menu>
+    xmlns:android="http://schemas.android.com/apk/res/android"/>

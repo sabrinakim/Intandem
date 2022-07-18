@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
@@ -21,7 +22,7 @@
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.275" />
         <entry key="app/src/main/res/layout/activity_testing.xml" value="0.12447916666666667" />
-        <entry key="app/src/main/res/layout/custom_bar.xml" value="0.3539520263671875" />
+        <entry key="app/src/main/res/layout/custom_bar.xml" value="0.31578369140625" />
         <entry key="app/src/main/res/layout/fragment_activity.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_compose.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_filter_dialog.xml" value="0.24454956054687502" />

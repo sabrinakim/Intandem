@@ -275,13 +275,13 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.logout) {
-            return false;
-        }
-        if (item.getItemId() == R.id.filter) {
-            showEditDialog();
-            return true;
-        }
+//        if (item.getItemId() == R.id.logout) {
+//            return false;
+//        }
+//        if (item.getItemId() == R.id.filter) {
+//            showEditDialog();
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 

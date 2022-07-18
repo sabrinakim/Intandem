@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@color/white">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/custom_profile_image"
@@ -19,43 +19,35 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
-        android:background="@color/black"
+        android:background="@null"
         app:layout_constraintBottom_toBottomOf="@+id/custom_profile_image"
         app:layout_constraintStart_toEndOf="@+id/custom_profile_image"
         app:layout_constraintTop_toTopOf="@+id/custom_profile_image"
         app:srcCompat="@drawable/ic_baseline_search_24" />
 
-    <TextView
-        android:id="@+id/tvAppName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/ibSearch"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton5"
-        app:layout_constraintStart_toEndOf="@+id/ibSearch"
-        app:layout_constraintTop_toTopOf="@+id/ibSearch" />
 
     <ImageButton
         android:id="@+id/ibFilter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/black"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/ibAddPost"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ibAddPost"
         app:srcCompat="@drawable/ic_baseline_filter_list_24" />
 
     <ImageButton
-        android:id="@+id/imageButton5"
+        android:id="@+id/ibAddPost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:background="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/ibFilter"
+        android:layout_marginStart="300dp"
+        android:layout_marginEnd="10dp"
+        android:background="@null"
         app:layout_constraintEnd_toStartOf="@+id/ibFilter"
-        app:layout_constraintTop_toTopOf="@+id/ibFilter"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/ibSearch"
         app:srcCompat="@drawable/ic_baseline_add_circle_24" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
