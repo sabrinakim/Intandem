@@ -24,6 +24,7 @@ import com.example.intandem.fragments.RepliesFragment;
 import com.example.intandem.fragments.ReviewsFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -80,7 +81,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
         ImageView ivPictureFeed, ivProfilePicture;
 
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 //            tvEventFeed = itemView.findViewById(R.id.tvEventFeed);
@@ -121,6 +121,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             CustomPlace customPlace = post.getCustomPlace();
             try {
                 customPlace.fetchIfNeeded();
+                tvLocationFeed.setText(post.getCustomPlace().getName());
                 googleMapsService.getDistanceSearchResult(currLocation.getLatitude() + "," + currLocation.getLongitude(),
                         "place_id:" + post.getCustomPlace().getGPlaceId(),
                         "driving",
@@ -139,7 +140,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                             moreInfo.append(customPlace.getPrice());
                         }
                         tvMoreData.setText(moreInfo);
-
                         tvMoreData.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -167,25 +167,25 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
 
 
-            CustomPlace c = post.getCustomPlace();
-            c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-                @Override
-                public void done(ParseObject object, ParseException e) {
-                    if (e != null) {
-                        Log.e(TAG, "error fetching if needed in background");
-                    }
-                    tvLocationFeed.setText(post.getCustomPlace().getName());
-                    tvLocationFeed.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // TODO: make reviews activity
-//                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
-//                            Fragment fragment = ReviewsFragment.newInstance(post);
-//                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
-                        }
-                    });
-                }
-            });
+//            CustomPlace c = post.getCustomPlace();
+//            c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+//                @Override
+//                public void done(ParseObject object, ParseException e) {
+//                    if (e != null) {
+//                        Log.e(TAG, "error fetching if needed in background");
+//                    }
+//                    tvLocationFeed.setText(post.getCustomPlace().getName());
+//                    tvLocationFeed.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            // TODO: make reviews activity
+////                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+////                            Fragment fragment = ReviewsFragment.newInstance(post);
+////                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+//                        }
+//                    });
+//                }
+//            });
 
             ParseFile image = post.getPicture();
             if (image != null) { // image is optional, so its possible that it is null
