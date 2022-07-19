@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.simform.refresh.SSPullToRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -100,11 +102,10 @@ public class MainActivity extends AppCompatActivity {
     private PostsAdapter adapter;
     private List<Post> allPosts, filteredDistancePosts;
     private FloatingActionButton fabCompose;
-    private SwipeRefreshLayout swipeContainer;
     private Set<String> friendIds = new HashSet<>();
     private int currPage, numPostsFetched;
     private CircleImageView currUserProfileImage;
-    private ImageButton ibAddPost, ibFilter;
+    private ImageButton ibFilter;
     private Toolbar homeToolbar;
     private LottieAnimationView walkingBlob;
     private TextView tvLoadingMsg;
@@ -118,14 +119,19 @@ public class MainActivity extends AppCompatActivity {
         walkingBlob = findViewById(R.id.walkingBlob);
         tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
         homeToolbar = findViewById(R.id.homeToolbar);
-        ibAddPost = findViewById(R.id.ibAddPost);
         ibFilter = findViewById(R.id.ibFilter);
         vp2Posts = findViewById(R.id.vp2Posts);
+        fabCompose = findViewById(R.id.fabAddPost);
+
+        fabCompose.setVisibility(View.INVISIBLE);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setSupportActionBar(homeToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        ibAddPost.setOnClickListener(new View.OnClickListener() {
+        fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
@@ -150,17 +156,30 @@ public class MainActivity extends AppCompatActivity {
         maxDistance = -1;
         adapter = new PostsAdapter(this, allPosts, user, currLocation);
 
-        swipeContainer = findViewById(R.id.swipeContainer);
+//        swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                allPosts.clear();
+////                walkingBlob.playAnimation();
+////                walkingBlob.setVisibility(View.VISIBLE);
+//                queryPosts();
+//                swipeContainer.setRefreshing(false);
+//            }
+//        });
+
+        SSPullToRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setLottieAnimation("loading_balls.json");
+        pullToRefresh.setRepeatMode(SSPullToRefreshLayout.RepeatMode.REPEAT);
+        pullToRefresh.setRepeatCount(SSPullToRefreshLayout.RepeatCount.INFINITE);
+        pullToRefresh.setOnRefreshListener(new SSPullToRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 allPosts.clear();
-//                walkingBlob.playAnimation();
-//                walkingBlob.setVisibility(View.VISIBLE);
                 queryPosts();
-                swipeContainer.setRefreshing(false);
+                pullToRefresh.setRefreshing(false);
             }
         });
 
@@ -426,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
             walkingBlob.cancelAnimation();
             walkingBlob.setVisibility(View.INVISIBLE);
             tvLoadingMsg.setVisibility(View.INVISIBLE);
+            fabCompose.setVisibility(View.VISIBLE);
             adapter.notifyDataSetChanged();
             return;
         }
@@ -480,6 +500,7 @@ public class MainActivity extends AppCompatActivity {
                 walkingBlob.cancelAnimation();
                 walkingBlob.setVisibility(View.INVISIBLE);
                 tvLoadingMsg.setVisibility(View.INVISIBLE);
+                fabCompose.setVisibility(View.VISIBLE);
                 // we created the list of filtered posts now.
                 adapter.notifyDataSetChanged();
             }

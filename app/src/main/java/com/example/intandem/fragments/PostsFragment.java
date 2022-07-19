@@ -147,18 +147,18 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         maxDistance = -1;
         adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
 
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+//        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                allPosts.clear();
-                adapter.notifyDataSetChanged();
-                queryPosts();
-                swipeContainer.setRefreshing(false);
-            }
-        });
+//        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                allPosts.clear();
+//                adapter.notifyDataSetChanged();
+//                queryPosts();
+//                swipeContainer.setRefreshing(false);
+//            }
+//        });
 
 
 
