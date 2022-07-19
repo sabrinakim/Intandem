@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="shimmer_background">#dddddd</color>
+    <color name="mustard">#FDCB6E</color>
+    <color name="dusty_pink">#F4E3E3</color>
+    <color name="almost_black">#2F3542</color>
+    <color name="watermelon">#FF6B81</color>
+
 </resources>

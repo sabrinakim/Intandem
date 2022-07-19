@@ -27,8 +27,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.intandem.dataModels.DistanceInfo;
 import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.CustomPlace;
@@ -91,22 +93,21 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location currLocation = new Location("");
-//    private Location currLocation;
     private Double latitude;
     private Double longitude;
     private int maxDistance;
     private ViewPager2 vp2Posts;
     private PostsAdapter adapter;
-    private List<Post> allPosts;
-    private List<Post> filteredDistancePosts;
+    private List<Post> allPosts, filteredDistancePosts;
     private FloatingActionButton fabCompose;
     private SwipeRefreshLayout swipeContainer;
     private Set<String> friendIds = new HashSet<>();
-    private int currPage;
-    private int numPostsFetched;
+    private int currPage, numPostsFetched;
     private CircleImageView currUserProfileImage;
     private ImageButton ibAddPost, ibFilter;
     private Toolbar homeToolbar;
+    private LottieAnimationView walkingBlob;
+    private TextView tvLoadingMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,12 +115,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
-
+        walkingBlob = findViewById(R.id.walkingBlob);
+        tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
         homeToolbar = findViewById(R.id.homeToolbar);
+        ibAddPost = findViewById(R.id.ibAddPost);
+        ibFilter = findViewById(R.id.ibFilter);
+        vp2Posts = findViewById(R.id.vp2Posts);
+
         setSupportActionBar(homeToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        ibAddPost = findViewById(R.id.ibAddPost);
         ibAddPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ibFilter = findViewById(R.id.ibFilter);
         ibFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,21 +144,21 @@ public class MainActivity extends AppCompatActivity {
         // unwrap parcel here
         user = getIntent().getParcelableExtra("user");
 
-        vp2Posts = findViewById(R.id.vp2Posts);
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();
         //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
         adapter = new PostsAdapter(this, allPosts, user, currLocation);
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 allPosts.clear();
-                adapter.notifyDataSetChanged();
+//                walkingBlob.playAnimation();
+//                walkingBlob.setVisibility(View.VISIBLE);
                 queryPosts();
                 swipeContainer.setRefreshing(false);
             }
@@ -379,6 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 queryPosts.whereContainedIn(Post.KEY_USER_FB_ID, friendIds);
                 Calendar rightNow = Calendar.getInstance();
                 queryPosts.whereGreaterThan(Post.KEY_EXPIRATION, rightNow.getTime());
+                queryPosts.addDescendingOrder(Post.KEY_CREATEDAT);
                 queryPosts.findInBackground(new FindCallback<Post>() {
                     @Override
                     public void done(List<Post> posts, ParseException e) {
@@ -418,6 +423,9 @@ public class MainActivity extends AppCompatActivity {
         allPosts.addAll(posts);
         if (maxDistance == -1) {
             numPostsFetched = posts.size();
+            walkingBlob.cancelAnimation();
+            walkingBlob.setVisibility(View.INVISIBLE);
+            tvLoadingMsg.setVisibility(View.INVISIBLE);
             adapter.notifyDataSetChanged();
             return;
         }
@@ -469,6 +477,9 @@ public class MainActivity extends AppCompatActivity {
                 allPosts.clear();
                 numPostsFetched = filteredDistancePosts.size();
                 allPosts.addAll(filteredDistancePosts);
+                walkingBlob.cancelAnimation();
+                walkingBlob.setVisibility(View.INVISIBLE);
+                tvLoadingMsg.setVisibility(View.INVISIBLE);
                 // we created the list of filtered posts now.
                 adapter.notifyDataSetChanged();
             }

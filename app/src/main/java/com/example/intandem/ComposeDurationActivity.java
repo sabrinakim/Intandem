@@ -64,7 +64,6 @@ public class ComposeDurationActivity extends AppCompatActivity {
                 Intent i = new Intent(ComposeDurationActivity.this, ComposePictureActivity.class);
                 i.putExtras(getIntent());
                 i.putExtra("duration", duration);
-                //i.putExtra("timeUnit", timeUnit);
                 startActivity(i);
             }
         });

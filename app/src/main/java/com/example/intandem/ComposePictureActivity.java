@@ -65,15 +65,13 @@ public class ComposePictureActivity extends AppCompatActivity {
 //        Log.i(TAG, event);
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
-        timeUnit = extras.getString("timeUnit");
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String caption = etCaption.getText().toString();
                 etCaption.setText(caption);
-                savePost(user, customPlace, etCaption.getText().toString(), photoFile, duration,
-                        timeUnit);
+                savePost(user, customPlace, etCaption.getText().toString(), photoFile, duration);
             }
         });
     }
@@ -132,7 +130,7 @@ public class ComposePictureActivity extends AppCompatActivity {
     }
 
     private void savePost(ParseUser currentUser, CustomPlace customPlace, String caption,
-                          File photoFile, String duration, String timeUnit) {
+                          File photoFile, String duration) {
         Post post = new Post();
         post.setUser(currentUser);
 //        post.setEvent(event);
@@ -142,11 +140,17 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setUserFbId(currentUser.getString("fbId"));
 
         Calendar rightNow = Calendar.getInstance();
-        if (timeUnit.equals("Minute(s)")) {
-            rightNow.add(Calendar.MINUTE, Integer.parseInt(duration));
-        } else {
-            rightNow.add(Calendar.HOUR, Integer.parseInt(duration));
-        }
+//        if (timeUnit.equals("Minute(s)")) {
+//            rightNow.add(Calendar.MINUTE, Integer.parseInt(duration));
+//        } else {
+//            rightNow.add(Calendar.HOUR, Integer.parseInt(duration));
+//        }
+
+        double fraction = Double.parseDouble(duration) % 1;
+        int minutes = (int) (fraction * 60);
+        int hours = (int) Math.floor(Double.parseDouble(duration));
+        rightNow.add(Calendar.MINUTE, minutes);
+        rightNow.add(Calendar.HOUR, hours);
 
         Date expiration = rightNow.getTime();
         post.setExpiration(expiration);
