@@ -112,11 +112,12 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         // passes in the login results to the login manager via the callback manager
         super.onActivityResult(requestCode, resultCode, data);
-
-
         // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
         // we will use the Graph API
+        useGraphApi();
+    }
 
+    private void useGraphApi() {
         GraphRequest meGraphRequest = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
@@ -137,29 +138,9 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.e(TAG, "Issue with getting user", e);
                                 return;
                             }
-
                             if (objects.size() == 0) {
                                 Log.i(TAG, "new user");
-                                ParseUser user = new ParseUser();
-                                user.put("firstName", first_name);
-                                user.put("lastName", last_name);
-                                // username and password is just their name
-                                user.put("username", name);
-                                user.put("password", name);
-                                user.put("fbId", id);
-
-                                user.signUpInBackground(new SignUpCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            Log.e(TAG, "something went wrong with saving user: " + e);
-                                            return;
-                                        }
-                                        Log.i(TAG, "user saved successfully");
-
-                                        recordFriendsList(id, user);
-                                    }
-                                });
+                                createNewUser(name, id, first_name, last_name);
                             } else { // user already registered in our database
                                 Log.i(TAG, "user already exists");
                                 updateFriendsList(id);
@@ -168,8 +149,6 @@ public class LoginActivity extends AppCompatActivity {
                                 i.putExtra("user", objects.get(0));
                                 startActivity(i);
                             }
-
-
                         }
                     });
 
@@ -188,6 +167,29 @@ public class LoginActivity extends AppCompatActivity {
         meGraphRequest.executeAsync();
     }
 
+    private void createNewUser(String name, String firstName, String lastName, String id) {
+        ParseUser user = new ParseUser();
+        user.put("firstName", firstName);
+        user.put("lastName", lastName);
+        // username and password is just their name
+        user.put("username", name);
+        user.put("password", name);
+        user.put("fbId", id);
+
+        user.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "something went wrong with saving user: " + e);
+                    return;
+                }
+                Log.i(TAG, "user saved successfully");
+
+                recordFriendsList(id, user);
+            }
+        });
+    }
+
     private void updateFriendsList(String id) {
 
         GraphRequest request = GraphRequest.newGraphPathRequest(
@@ -200,10 +202,8 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             Set<String> currFriendsList = new HashSet<>();
                             HashMap<String, Friendship> storedFriendsMap = new HashMap<>();
-                            Set<Friendship> toDelete = new HashSet<>();
 
-                            JSONArray friends = response.getJSONObject()
-                                    .getJSONArray("data");
+                            JSONArray friends = response.getJSONObject().getJSONArray("data");
                             for (int i = 0; i < friends.length(); i++) {
                                 currFriendsList.add(friends.getJSONObject(i).getString("id"));
                             }
@@ -222,10 +222,20 @@ public class LoginActivity extends AppCompatActivity {
                                         // {1, 2, 3} storedFriendsMap
                                         // {1, 4, 3} currFriendsList
 
-                                        HashMap<String, Friendship> deletedFriendsMap = new HashMap<>();
-                                        deletedFriendsMap.putAll(storedFriendsMap);
-                                        for (String currFriend : currFriendsList) {
-                                            deletedFriendsMap.remove(currFriend);
+                                        FriendshipUpdates friendshipUpdates = new FriendshipUpdates(currFriendsList);
+                                        HashMap<String, Friendship> deletedFriendsMap = friendshipUpdates.getFriendsToDelete(storedFriendsMap);
+
+                                        for (Map.Entry<String, Friendship> deletedFriend : deletedFriendsMap.entrySet()) {
+                                            deletedFriend.getValue().deleteInBackground(new DeleteCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e != null) {
+                                                        Log.e(TAG, "error deleting friendship");
+                                                    } else {
+                                                        Log.i(TAG, "success deleting friendship");
+                                                    }
+                                                }
+                                            });
                                         }
 
                                         if (deletedFriendsMap.size() > 0) {
@@ -238,11 +248,9 @@ public class LoginActivity extends AppCompatActivity {
                                                         Log.e(TAG, "error getting inverse friendships");
                                                         return;
                                                     }
-                                                    for (Friendship friendship : friendships) {
-                                                        if (deletedFriendsMap.containsKey(friendship.getUser1Id())) {
-                                                            toDelete.add(friendship);
-                                                        }
-                                                    }
+
+                                                    Set<Friendship> toDelete = friendshipUpdates.getFriendsToDeleteInverse(deletedFriendsMap, friendships);
+
                                                     for (Friendship deletedFriend : toDelete) {
                                                         deletedFriend.deleteInBackground(new DeleteCallback() {
                                                             @Override
@@ -259,22 +267,7 @@ public class LoginActivity extends AppCompatActivity {
                                             });
                                         }
 
-                                        Set<String> newFriends = new HashSet<>();
-                                        newFriends.addAll(currFriendsList);
-                                        newFriends.removeAll(storedFriendsMap.keySet());
-
-                                        for (Map.Entry<String, Friendship> deletedFriend : deletedFriendsMap.entrySet()) {
-                                            deletedFriend.getValue().deleteInBackground(new DeleteCallback() {
-                                                @Override
-                                                public void done(ParseException e) {
-                                                    if (e != null) {
-                                                        Log.e(TAG, "error deleting friendship");
-                                                    } else {
-                                                        Log.i(TAG, "success deleting friendship");
-                                                    }
-                                                }
-                                            });
-                                        }
+                                        Set<String> newFriends = friendshipUpdates.getNewFriendships(storedFriendsMap);
 
                                         for (String newFriend : newFriends) {
                                             Friendship friendship = new Friendship();
@@ -307,8 +300,6 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                             });
                                         }
-
-
                                     }
                                 }
                             });
@@ -319,10 +310,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
 
         request.executeAsync();
-
-
-
-
     }
 
     private void recordFriendsList(String id, ParseUser user) {
@@ -336,8 +323,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.i(TAG, response.toString());
 
                         try {
-                            JSONArray friends = response.getJSONObject()
-                                    .getJSONArray("data");
+                            JSONArray friends = response.getJSONObject().getJSONArray("data");
 
                             for (int i = 0; i < friends.length(); i++) {
                                 String friendsId = friends.getJSONObject(i).getString("id");
