@@ -69,13 +69,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//import okhttp3.Call;
-//import okhttp3.Callback;
-//import okhttp3.HttpUrl;
-//import okhttp3.OkHttpClient;
-//import okhttp3.Request;
-//import okhttp3.Response;
-//import okhttp3.ResponseBody;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -109,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar homeToolbar;
     private LottieAnimationView walkingBlob;
     private TextView tvLoadingMsg;
+    private SSPullToRefreshLayout pullToRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,21 +150,7 @@ public class MainActivity extends AppCompatActivity {
         maxDistance = -1;
         adapter = new PostsAdapter(this, allPosts, user, currLocation);
 
-//        swipeContainer = findViewById(R.id.swipeContainer);
-
-        // Setup refresh listener which triggers new data loading
-//        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                allPosts.clear();
-////                walkingBlob.playAnimation();
-////                walkingBlob.setVisibility(View.VISIBLE);
-//                queryPosts();
-//                swipeContainer.setRefreshing(false);
-//            }
-//        });
-
-        SSPullToRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh = findViewById(R.id.pullToRefresh);
         pullToRefresh.setLottieAnimation("loading_balls.json");
         pullToRefresh.setRepeatMode(SSPullToRefreshLayout.RepeatMode.REPEAT);
         pullToRefresh.setRepeatCount(SSPullToRefreshLayout.RepeatCount.INFINITE);
@@ -179,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
             public void onRefresh() {
                 allPosts.clear();
                 queryPosts();
-                pullToRefresh.setRefreshing(false);
             }
         });
 
@@ -187,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
         vp2Posts.setAdapter(adapter);
         vp2Posts.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             int previousState = ViewPager2.SCROLL_STATE_IDLE;
-            //final int[] previousState = {ViewPager2.SCROLL_STATE_IDLE};
 
             @Override
             // This method is triggered when there is any scrolling activity for the current page
@@ -446,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
             walkingBlob.setVisibility(View.INVISIBLE);
             tvLoadingMsg.setVisibility(View.INVISIBLE);
             fabCompose.setVisibility(View.VISIBLE);
+            pullToRefresh.setRefreshing(false);
             adapter.notifyDataSetChanged();
             return;
         }
@@ -501,6 +480,7 @@ public class MainActivity extends AppCompatActivity {
                 walkingBlob.setVisibility(View.INVISIBLE);
                 tvLoadingMsg.setVisibility(View.INVISIBLE);
                 fabCompose.setVisibility(View.VISIBLE);
+                pullToRefresh.setRefreshing(false);
                 // we created the list of filtered posts now.
                 adapter.notifyDataSetChanged();
             }
