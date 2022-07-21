@@ -31,6 +31,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.time.Duration;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -109,7 +111,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 //            });
 
             tvName.setText(post.getUser().getUsername());
-            tvExpiration.setText("3 hr Left");
+
+            Calendar rightNow = Calendar.getInstance();
+            String timeLeft = DateDiff.findDifference(rightNow.getTime(), post.getExpiration());
+
+            tvExpiration.setText(timeLeft + " Left");
 
             //Log.i(TAG, "" + currLocation.getLatitude());
 
@@ -213,5 +219,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         }
     }
+
+
 
 }
