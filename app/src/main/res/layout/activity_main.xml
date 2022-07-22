@@ -27,11 +27,23 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:visibility="invisible"
         android:clickable="true"
         android:src="@drawable/ic_baseline_add_24"
-        app:backgroundTint="@color/white"
+        app:backgroundTint="@color/purple_200"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+<!--    <View-->
+<!--        android:id="@+id/circle"-->
+<!--        android:layout_width="64dp"-->
+<!--        android:layout_height="64dp"-->
+<!--        android:background="@drawable/circle"-->
+<!--        android:visibility="visible"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/fabAddPost" />-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -159,5 +171,16 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/blob_walking" />
+
+<!--    <View-->
+<!--        android:id="@+id/circle"-->
+<!--        android:layout_width="64dp"-->
+<!--        android:layout_height="64dp"-->
+<!--        android:background="@drawable/circle"-->
+<!--        android:visibility="visible"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/fabAddPost"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/fabAddPost" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

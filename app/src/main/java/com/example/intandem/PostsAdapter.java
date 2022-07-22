@@ -2,9 +2,12 @@ package com.example.intandem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.gesture.Gesture;
 import android.location.Location;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.RoundedCorner;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,6 +97,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvExpiration = itemView.findViewById(R.id.tvExpiration);
             tvMoreData = itemView.findViewById(R.id.tvMoreData);
             itemView.setOnClickListener(this);
+
+
+            GestureDetector gestureDetector = new GestureDetector(context.getApplicationContext(), new GestureListener());
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return gestureDetector.onTouchEvent(event);
+                }
+            });
+
+
         }
 
         public void bind(Post post) {
@@ -215,7 +229,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Intent i = new Intent (context, ReplyActivity.class);
                 i.putExtra("user", currUser);
                 i.putExtra("post", post);
-                context.startActivity(i);
+                //context.startActivity(i);
+            }
+        }
+
+
+        private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Log.i(TAG, "double tapped");
+                return super.onDoubleTapEvent(e);
             }
         }
     }

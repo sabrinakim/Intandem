@@ -25,8 +25,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
     private LottieAnimationView walkingBlob;
     private TextView tvLoadingMsg;
     private SSPullToRefreshLayout pullToRefresh;
+    private float x1,x2;
+    static final int MIN_DISTANCE = 150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         ibFilter = findViewById(R.id.ibFilter);
         vp2Posts = findViewById(R.id.vp2Posts);
         fabCompose = findViewById(R.id.fabAddPost);
+//        circle = findViewById(R.id.circle);
 
         fabCompose.setVisibility(View.INVISIBLE);
 
@@ -125,12 +132,37 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(homeToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.circle_explosion_anim);
+//        animation.setDuration(700);
+//        animation.setInterpolator(new AccelerateDecelerateInterpolator());
+//        animation.setAnimationListener(new Animation.AnimationListener() {
+//            @Override
+//            public void onAnimationStart(Animation animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animation animation) {
+//                Log.i(TAG, "animation ended");
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animation animation) {
+//
+//            }
+//        });
+
+
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //fabCompose.setVisibility(View.INVISIBLE);
+                //circle.setVisibility(View.VISIBLE);
+                //animation.start();
                 Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
                 i.putExtra("user", user);
                 startActivity(i);
+                overridePendingTransition(R.anim.slide_up_in, R.anim.nothing);
             }
         });
 
@@ -254,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
         return super.onOptionsItemSelected(item);
     }
+
+
     private void getMorePosts(int currPage) {
         numPostsFetched = 0;
         ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
