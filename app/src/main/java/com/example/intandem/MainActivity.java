@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -106,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
     private LottieAnimationView walkingBlob;
     private TextView tvLoadingMsg;
     private SSPullToRefreshLayout pullToRefresh;
-    private View circle;
+    private float x1,x2;
+    static final int MIN_DISTANCE = 150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -284,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
         return super.onOptionsItemSelected(item);
     }
+
+
     private void getMorePosts(int currPage) {
         numPostsFetched = 0;
         ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
