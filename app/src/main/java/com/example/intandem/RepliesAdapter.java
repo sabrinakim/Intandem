@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.intandem.models.Reply;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.parse.ParseFile;
 
 import java.util.List;
@@ -50,7 +52,7 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView ivPictureReplyFeed;
+        RoundedImageView ivPictureReplyFeed;
         TextView tvCaptionReplyFeed;
 
         public ViewHolder(@NonNull View itemView) {

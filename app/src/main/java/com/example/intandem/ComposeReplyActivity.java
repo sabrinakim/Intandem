@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ public class ComposeReplyActivity extends AppCompatActivity {
     private File photoFile;
     private String photoFileName = "photo.jpg";
     private ImageView ivPictureReply;
-    private Button btnReply;
+    private ImageButton btnReply;
     private ParseUser currUser;
     private Post currPost;
     private EditText etCaptionReply;
@@ -126,9 +127,13 @@ public class ComposeReplyActivity extends AppCompatActivity {
         reply.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
+                Log.i(TAG, "reply saved successfully");
                 ivPictureReply.setImageResource(0);
                 etCaptionReply.setText("");
-                Log.i(TAG, "reply saved successfully");
+                // go to reply feed
+                Intent i = new Intent(ComposeReplyActivity.this, ViewRepliesActivity.class);
+                i.putExtra("currPost", currPost);
+                startActivity(i);
             }
         });
 
