@@ -88,7 +88,7 @@
         app:suffixText="hrs">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etDuration"
+            android:id="@+id/etCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal" />

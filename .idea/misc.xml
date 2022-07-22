@@ -13,7 +13,8 @@
         <entry key="app/src/main/res/layout/activity_compose_duration.xml" value="0.25903472900390623" />
         <entry key="app/src/main/res/layout/activity_compose_event.xml" value="0.2547118290337869" />
         <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.26976205701025846" />
-        <entry key="app/src/main/res/layout/activity_compose_picture.xml" value="0.22885766513105757" />
+        <entry key="app/src/main/res/layout/activity_compose_picture.xml" value="0.19830956942793243" />
+        <entry key="app/src/main/res/layout/activity_compose_reply.xml" value="0.10258358662613981" />
         <entry key="app/src/main/res/layout/activity_current_location.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />

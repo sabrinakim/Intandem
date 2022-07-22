@@ -2,6 +2,7 @@ package com.example.intandem;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import android.content.Intent;
@@ -45,8 +46,8 @@ public class ComposePictureActivity extends AppCompatActivity {
 //    private String event;
     private ParseUser user;
     private String duration;
-    private String timeUnit;
     private CustomPlace customPlace;
+    private Toolbar composePictureToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,11 @@ public class ComposePictureActivity extends AppCompatActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        composePictureToolbar = findViewById(R.id.composePictureToolbar);
+        setSupportActionBar(composePictureToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ivImage = findViewById(R.id.ivImage);
         etCaption = findViewById(R.id.etCaption);
