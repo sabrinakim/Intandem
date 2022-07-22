@@ -5,6 +5,7 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/circle.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/circle_button.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.1" />
@@ -14,7 +15,7 @@
         <entry key="app/src/main/res/layout/activity_compose_event.xml" value="0.2547118290337869" />
         <entry key="app/src/main/res/layout/activity_compose_location.xml" value="0.26976205701025846" />
         <entry key="app/src/main/res/layout/activity_compose_picture.xml" value="0.19830956942793243" />
-        <entry key="app/src/main/res/layout/activity_compose_reply.xml" value="0.10258358662613981" />
+        <entry key="app/src/main/res/layout/activity_compose_reply.xml" value="0.28597286885270234" />
         <entry key="app/src/main/res/layout/activity_current_location.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />
@@ -25,6 +26,7 @@
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.275" />
         <entry key="app/src/main/res/layout/activity_testing.xml" value="0.12447916666666667" />
+        <entry key="app/src/main/res/layout/activity_view_replies.xml" value="0.17753623188405798" />
         <entry key="app/src/main/res/layout/custom_bar.xml" value="0.31578369140625" />
         <entry key="app/src/main/res/layout/data_placeholder_layout.xml" value="0.37150878906249996" />
         <entry key="app/src/main/res/layout/fragment_activity.xml" value="0.29438405797101447" />
@@ -34,7 +36,7 @@
         <entry key="app/src/main/res/layout/fragment_replies.xml" value="0.2472015380859375" />
         <entry key="app/src/main/res/layout/fragment_reviews.xml" value="0.13500506585612967" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.32185283567432826" />
-        <entry key="app/src/main/res/layout/item_reply.xml" value="0.30510864257812503" />
+        <entry key="app/src/main/res/layout/item_reply.xml" value="0.12264150943396226" />
         <entry key="app/src/main/res/layout/item_review.xml" value="0.30322100823894216" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2898148148148148" />
         <entry key="app/src/main/res/menu/menu_compose_event.xml" value="0.26615384615384613" />

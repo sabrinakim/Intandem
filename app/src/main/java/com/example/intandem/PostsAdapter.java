@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,6 +75,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
         ImageView ivPictureFeed, ivProfilePicture;
+        ImageButton btnViewReplies;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,6 +87,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvName = itemView.findViewById(R.id.tvName);
             tvExpiration = itemView.findViewById(R.id.tvExpiration);
             tvMoreData = itemView.findViewById(R.id.tvMoreData);
+            btnViewReplies = itemView.findViewById(R.id.btnViewReplies);
             itemView.setOnClickListener(this);
 
 
@@ -95,7 +98,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     return gestureDetector.onTouchEvent(event);
                 }
             });
-
 
         }
 
@@ -120,7 +122,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             tvExpiration.setText(timeLeft + " Left");
 
-            //Log.i(TAG, "" + currLocation.getLatitude());
+            btnViewReplies.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ViewRepliesActivity.class);
+                    i.putExtra("currPost", post);
+                    context.startActivity(i);
+                }
+            });
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)

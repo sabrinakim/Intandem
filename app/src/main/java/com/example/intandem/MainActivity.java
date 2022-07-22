@@ -107,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
     private LottieAnimationView walkingBlob;
     private TextView tvLoadingMsg;
     private SSPullToRefreshLayout pullToRefresh;
-    private float x1,x2;
-    static final int MIN_DISTANCE = 150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
