@@ -5,15 +5,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-
-import com.parse.ParseUser;
 
 public class ComposeDurationActivity extends AppCompatActivity {
 
@@ -30,7 +24,7 @@ public class ComposeDurationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compose_duration);
 
         btnDurationNext = findViewById(R.id.btnDurationNext);
-        etDuration = findViewById(R.id.etDuration);
+        etDuration = findViewById(R.id.etCaption);
         composeDurationToolbar = findViewById(R.id.composeDurationToolbar);
         setSupportActionBar(composeDurationToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

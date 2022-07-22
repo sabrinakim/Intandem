@@ -42,7 +42,7 @@
             android:name=".PermissionsActivity"
             android:exported="false" />
         <activity
-            android:name=".ReplyActivity"
+            android:name=".ComposeReplyActivity"
             android:exported="false" />
         <activity
             android:name=".ComposeDurationActivity"
@@ -70,7 +70,8 @@
 
         <activity
             android:name=".ComposePictureActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".ComposeDurationActivity"/>
         <activity
             android:name=".ComposeLocationActivity"
             android:exported="false"

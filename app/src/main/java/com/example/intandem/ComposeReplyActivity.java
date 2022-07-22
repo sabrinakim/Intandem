@@ -27,7 +27,7 @@ import com.parse.SaveCallback;
 
 import java.io.File;
 
-public class ReplyActivity extends AppCompatActivity {
+public class ComposeReplyActivity extends AppCompatActivity {
 
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public static final String TAG = "ReplyActivity";
@@ -42,7 +42,7 @@ public class ReplyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reply);
+        setContentView(R.layout.activity_compose_reply);
 
         Bundle extras = getIntent().getExtras();
         currUser = extras.getParcelable("user");
