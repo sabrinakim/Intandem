@@ -90,7 +90,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             btnViewReplies = itemView.findViewById(R.id.btnViewReplies);
             itemView.setOnClickListener(this);
 
-
             GestureDetector gestureDetector = new GestureDetector(context.getApplicationContext(), new GestureListener());
             itemView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -217,23 +216,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvCaptionFeed.setText(post.getCaption());
         }
 
-
         @Override
         public void onClick(View v) {
-            //Toast.makeText(context, "reply", Toast.LENGTH_SHORT).show();
-            int position = getAdapterPosition();
-//            if (position != RecyclerView.NO_POSITION) {
-//                Post post = posts.get(position);
-//                Intent i = new Intent (context, ReplyActivity.class);
-//                i.putExtra("user", currUser);
-//                i.putExtra("post", post);
-//                context.startActivity(i);
-//            }
+            Log.i(TAG, "CLICK");
         }
+
         private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+            private static final int SWIPE_THRESHOLD = 100;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                //Log.i(TAG, "double tapped");
+                Log.i(TAG, "double tapped");
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     Post post = posts.get(position);
@@ -243,6 +238,30 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     context.startActivity(i);
                 }
                 return super.onDoubleTapEvent(e);
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                boolean result = false;
+                try {
+                    float diffY = e2.getY() - e1.getY();
+                    float diffX = e2.getX() - e1.getX();
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (diffX <= 0) {
+                                onSwipeLeft();
+                            }
+                            result = true;
+                        }
+                    }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                return result;
+            }
+
+            private void onSwipeLeft() {
+                Log.i(TAG, "swiped left");
             }
         }
     }
