@@ -26,9 +26,9 @@ public class DateDiff {
             timeLeft = diffDays;
         } else if (largestUnitFound) {
             if (diffDays > (365 / 2)) {
-                return timeLeft + 1 + " year";
+                return timeLeft + 1 + " yr";
             }
-            return timeLeft + " year";
+            return timeLeft + " yr";
         }
 
         long diffHrs = (diffMill / (1000 * 60 * 60)) % 24;
@@ -38,9 +38,9 @@ public class DateDiff {
             timeLeft = diffHrs;
         } else if (largestUnitFound) {
             if (diffHrs > 12) {
-                return timeLeft + 1 + " day";
+                return timeLeft + 1 + " d";
             }
-            return timeLeft + " day";
+            return timeLeft + " d";
         }
 
         long diffMins = (diffMill / (1000 * 60)) % 60;

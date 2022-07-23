@@ -1,6 +1,7 @@
 package com.example.intandem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +28,7 @@ public class ViewRepliesActivity extends AppCompatActivity {
     private RecyclerView rvReplies;
     private RepliesAdapter adapter;
     private Post currPost;
+    private Toolbar viewRepliesToolbar;
 
 
     @Override
@@ -35,6 +37,11 @@ public class ViewRepliesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_replies);
 
         rvReplies = findViewById(R.id.rvReplies);
+        viewRepliesToolbar = findViewById(R.id.viewRepliesToolbar);
+
+        setSupportActionBar(viewRepliesToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         allReplies = new ArrayList<>();
         adapter = new RepliesAdapter(this, allReplies);
