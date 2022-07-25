@@ -1,8 +1,11 @@
 package com.example.intandem;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Parcel;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -14,13 +17,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.intandem.dataModels.DistanceSearchResult;
+import com.example.intandem.fragments.MyViewPagerAdapter;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
+import com.google.android.material.tabs.TabLayout;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -37,12 +44,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     public static final String TAG = "PostsAdapter";
-    private static final String BASE_URL = "https://maps.googleapis.com/";
     Context context;
     private List<Post> posts;
     private ParseUser currUser;
     private Location currLocation;
-    private boolean duration_flag = false;
 
     public PostsAdapter(Context context, List<Post> posts, ParseUser currUser, Location currLocation) {
         this.context = context;
@@ -73,21 +78,52 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
-        ImageView ivPictureFeed, ivProfilePicture;
-        ImageButton btnViewReplies;
+//        TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
+//        ImageView ivPictureFeed, ivProfilePicture;
+//        ImageButton btnViewReplies;
+        TabLayout tabLayout;
+        ViewPager2 viewPager2;
+        MyViewPagerAdapter myViewPagerAdapter;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-//            tvEventFeed = itemView.findViewById(R.id.tvEventFeed);
-            tvLocationFeed = itemView.findViewById(R.id.tvLocationFeed);
-            tvCaptionFeed = itemView.findViewById(R.id.tvCaptionFeed);
-            ivPictureFeed = itemView.findViewById(R.id.ivPictureFeed);
-            ivProfilePicture = itemView.findViewById(R.id.ivProfilePic);
-            tvName = itemView.findViewById(R.id.tvName);
-            tvExpiration = itemView.findViewById(R.id.tvExpiration);
-            tvMoreData = itemView.findViewById(R.id.tvMoreData);
-            btnViewReplies = itemView.findViewById(R.id.btnViewReplies);
+
+            tabLayout = itemView.findViewById(R.id.postTabs);
+            viewPager2 = itemView.findViewById(R.id.viewPager2);
+
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager2.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+            viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    tabLayout.getTabAt(position).select();
+                }
+            });
+
+//            tvLocationFeed = itemView.findViewById(R.id.tvLocationFeed);
+//            tvCaptionFeed = itemView.findViewById(R.id.tvCaptionFeed);
+//            ivPictureFeed = itemView.findViewById(R.id.ivPictureFeed);
+//            ivProfilePicture = itemView.findViewById(R.id.ivProfilePic);
+//            tvName = itemView.findViewById(R.id.tvName);
+//            tvExpiration = itemView.findViewById(R.id.tvExpiration);
+//            tvMoreData = itemView.findViewById(R.id.tvMoreData);
+//            btnViewReplies = itemView.findViewById(R.id.btnViewReplies);
             itemView.setOnClickListener(this);
 
             GestureDetector gestureDetector = new GestureDetector(context.getApplicationContext(), new GestureListener());
@@ -102,118 +138,91 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public void bind(Post post) {
 
-//            tvEventFeed.setText(post.getEvent());
-//            tvEventFeed.setOnClickListener(new View.OnClickListener() {
+//            Parcel locationParcel = Parcel.obtain();
+//            currLocation.writeToParcel(locationParcel, 0);
+
+            myViewPagerAdapter = new MyViewPagerAdapter((FragmentActivity) context, post, currLocation);
+            viewPager2.setAdapter(myViewPagerAdapter);
+
+//            tvName.setText(post.getUser().getUsername());
 //
+//            Calendar rightNow = Calendar.getInstance();
+//            String timeLeft = DateDiff.findDifference(rightNow.getTime(), post.getExpiration());
+//
+//            tvExpiration.setText(timeLeft + " Left");
+//
+//            btnViewReplies.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
-//                    // navigate to replies fragment
-//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
-//                    Fragment fragment = RepliesFragment.newInstance(post);
-//                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+//                    Intent i = new Intent(context, ViewRepliesActivity.class);
+//                    i.putExtra("currPost", post);
+//                    context.startActivity(i);
 //                }
 //            });
-
-            tvName.setText(post.getUser().getUsername());
-
-            Calendar rightNow = Calendar.getInstance();
-            String timeLeft = DateDiff.findDifference(rightNow.getTime(), post.getExpiration());
-
-            tvExpiration.setText(timeLeft + " Left");
-
-            btnViewReplies.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ViewRepliesActivity.class);
-                    i.putExtra("currPost", post);
-                    context.startActivity(i);
-                }
-            });
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
-            CustomPlace customPlace = post.getCustomPlace();
-            try {
-                customPlace.fetchIfNeeded();
-                tvLocationFeed.setText(post.getCustomPlace().getName());
-                googleMapsService.getDistanceSearchResult(currLocation.getLatitude() + "," + currLocation.getLongitude(),
-                        "place_id:" + post.getCustomPlace().getGPlaceId(),
-                        "driving",
-                        "en",
-                        BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
-                    @Override
-                    public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
-                        DistanceSearchResult distanceSearchResult = response.body();
-                        Log.i(TAG, "success getting the distance");
-                        StringBuilder moreInfo = new StringBuilder();
-                        moreInfo.append(distanceSearchResult.getRows().get(0).getElements().get(0)
-                                .getDistance().getText());
-                        String price = customPlace.getPrice();
-                        if (price != null) {
-                            moreInfo.append(" | ");
-                            moreInfo.append(customPlace.getPrice());
-                        }
-                        tvMoreData.setText(moreInfo);
-                        tvMoreData.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (!duration_flag) {
-                                    duration_flag = true;
-                                    String duration = distanceSearchResult.getRows().get(0).getElements()
-                                            .get(0).getDuration().getText() + " by car";
-                                    tvMoreData.setText(duration);
-                                } else {
-                                    duration_flag = false;
-                                    tvMoreData.setText(moreInfo);
-                                }
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
-                        Log.e(TAG, "error getting the distance");
-                    }
-                });
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-//            CustomPlace c = post.getCustomPlace();
-//            c.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-//                @Override
-//                public void done(ParseObject object, ParseException e) {
-//                    if (e != null) {
-//                        Log.e(TAG, "error fetching if needed in background");
-//                    }
-//                    tvLocationFeed.setText(post.getCustomPlace().getName());
-//                    tvLocationFeed.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            // TODO: make reviews activity
-////                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
-////                            Fragment fragment = ReviewsFragment.newInstance(post);
-////                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+//
+//            Retrofit retrofit = new Retrofit.Builder()
+//                    .baseUrl(BASE_URL)
+//                    .addConverterFactory(GsonConverterFactory.create())
+//                    .build();
+//            GoogleMapsService googleMapsService = retrofit.create(GoogleMapsService.class);
+//            CustomPlace customPlace = post.getCustomPlace();
+//            try {
+//                customPlace.fetchIfNeeded();
+//                tvLocationFeed.setText(post.getCustomPlace().getName());
+//                googleMapsService.getDistanceSearchResult(currLocation.getLatitude() + "," + currLocation.getLongitude(),
+//                        "place_id:" + post.getCustomPlace().getGPlaceId(),
+//                        "driving",
+//                        "en",
+//                        BuildConfig.MAPS_API_KEY).enqueue(new Callback<DistanceSearchResult>() {
+//                    @Override
+//                    public void onResponse(Call<DistanceSearchResult> call, Response<DistanceSearchResult> response) {
+//                        DistanceSearchResult distanceSearchResult = response.body();
+//                        Log.i(TAG, "success getting the distance");
+//                        StringBuilder moreInfo = new StringBuilder();
+//                        moreInfo.append(distanceSearchResult.getRows().get(0).getElements().get(0)
+//                                .getDistance().getText());
+//                        String price = customPlace.getPrice();
+//                        if (price != null) {
+//                            moreInfo.append(" | ");
+//                            moreInfo.append(customPlace.getPrice());
 //                        }
-//                    });
-//                }
-//            });
-
-            ParseFile image = post.getPicture();
-            if (image != null) { // image is optional, so its possible that it is null
-                Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
-            }
-
-            Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
-                    .transform(new CircleCrop())
-                    .into(ivProfilePicture);
-
-            tvCaptionFeed.setText(post.getCaption());
+//                        tvMoreData.setText(moreInfo);
+//                        tvMoreData.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                if (!duration_flag) {
+//                                    duration_flag = true;
+//                                    String duration = distanceSearchResult.getRows().get(0).getElements()
+//                                            .get(0).getDuration().getText() + " by car";
+//                                    tvMoreData.setText(duration);
+//                                } else {
+//                                    duration_flag = false;
+//                                    tvMoreData.setText(moreInfo);
+//                                }
+//
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<DistanceSearchResult> call, Throwable t) {
+//                        Log.e(TAG, "error getting the distance");
+//                    }
+//                });
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//            ParseFile image = post.getPicture();
+//            if (image != null) { // image is optional, so its possible that it is null
+//                Glide.with(context).load(image.getUrl()).into(ivPictureFeed);
+//            }
+//
+//            Glide.with(context).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
+//                    .transform(new CircleCrop())
+//                    .into(ivProfilePicture);
+//
+//            tvCaptionFeed.setText(post.getCaption());
         }
 
         @Override
