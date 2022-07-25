@@ -1,45 +1,25 @@
 package com.example.intandem;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.Parcel;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.example.intandem.dataModels.DistanceSearchResult;
-import com.example.intandem.fragments.MyViewPagerAdapter;
-import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.google.android.material.tabs.TabLayout;
-import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import java.util.Calendar;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
@@ -137,9 +117,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         public void bind(Post post) {
-
-//            Parcel locationParcel = Parcel.obtain();
-//            currLocation.writeToParcel(locationParcel, 0);
 
             myViewPagerAdapter = new MyViewPagerAdapter((FragmentActivity) context, post, currLocation);
             viewPager2.setAdapter(myViewPagerAdapter);

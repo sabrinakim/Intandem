@@ -1,4 +1,4 @@
-package com.example.intandem.fragments;
+package com.example.intandem;
 
 import android.location.Location;
 import android.os.Parcel;
@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.example.intandem.fragments.LocationFragment;
+import com.example.intandem.fragments.PictureFragment;
 import com.example.intandem.models.Post;
 
 public class MyViewPagerAdapter extends FragmentStateAdapter {
@@ -28,7 +30,7 @@ public class MyViewPagerAdapter extends FragmentStateAdapter {
         if (position == 0) {
             return PictureFragment.newInstance(currPost, currLocation);
         }
-        return new LocationFragment();
+        return LocationFragment.newInstance(currPost, currLocation);
     }
 
     @Override

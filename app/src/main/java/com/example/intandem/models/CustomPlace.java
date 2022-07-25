@@ -9,6 +9,7 @@ public class CustomPlace extends ParseObject {
     public static final String KEY_NAME = "name";
     public static final String KEY_RATING = "rating";
     public static final String KEY_PRICE = "price";
+    public static final String KEY_PLACE_IMAGE_URL = "placeImageUrl";
 
     public CustomPlace() {}
 
@@ -42,5 +43,13 @@ public class CustomPlace extends ParseObject {
 
     public void setPrice(String price) {
         put(KEY_PRICE, price);
+    }
+
+    public String getPlaceImageUrl() {
+        return getString(KEY_PLACE_IMAGE_URL);
+    }
+
+    public void setPlaceImageUrl(String placeImageUrl) {
+        put(KEY_PLACE_IMAGE_URL, placeImageUrl);
     }
 }
