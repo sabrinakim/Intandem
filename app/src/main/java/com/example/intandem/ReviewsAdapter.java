@@ -23,12 +23,10 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
     public static final String TAG = "ReviewsAdapter";
     private Context context;
     private List<Review> reviews;
-    private Post currPost;
 
-    public ReviewsAdapter(Context context, List<Review> reviews, Post currPost) {
+    public ReviewsAdapter(Context context, List<Review> reviews) {
         this.context = context;
         this.reviews = reviews;
-        this.currPost = currPost;
     }
 
     @NonNull

@@ -7,7 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +23,20 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.intandem.MainActivity;
 import com.example.intandem.R;
+import com.example.intandem.ReviewsAdapter;
 import com.example.intandem.models.CustomPlace;
+import com.example.intandem.models.CustomPlaceToReview;
 import com.example.intandem.models.Post;
+import com.example.intandem.models.Review;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +45,7 @@ import com.parse.ParseFile;
  */
 public class LocationFragment extends Fragment {
 
+    public static final String TAG = "LocationFragment";
     private static final String ARG_CURR_POST = "currPost";
     private static final String ARG_CURR_LOCATION = "currLocation";
     private Post currPost;
@@ -44,6 +56,9 @@ public class LocationFragment extends Fragment {
     private ImageView ivPlaceImage;
     private TextView tvLocationReviews;
     private RatingBar ratingsMerged;
+    private RecyclerView rvReviewsBottomSheet;
+    private ReviewsAdapter reviewsAdapter;
+    private List<Review> allReviews;
 
     public LocationFragment() {
         // Required empty public constructor
@@ -95,7 +110,7 @@ public class LocationFragment extends Fragment {
         bottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet);
         btnShrink.setVisibility(View.INVISIBLE);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        bottomSheetBehavior.setPeekHeight(228);
+        bottomSheetBehavior.setPeekHeight(700);
 
         btnExpand.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +143,35 @@ public class LocationFragment extends Fragment {
             e.printStackTrace();
         }
 
+        rvReviewsBottomSheet = view.findViewById(R.id.rvReviewsBottomSheet);
+        allReviews = new ArrayList<>();
+        reviewsAdapter = new ReviewsAdapter(getContext(), allReviews);
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        rvReviewsBottomSheet.setAdapter(reviewsAdapter);
+        rvReviewsBottomSheet.setLayoutManager(linearLayoutManager);
+        queryReviews();
+
+    }
+
+    private void queryReviews() {
+        ParseQuery<CustomPlaceToReview> queryMapping = ParseQuery.getQuery(CustomPlaceToReview.class);
+        queryMapping.whereEqualTo(CustomPlaceToReview.KEY_CUSTOMPLACE, currPost.getCustomPlace());
+        queryMapping.findInBackground(new FindCallback<CustomPlaceToReview>() {
+            @Override
+            public void done(List<CustomPlaceToReview> mappings, ParseException e) {
+                for (CustomPlaceToReview mapping : mappings) {
+                    Review review = mapping.getReview();
+                    try {
+                        review.fetchIfNeeded();
+                        Log.d(TAG, "" + mapping.getReview().getRating());
+                        allReviews.add(mapping.getReview());
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                reviewsAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
