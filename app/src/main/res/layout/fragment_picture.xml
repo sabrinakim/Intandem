@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.PictureFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+<!--            <com.facebook.shimmer.ShimmerFrameLayout-->
+<!--                android:id="@+id/shimmerViewContainer"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="vertical"-->
+<!--                shimmer:duration="800">-->
+
+<!--                <include layout="@layout/data_placeholder_layout" />-->
+
+<!--            </com.facebook.shimmer.ShimmerFrameLayout>-->
+
+            <ImageView
+                android:id="@+id/ivPictureFeed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvLocationFeed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/ivPictureFeed"
+                app:layout_constraintTop_toTopOf="@+id/ivPictureFeed" />
+
+            <TextView
+                android:id="@+id/tvCaptionFeed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="caption"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/tvName"
+                app:layout_constraintTop_toBottomOf="@+id/tvName" />
+
+            <ImageView
+                android:id="@+id/ivProfilePic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="380dp"
+                app:layout_constraintBottom_toBottomOf="@+id/ivPictureFeed"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="44dp"
+                android:text="TextView"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/ivPictureFeed" />
+
+            <TextView
+                android:id="@+id/tvExpiration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="3 hr Left"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@+id/tvLocationFeed"
+                app:layout_constraintStart_toEndOf="@+id/tvLocationFeed"
+                app:layout_constraintTop_toTopOf="@+id/tvLocationFeed" />
+
+            <TextView
+                android:id="@+id/tvMoreData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="distance | price"
+                android:textColor="#FFFFFF"
+                app:layout_constraintStart_toStartOf="@+id/tvLocationFeed"
+                app:layout_constraintTop_toBottomOf="@+id/tvLocationFeed" />
+
+            <ImageButton
+                android:id="@+id/btnViewReplies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@null"
+                app:layout_constraintEnd_toEndOf="@+id/ivProfilePic"
+                app:layout_constraintStart_toStartOf="@+id/ivProfilePic"
+                app:layout_constraintTop_toBottomOf="@+id/ivProfilePic" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

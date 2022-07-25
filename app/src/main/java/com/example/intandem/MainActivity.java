@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
         ibFilter = findViewById(R.id.ibFilter);
         vp2Posts = findViewById(R.id.vp2Posts);
         fabCompose = findViewById(R.id.fabAddPost);
-//        circle = findViewById(R.id.circle);
 
         fabCompose.setVisibility(View.INVISIBLE);
 
@@ -129,27 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(homeToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.circle_explosion_anim);
-//        animation.setDuration(700);
-//        animation.setInterpolator(new AccelerateDecelerateInterpolator());
-//        animation.setAnimationListener(new Animation.AnimationListener() {
-//            @Override
-//            public void onAnimationStart(Animation animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animation animation) {
-//                Log.i(TAG, "animation ended");
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animation animation) {
-//
-//            }
-//        });
-
 
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override

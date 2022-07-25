@@ -6,7 +6,7 @@ public class DateDiff {
 
     // Function to print difference in
     // time start_date and end_date
-    static String findDifference(Date d1, Date d2) {
+    public static String findDifference(Date d1, Date d2) {
         boolean largestUnitFound = false;
         long timeLeft = 0;
 

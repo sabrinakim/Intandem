@@ -8,6 +8,8 @@
         <entry key="app/src/main/res/drawable/circle_button.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_expand_less_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_expand_more_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2971014492753623" />
@@ -32,12 +34,15 @@
         <entry key="app/src/main/res/layout/fragment_activity.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_compose.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_filter_dialog.xml" value="0.24454956054687502" />
+        <entry key="app/src/main/res/layout/fragment_location.xml" value="0.2647247314453125" />
+        <entry key="app/src/main/res/layout/fragment_picture.xml" value="0.24139492753623187" />
         <entry key="app/src/main/res/layout/fragment_posts.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_replies.xml" value="0.2472015380859375" />
         <entry key="app/src/main/res/layout/fragment_reviews.xml" value="0.13500506585612967" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.32185283567432826" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.26871257688526573" />
         <entry key="app/src/main/res/layout/item_reply.xml" value="0.12264150943396226" />
         <entry key="app/src/main/res/layout/item_review.xml" value="0.30322100823894216" />
+        <entry key="app/src/main/res/layout/layout_bottom_sheet.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2898148148148148" />
         <entry key="app/src/main/res/menu/menu_compose_event.xml" value="0.26615384615384613" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.25510711669921876" />

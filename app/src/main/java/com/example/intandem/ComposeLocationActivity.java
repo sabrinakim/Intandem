@@ -305,8 +305,10 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 double yRating = matchingYelpBusiness.getRating();
                 String yPrice = matchingYelpBusiness.getPrice();
                 double avgRating = (gRating + yRating) / 2;
+                String placeImageUrl = matchingYelpBusiness.getImageUrl();
                 customPlace.setRating(avgRating);
                 customPlace.setPrice(yPrice);
+                customPlace.setPlaceImageUrl(placeImageUrl);
                 customPlace.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
