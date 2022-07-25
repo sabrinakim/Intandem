@@ -16,6 +16,9 @@
             android:background="@android:color/white"
             style="?attr/bottomSheetStyle"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" >
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -75,7 +78,34 @@
                     app:layout_constraintBottom_toBottomOf="@+id/ivPlaceImage"
                     app:layout_constraintStart_toStartOf="@+id/tvLocationReviews" />
 
+                <TextView
+                    android:id="@+id/reviews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="Reviews"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ivPlaceImage" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvReviewsBottomSheet"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="30dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="@+id/reviews"
+                    app:layout_constraintTop_toBottomOf="@+id/reviews" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+            </ScrollView>
 
         </FrameLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
