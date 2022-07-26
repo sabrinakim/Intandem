@@ -59,7 +59,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TabLayout tabLayout;
         ViewPager2 viewPager2;
         MyViewPagerAdapter myViewPagerAdapter;
@@ -121,43 +121,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
             });
 
-            itemView.setOnClickListener(this);
-
-            GestureDetector gestureDetector = new GestureDetector(context.getApplicationContext(), new GestureListener());
-            itemView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
-                }
-            });
-
         }
 
         public void bind(Post post) {
-            myViewPagerAdapter = new MyViewPagerAdapter((FragmentActivity) context, post, currLocation);
+            myViewPagerAdapter = new MyViewPagerAdapter((FragmentActivity) context, post, currLocation, currUser);
             viewPager2.setAdapter(myViewPagerAdapter);
-        }
-
-        @Override
-        public void onClick(View v) {
-            // do nothing
-        }
-
-        private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                Log.i(TAG, "double tapped");
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    Post post = posts.get(position);
-                    Intent i = new Intent(context, ComposeReplyActivity.class);
-                    i.putExtra("user", currUser);
-                    i.putExtra("post", post);
-                    context.startActivity(i);
-                }
-                return super.onDoubleTapEvent(e);
-            }
         }
     }
 
