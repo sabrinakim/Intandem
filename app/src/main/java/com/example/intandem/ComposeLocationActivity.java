@@ -216,6 +216,8 @@ public class ComposeLocationActivity extends AppCompatActivity {
         CustomPlace customPlace = new CustomPlace();
         customPlace.setGPlaceId(placeId);
         customPlace.setName(placeName);
+        customPlace.setLat(latLng.latitude);
+        customPlace.setLong(latLng.longitude);
         performQueries(customPlace);
     }
 

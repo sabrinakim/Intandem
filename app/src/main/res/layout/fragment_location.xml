@@ -6,6 +6,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.LocationFragment">
 
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -16,6 +24,7 @@
             android:background="@android:color/white"
             style="?attr/bottomSheetStyle"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" >
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
@@ -26,12 +35,13 @@
 
                 <ImageView
                     android:id="@+id/ivPlaceImage"
-                    android:layout_width="409dp"
-                    android:layout_height="228dp"
+                    android:layout_width="0dp"
+                    android:layout_height="400dp"
+                    android:layout_marginTop="20dp"
                     android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ratingsMerged"
                     tools:src="@tools:sample/avatars" />
 
                 <ImageButton
@@ -61,22 +71,25 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="70dp"
                     android:fontFamily="@font/poppins_extrabold"
                     android:text="TextView"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="26sp"
-                    app:layout_constraintBottom_toTopOf="@+id/ratingsMerged"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btnExpand" />
 
                 <RatingBar
                     android:id="@+id/ratingsMerged"
+                    style="@android:style/Widget.Material.RatingBar.Indicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/ivPlaceImage"
-                    app:layout_constraintStart_toStartOf="@+id/tvLocationReviews" />
+                    app:layout_constraintStart_toStartOf="@+id/tvLocationReviews"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLocationReviews" />
 
                 <TextView
                     android:id="@+id/reviews"
@@ -86,6 +99,7 @@
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/poppins_medium"
                     android:text="Reviews"
+                    android:textAllCaps="false"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"

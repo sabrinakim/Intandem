@@ -28,6 +28,15 @@ import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.CustomPlaceToReview;
 import com.example.intandem.models.Post;
 import com.example.intandem.models.Review;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.parse.FindCallback;
@@ -92,8 +101,45 @@ public class LocationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_location, container, false);
+        // Initialize view
+        View view = inflater.inflate(R.layout.fragment_location, container, false);
+
+        // Get the SupportMapFragment and request notification when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                // when map is loaded
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                LatLng youLatLong = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
+                Marker youMarker = googleMap.addMarker(new MarkerOptions()
+                        .position(youLatLong)
+                        .title("You"));
+                builder.include(youMarker.getPosition());
+                CustomPlace customPlace = currPost.getCustomPlace();
+                try {
+                    customPlace.fetchIfNeeded();
+                    LatLng friendLatLong = new LatLng(customPlace.getLat(), customPlace.getLong());
+                    Marker friendMarker = googleMap.addMarker(new MarkerOptions()
+                            .position(friendLatLong)
+                            .title(currPost.getUser().getString("firstName")));
+                    builder.include(friendMarker.getPosition());
+                    LatLngBounds bounds = builder.build();
+
+                    int padding = 0; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    googleMap.moveCamera(cu);
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        return view;
     }
 
     @Override
