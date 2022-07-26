@@ -160,13 +160,14 @@ public class LocationFragment extends Fragment {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         bottomSheetBehavior.setPeekHeight(275);
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // navigate to picture fragment
-
-            }
-        });
+//        btnBack.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.i(TAG, "back button clicked");
+//                // navigate to picture fragment
+//
+//            }
+//        });
 
         btnExpand.setOnClickListener(new View.OnClickListener() {
             @Override

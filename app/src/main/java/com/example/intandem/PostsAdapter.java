@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -62,25 +63,36 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TabLayout tabLayout;
         ViewPager2 viewPager2;
         MyViewPagerAdapter myViewPagerAdapter;
+        ImageButton btnBack;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tabLayout = itemView.findViewById(R.id.postTabs);
             viewPager2 = itemView.findViewById(R.id.viewPager2);
+            btnBack = itemView.findViewById(R.id.btnBack);
 
             viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
                     if (position == 0) {
+                        btnBack.setVisibility(View.INVISIBLE);
                         viewPager2.setUserInputEnabled(true);
                         vp2Posts.setUserInputEnabled(true);
                     } else {
+                        btnBack.setVisibility(View.VISIBLE);
                         viewPager2.setUserInputEnabled(false);
                         vp2Posts.setUserInputEnabled(false);
                     }
 
+                }
+            });
+
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewPager2.setCurrentItem(0);
                 }
             });
 
@@ -109,14 +121,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
             });
 
-//            tvLocationFeed = itemView.findViewById(R.id.tvLocationFeed);
-//            tvCaptionFeed = itemView.findViewById(R.id.tvCaptionFeed);
-//            ivPictureFeed = itemView.findViewById(R.id.ivPictureFeed);
-//            ivProfilePicture = itemView.findViewById(R.id.ivProfilePic);
-//            tvName = itemView.findViewById(R.id.tvName);
-//            tvExpiration = itemView.findViewById(R.id.tvExpiration);
-//            tvMoreData = itemView.findViewById(R.id.tvMoreData);
-//            btnViewReplies = itemView.findViewById(R.id.btnViewReplies);
             itemView.setOnClickListener(this);
 
             GestureDetector gestureDetector = new GestureDetector(context.getApplicationContext(), new GestureListener());
