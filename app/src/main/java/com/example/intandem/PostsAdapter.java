@@ -140,13 +140,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "CLICK");
+            // do nothing
         }
 
         private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
-            private static final int SWIPE_THRESHOLD = 100;
-            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {

@@ -83,7 +83,7 @@ public class ReviewsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         rvReviews = view.findViewById(R.id.rvReviews);
         allReviews = new ArrayList<>();
-        adapter = new ReviewsAdapter(getContext(), allReviews);
+        //adapter = new ReviewsAdapter(getContext(), allReviews);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvReviews.setAdapter(adapter);

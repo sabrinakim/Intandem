@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.intandem.MainActivity;
 import com.example.intandem.R;
+import com.example.intandem.ReviewItemClass;
 import com.example.intandem.ReviewsAdapter;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.CustomPlaceToReview;
@@ -63,12 +64,9 @@ public class LocationFragment extends Fragment {
     private FrameLayout standardBottomSheet;
     private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
     private ImageButton btnExpand, btnShrink, btnBack;
-    private ImageView ivPlaceImage;
-    private TextView tvLocationReviews;
-    private RatingBar ratingsMerged;
     private RecyclerView rvReviewsBottomSheet;
     private ReviewsAdapter reviewsAdapter;
-    private List<Review> allReviews;
+    private List<ReviewItemClass> allReviews;
 
     public LocationFragment() {
         // Required empty public constructor
@@ -150,24 +148,12 @@ public class LocationFragment extends Fragment {
         standardBottomSheet = view.findViewById(R.id.standardBottomSheet);
         btnExpand = view.findViewById(R.id.btnExpand);
         btnShrink = view.findViewById(R.id.btnShrink);
-        ivPlaceImage = view.findViewById(R.id.ivPlaceImage);
-        tvLocationReviews = view.findViewById(R.id.tvLocationReviews);
-        ratingsMerged = view.findViewById(R.id.ratingsMerged);
         btnBack = view.findViewById(R.id.btnBack);
 
         bottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet);
         btnShrink.setVisibility(View.INVISIBLE);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         bottomSheetBehavior.setPeekHeight(275);
-
-//        btnBack.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.i(TAG, "back button clicked");
-//                // navigate to picture fragment
-//
-//            }
-//        });
 
         btnExpand.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,21 +173,19 @@ public class LocationFragment extends Fragment {
             }
         });
 
+        allReviews = new ArrayList<>();
+
         CustomPlace customPlace = currPost.getCustomPlace();
         try {
             customPlace.fetchIfNeeded();
-            String imageUrl = customPlace.getPlaceImageUrl();
-            if (imageUrl != null) { // image is optional, so its possible that it is null
-                Glide.with(getContext()).load(imageUrl).into(ivPlaceImage);
-            }
-            tvLocationReviews.setText(customPlace.getName());
-            ratingsMerged.setRating(((Double) customPlace.getRating()).floatValue());
+            ReviewItemClass header = new ReviewItemClass(0, customPlace.getName(),
+                    customPlace.getPlaceImageUrl(), customPlace.getRating());
+            allReviews.add(header);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         rvReviewsBottomSheet = view.findViewById(R.id.rvReviewsBottomSheet);
-        allReviews = new ArrayList<>();
         reviewsAdapter = new ReviewsAdapter(getContext(), allReviews);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -222,7 +206,10 @@ public class LocationFragment extends Fragment {
                     try {
                         review.fetchIfNeeded();
                         Log.d(TAG, "" + mapping.getReview().getRating());
-                        allReviews.add(mapping.getReview());
+                        Review currReview = mapping.getReview();
+                        ReviewItemClass reviewItemClass = new ReviewItemClass(1,
+                                currReview.getProfilePicUrl(), currReview.getName(), currReview.getText(), currReview.getRating());
+                        allReviews.add(reviewItemClass);
                     } catch (ParseException ex) {
                         ex.printStackTrace();
                     }
