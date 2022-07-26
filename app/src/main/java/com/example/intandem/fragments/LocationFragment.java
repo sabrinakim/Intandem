@@ -128,7 +128,7 @@ public class LocationFragment extends Fragment {
                     builder.include(friendMarker.getPosition());
                     LatLngBounds bounds = builder.build();
 
-                    int padding = 0; // offset from edges of the map in pixels
+                    int padding = 200; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     googleMap.moveCamera(cu);
 
@@ -156,7 +156,7 @@ public class LocationFragment extends Fragment {
         bottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet);
         btnShrink.setVisibility(View.INVISIBLE);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        bottomSheetBehavior.setPeekHeight(700);
+        bottomSheetBehavior.setPeekHeight(200);
 
         btnExpand.setOnClickListener(new View.OnClickListener() {
             @Override
