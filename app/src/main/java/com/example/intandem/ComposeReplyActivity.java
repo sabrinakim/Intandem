@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -50,7 +49,7 @@ public class ComposeReplyActivity extends AppCompatActivity {
         currPost = extras.getParcelable("post");
 
         ivPictureReply = findViewById(R.id.ivPictureReply);
-        btnReply = findViewById(R.id.btnReply);
+        btnReply = findViewById(R.id.btnBack);
         etCaptionReply = findViewById(R.id.etCaptionReply);
 
         btnReply.setOnClickListener(new View.OnClickListener() {

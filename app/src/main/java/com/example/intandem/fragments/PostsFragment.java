@@ -145,7 +145,7 @@ public class PostsFragment extends Fragment implements FilterDialogFragment.Filt
         filteredDistancePosts = new ArrayList<>();
         //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
-        adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation);
+        adapter = new PostsAdapter(getContext(), allPosts, mUser, currLocation, vp2Posts);
 
 //        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
 
