@@ -5,6 +5,7 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/circle.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/circle_back_button.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/circle_button.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.1" />

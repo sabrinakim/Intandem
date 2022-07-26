@@ -62,7 +62,7 @@ public class LocationFragment extends Fragment {
     private Location currLocation;
     private FrameLayout standardBottomSheet;
     private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
-    private ImageButton btnExpand, btnShrink;
+    private ImageButton btnExpand, btnShrink, btnBack;
     private ImageView ivPlaceImage;
     private TextView tvLocationReviews;
     private RatingBar ratingsMerged;
@@ -153,11 +153,20 @@ public class LocationFragment extends Fragment {
         ivPlaceImage = view.findViewById(R.id.ivPlaceImage);
         tvLocationReviews = view.findViewById(R.id.tvLocationReviews);
         ratingsMerged = view.findViewById(R.id.ratingsMerged);
+        btnBack = view.findViewById(R.id.btnBack);
 
         bottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet);
         btnShrink.setVisibility(View.INVISIBLE);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        bottomSheetBehavior.setPeekHeight(200);
+        bottomSheetBehavior.setPeekHeight(275);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // navigate to picture fragment
+
+            }
+        });
 
         btnExpand.setOnClickListener(new View.OnClickListener() {
             @Override
