@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         filteredDistancePosts = new ArrayList<>();
         //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
-        adapter = new PostsAdapter(this, allPosts, user, currLocation);
+        adapter = new PostsAdapter(this, allPosts, user, currLocation, vp2Posts);
 
         pullToRefresh = findViewById(R.id.pullToRefresh);
         pullToRefresh.setLottieAnimation("loading_balls.json");
