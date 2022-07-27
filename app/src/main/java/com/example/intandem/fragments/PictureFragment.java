@@ -7,10 +7,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Parcel;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -20,6 +23,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.intandem.BuildConfig;
+import com.example.intandem.ComposeReplyActivity;
 import com.example.intandem.DateDiff;
 import com.example.intandem.GoogleMapsService;
 import com.example.intandem.R;
@@ -28,6 +32,7 @@ import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -48,9 +53,11 @@ public class PictureFragment extends Fragment {
     private static final String ARG_CURR_POST = "currPost";
     public static final String TAG = "PictureFragment";
     private static final String ARG_CURR_LOCATION = "currLocation";
+    public static final String ARG_CURR_USER = "currUser";
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private Post currPost;
     private Location currLocation;
+    private ParseUser currUser;
     private TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
     private ImageView ivPictureFeed, ivProfilePicture;
     private ImageButton btnViewReplies;
@@ -67,11 +74,12 @@ public class PictureFragment extends Fragment {
      * @param currPost Parameter 1.
      * @return A new instance of fragment PictureFragment.
      */
-    public static PictureFragment newInstance(Post currPost, Location currLocation) {
+    public static PictureFragment newInstance(Post currPost, Location currLocation, ParseUser currUser) {
         PictureFragment fragment = new PictureFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_CURR_POST, currPost);
         args.putParcelable(ARG_CURR_LOCATION, currLocation);
+        args.putParcelable(ARG_CURR_USER, currUser);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,6 +90,7 @@ public class PictureFragment extends Fragment {
         if (getArguments() != null) {
             currPost = getArguments().getParcelable(ARG_CURR_POST);
             currLocation = getArguments().getParcelable(ARG_CURR_LOCATION);
+            currUser = getArguments().getParcelable(ARG_CURR_USER);
         }
     }
 
@@ -179,10 +188,33 @@ public class PictureFragment extends Fragment {
                 Glide.with(getContext()).load(image.getUrl()).into(ivPictureFeed);
             }
 
-            Glide.with(getContext()).load("https://s3-media3.fl.yelpcdn.com/photo/iwoAD12zkONZxJ94ChAaMg/o.jpg")
+            Glide.with(getContext()).load(currUser.getString("pictureUrl"))
                     .transform(new CircleCrop())
                     .into(ivProfilePicture);
 
             tvCaptionFeed.setText(currPost.getCaption());
+
+        GestureDetector gestureDetector = new GestureDetector(getContext().getApplicationContext(), new GestureListener());
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "touched");
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Log.i(TAG, "double tapped");
+            Intent i = new Intent(getContext(), ComposeReplyActivity.class);
+            i.putExtra("user", currUser);
+            i.putExtra("post", currPost);
+            getContext().startActivity(i);
+            return super.onDoubleTapEvent(e);
+        }
     }
 }

@@ -12,24 +12,27 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.intandem.fragments.LocationFragment;
 import com.example.intandem.fragments.PictureFragment;
 import com.example.intandem.models.Post;
+import com.parse.ParseUser;
 
 public class MyViewPagerAdapter extends FragmentStateAdapter {
 
     public static final String TAG = "MyViewPagerAdapter";
     private Post currPost;
     private Location currLocation;
+    private ParseUser currUser;
 
-    public MyViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, Post currPost, Location currLocation) {
+    public MyViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, Post currPost, Location currLocation, ParseUser currUser) {
         super(fragmentActivity);
         this.currPost = currPost;
         this.currLocation = currLocation;
+        this.currUser = currUser;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
         if (position == 0) {
-            return PictureFragment.newInstance(currPost, currLocation);
+            return PictureFragment.newInstance(currPost, currLocation, currUser);
         }
         return LocationFragment.newInstance(currPost, currLocation);
     }

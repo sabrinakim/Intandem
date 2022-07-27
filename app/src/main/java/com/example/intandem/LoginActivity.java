@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                     String id = jsonObject.getString("id");
                     String first_name = jsonObject.getString("first_name");
                     String last_name = jsonObject.getString("last_name");
+                    String pictureUrl = jsonObject.getJSONObject("picture").getJSONObject("data").getString("url");
 
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("fbId", id);
@@ -140,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             if (objects.size() == 0) {
                                 Log.i(TAG, "new user");
-                                createNewUser(name, id, first_name, last_name);
+                                createNewUser(name, first_name, last_name, id, pictureUrl);
                             } else { // user already registered in our database
                                 Log.i(TAG, "user already exists");
                                 updateFriendsList(id);
@@ -161,13 +162,13 @@ public class LoginActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
 
         // change later: these are what you are requesting from the graph api
-        bundle.putString("fields", "name, id, first_name, last_name");
+        bundle.putString("fields", "name, id, first_name, last_name, picture");
 
         meGraphRequest.setParameters(bundle);
         meGraphRequest.executeAsync();
     }
 
-    private void createNewUser(String name, String firstName, String lastName, String id) {
+    private void createNewUser(String name, String firstName, String lastName, String id, String pictureUrl) {
         ParseUser user = new ParseUser();
         user.put("firstName", firstName);
         user.put("lastName", lastName);
@@ -175,6 +176,7 @@ public class LoginActivity extends AppCompatActivity {
         user.put("username", name);
         user.put("password", name);
         user.put("fbId", id);
+        user.put("pictureUrl", pictureUrl);
 
         user.signUpInBackground(new SignUpCallback() {
             @Override
