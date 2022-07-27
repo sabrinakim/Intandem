@@ -31,6 +31,8 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,7 +58,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.slider.Slider;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -90,21 +94,23 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location currLocation = new Location("");
-    private Double latitude;
-    private Double longitude;
-    private int maxDistance;
+    private Double latitude, longitude;
+    private int maxDistance, currPage, numPostsFetched;
     private ViewPager2 vp2Posts;
     private PostsAdapter adapter;
     private List<Post> allPosts, filteredDistancePosts;
     private FloatingActionButton fabCompose;
     private Set<String> friendIds = new HashSet<>();
-    private int currPage, numPostsFetched;
     private CircleImageView currUserProfileImage;
     private ImageButton ibFilter;
     private Toolbar homeToolbar;
     private LottieAnimationView walkingBlob;
-    private TextView tvLoadingMsg;
+    private TextView tvLoadingMsg, tvMaxDistance;
     private SSPullToRefreshLayout pullToRefresh;
+    private Slider distSlider;
+    private FrameLayout filterBottomSheet;
+    private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
+    private Button btnCancelFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,11 +124,47 @@ public class MainActivity extends AppCompatActivity {
         ibFilter = findViewById(R.id.ibFilter);
         vp2Posts = findViewById(R.id.vp2Posts);
         fabCompose = findViewById(R.id.fabAddPost);
+        distSlider = findViewById(R.id.distSlider);
+        tvMaxDistance = findViewById(R.id.tvMaxDistance);
+        filterBottomSheet = findViewById(R.id.filterBottomSheet);
+        btnCancelFilter = findViewById(R.id.btnCancelFilter);
 
         fabCompose.setVisibility(View.INVISIBLE);
 
         user = getIntent().getParcelableExtra("user");
         Glide.with(this).load(user.getString("pictureUrl")).into(currUserProfileImage);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(filterBottomSheet);
+        bottomSheetBehavior.setPeekHeight(0);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        distSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                String val;
+                if (value == 0.0) {
+                    val = "> 100 km";
+                } else {
+                    val = "" + value + " km";
+                }
+                tvMaxDistance.setText(val);
+            }
+        });
+
+        ibFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+
+        btnCancelFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+            }
+        });
 
         currUserProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,13 +191,6 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra("user", user);
                 startActivity(i);
                 overridePendingTransition(R.anim.slide_up_in, R.anim.nothing);
-            }
-        });
-
-        ibFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEditDialog();
             }
         });
 
