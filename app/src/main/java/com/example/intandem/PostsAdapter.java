@@ -85,7 +85,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         viewPager2.setUserInputEnabled(false);
                         vp2Posts.setUserInputEnabled(false);
                     }
-
                 }
             });
 

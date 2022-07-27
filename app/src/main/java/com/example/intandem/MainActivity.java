@@ -41,6 +41,7 @@ import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -112,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // TODO: REMOVE THIS
+        LoginManager.getInstance().logOut();
 
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
