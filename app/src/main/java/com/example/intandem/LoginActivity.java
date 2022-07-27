@@ -176,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
         user.put("username", name);
         user.put("password", name);
         user.put("fbId", id);
-        user.put("profileUrl", pictureUrl);
+        user.put("pictureUrl", pictureUrl);
 
         user.signUpInBackground(new SignUpCallback() {
             @Override
