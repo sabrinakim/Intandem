@@ -124,6 +124,15 @@ public class MainActivity extends AppCompatActivity {
         user = getIntent().getParcelableExtra("user");
         Glide.with(this).load(user.getString("pictureUrl")).into(currUserProfileImage);
 
+        currUserProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 

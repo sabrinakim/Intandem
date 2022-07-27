@@ -162,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
 
         // change later: these are what you are requesting from the graph api
-        bundle.putString("fields", "name, id, first_name, last_name, picture");
+        bundle.putString("fields", "name, id, first_name, last_name, picture.width(150).height(150)");
 
         meGraphRequest.setParameters(bundle);
         meGraphRequest.executeAsync();
