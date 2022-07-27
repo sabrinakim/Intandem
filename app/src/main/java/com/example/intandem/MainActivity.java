@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.bumptech.glide.Glide;
 import com.example.intandem.dataModels.DistanceInfo;
 import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.CustomPlace;
@@ -84,10 +85,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
-//    private static final String BASE_URL = "https://api.yelp.com/v3/";
-//    private static final String API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
-//    final FragmentManager fragmentManager = getSupportFragmentManager();
-//    private BottomNavigationView bottomNavigationView;
     private ParseUser user;
     public static final int LIMIT = 20;
     private static final String BASE_URL = "https://maps.googleapis.com/";
@@ -114,9 +111,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: REMOVE THIS
-        LoginManager.getInstance().logOut();
-
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
         tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
@@ -126,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         fabCompose = findViewById(R.id.fabAddPost);
 
         fabCompose.setVisibility(View.INVISIBLE);
+
+        user = getIntent().getParcelableExtra("user");
+        Glide.with(this).load(user.getString("pictureUrl")).into(currUserProfileImage);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -152,9 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 showEditDialog();
             }
         });
-
-        // unwrap parcel here
-        user = getIntent().getParcelableExtra("user");
 
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();

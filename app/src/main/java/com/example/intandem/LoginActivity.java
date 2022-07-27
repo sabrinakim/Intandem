@@ -141,8 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             if (objects.size() == 0) {
                                 Log.i(TAG, "new user");
-                                //TODO: ORDER OF THESE R WRONG
-                                createNewUser(name, id, first_name, last_name, pictureUrl);
+                                createNewUser(name, first_name, last_name, id, pictureUrl);
                             } else { // user already registered in our database
                                 Log.i(TAG, "user already exists");
                                 updateFriendsList(id);
