@@ -162,7 +162,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
+                // filter here
+                float val = distSlider.getValue();
+                if (val == 0.0) {
+                    if (maxDistance == -1) {
+                        // do nothing
+                    } else {
+                        maxDistance = -1;
+                        queryPosts();
+                    }
+                } else {
+                    maxDistance = Math.round(val);
+                    queryPosts();
+                }
             }
         });
 
