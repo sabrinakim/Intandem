@@ -148,6 +148,7 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
         post.setUserFbId(currentUser.getString("fbId"));
+        post.setCommentCount(0);
 
         Calendar rightNow = Calendar.getInstance();
 //        if (timeUnit.equals("Minute(s)")) {

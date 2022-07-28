@@ -159,8 +159,10 @@ public class MainActivity extends AppCompatActivity {
                 if (filterOn) {
                     filterOn = false;
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    fabCompose.setVisibility(View.VISIBLE);
                 } else {
                     filterOn = true;
+                    fabCompose.setVisibility(View.INVISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
             }
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                fabCompose.setVisibility(View.VISIBLE);
                 // filter here
                 float val = distSlider.getValue();
                 if (val == 0.0) {

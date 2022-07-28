@@ -58,7 +58,7 @@ public class PictureFragment extends Fragment {
     private Post currPost;
     private Location currLocation;
     private ParseUser currUser;
-    private TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
+    private TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData, tvCommentCount;
     private ImageView ivPictureFeed, ivProfilePicture;
     private ImageButton btnViewReplies;
     private boolean durationFlag = false;
@@ -113,6 +113,7 @@ public class PictureFragment extends Fragment {
             tvExpiration = view.findViewById(R.id.tvExpiration);
             tvMoreData = view.findViewById(R.id.tvMoreData);
             btnViewReplies = view.findViewById(R.id.btnViewReplies);
+            tvCommentCount = view.findViewById(R.id.tvCommentCount);
 
             Calendar rightNow = Calendar.getInstance();
             String timeLeft = DateDiff.findDifference(rightNow.getTime(), currPost.getExpiration());
@@ -126,6 +127,8 @@ public class PictureFragment extends Fragment {
             String countdownMsg = "You have " + timeLeft + " left to join!";
 
             tvExpiration.setText(countdownMsg);
+
+            tvCommentCount.setText(String.valueOf(currPost.getCommentCount()));
 
             btnViewReplies.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -30,7 +30,7 @@ import java.io.File;
 public class ComposeReplyActivity extends AppCompatActivity {
 
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    public static final String TAG = "ReplyActivity";
+    public static final String TAG = "ComposeReplyActivity";
     private File photoFile;
     private String photoFileName = "photo.jpg";
     private ImageView ivPictureReply;
@@ -127,6 +127,9 @@ public class ComposeReplyActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 Log.i(TAG, "reply saved successfully");
+                Log.d(TAG, String.valueOf(currPost.getCommentCount() + 1));
+                currPost.setCommentCount(currPost.getCommentCount() + 1);
+                currPost.saveInBackground();
                 ivPictureReply.setImageResource(0);
                 etCaptionReply.setText("");
                 // go to reply feed
