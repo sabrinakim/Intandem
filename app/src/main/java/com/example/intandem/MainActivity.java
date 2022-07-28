@@ -121,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
         //String s = removeParens("cicken meets rice");
 
-
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
         tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
@@ -310,31 +309,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
-    private String removeParens(String s) {
-        int openParenIdx = -1;
-        int closeParenIdx = -1;
-        if (s.length() == 0) {
-            return "";
-        }
-        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '(') {
-                openParenIdx = i;
-            } else if (s.charAt(i) == ')') {
-                closeParenIdx = i;
-            }
-            if (openParenIdx != -1 && closeParenIdx != -1) {
-                // assuming space precedes and succeeds paren.
-                if (closeParenIdx == s.length() - 1) {
-                    return s.substring(0, openParenIdx - 1) + removeParens("");
-                }
-                return s.substring(0, openParenIdx - 1) + removeParens(s.substring(closeParenIdx + 2));
-            }
-        }
-        return s;
-    }
-
 
     private void getMorePosts(int currPage) {
         numPostsFetched = 0;
