@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, ProfileActivity.class);
                 i.putExtra("user", user);
                 startActivity(i);
+                overridePendingTransition(R.anim.slide_left_out, R.anim.nothing);
             }
         });
 
