@@ -20,94 +20,108 @@
 
 <!--            </com.facebook.shimmer.ShimmerFrameLayout>-->
 
-            <ImageView
-                android:id="@+id/ivPictureFeed"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0"
-                tools:srcCompat="@tools:sample/avatars" />
+        <ImageView
+            android:id="@+id/ivPictureFeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            tools:srcCompat="@tools:sample/avatars" />
 
-            <TextView
-                android:id="@+id/tvLocationFeed"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:text="Location"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/ivPictureFeed"
-                app:layout_constraintTop_toTopOf="@+id/ivPictureFeed" />
+        <TextView
+            android:id="@+id/tvLocationFeed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:fontFamily="sans-serif"
+            android:text="Location"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/ivProfilePic"
+            app:layout_constraintStart_toEndOf="@+id/ivProfilePic"
+            app:layout_constraintTop_toTopOf="@+id/ivProfilePic"
+            app:layout_constraintVertical_bias="0.25" />
 
-            <TextView
-                android:id="@+id/tvCaptionFeed"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="caption"
-                android:textColor="@color/white"
-                app:layout_constraintStart_toStartOf="@+id/tvName"
-                app:layout_constraintTop_toBottomOf="@+id/tvName" />
+        <TextView
+            android:id="@+id/tvCaptionFeed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="40dp"
+            android:fontFamily="sans-serif"
+            android:text="caption"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
-                android:id="@+id/ivProfilePic"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="380dp"
-                app:layout_constraintBottom_toBottomOf="@+id/ivPictureFeed"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:srcCompat="@tools:sample/avatars" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivProfilePic"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="44dp"
-                android:text="TextView"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/ivPictureFeed" />
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tvCaptionFeed"
+            app:layout_constraintStart_toStartOf="@+id/tvCaptionFeed" />
 
-            <TextView
-                android:id="@+id/tvExpiration"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:text="3 hr Left"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/tvLocationFeed"
-                app:layout_constraintStart_toEndOf="@+id/tvLocationFeed"
-                app:layout_constraintTop_toTopOf="@+id/tvLocationFeed" />
+        <TextView
+            android:id="@+id/tvExpiration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="3 hr Left"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/tvLocationFeed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvLocationFeed"
+            app:layout_constraintTop_toTopOf="@+id/tvLocationFeed" />
 
-            <TextView
-                android:id="@+id/tvMoreData"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="distance | price"
-                android:textColor="#FFFFFF"
-                app:layout_constraintStart_toStartOf="@+id/tvLocationFeed"
-                app:layout_constraintTop_toBottomOf="@+id/tvLocationFeed" />
+        <TextView
+            android:id="@+id/tvMoreData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="172dp"
+            android:text="distance | price"
+            android:textColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvLocationFeed"
+            app:layout_constraintTop_toBottomOf="@+id/tvLocationFeed" />
 
         <ImageButton
             android:id="@+id/btnViewReplies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="368dp"
             android:background="@null"
             android:src="@drawable/ic_baseline_comment_24"
-            app:layout_constraintEnd_toEndOf="@+id/ivProfilePic"
-            app:layout_constraintStart_toStartOf="@+id/ivProfilePic"
-            app:layout_constraintTop_toBottomOf="@+id/ivProfilePic" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

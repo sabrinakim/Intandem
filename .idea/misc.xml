@@ -23,8 +23,9 @@
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.18659420289855072" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3537338256835938" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.21465968586387435" />
         <entry key="app/src/main/res/layout/activity_permissions.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.22071197067481885" />
         <entry key="app/src/main/res/layout/activity_replies_adapter.xml" value="0.21105072463768115" />
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.275" />
@@ -36,8 +37,9 @@
         <entry key="app/src/main/res/layout/fragment_compose.xml" value="0.29438405797101447" />
         <entry key="app/src/main/res/layout/fragment_filter_dialog.xml" value="0.24454956054687502" />
         <entry key="app/src/main/res/layout/fragment_location.xml" value="0.2647247314453125" />
-        <entry key="app/src/main/res/layout/fragment_picture.xml" value="0.24139492753623187" />
+        <entry key="app/src/main/res/layout/fragment_picture.xml" value="0.34608090165732563" />
         <entry key="app/src/main/res/layout/fragment_posts.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.19519927536231885" />
         <entry key="app/src/main/res/layout/fragment_replies.xml" value="0.2472015380859375" />
         <entry key="app/src/main/res/layout/fragment_reviews.xml" value="0.13500506585612967" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.26871257688526573" />

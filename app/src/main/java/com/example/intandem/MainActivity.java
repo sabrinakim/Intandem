@@ -31,6 +31,8 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,7 +58,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.slider.Slider;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -70,6 +74,7 @@ import com.parse.ParseUser;
 import com.simform.refresh.SSPullToRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -90,26 +95,32 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://maps.googleapis.com/";
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location currLocation = new Location("");
-    private Double latitude;
-    private Double longitude;
-    private int maxDistance;
+    private Double latitude, longitude;
+    private int maxDistance, currPage, numPostsFetched;
     private ViewPager2 vp2Posts;
     private PostsAdapter adapter;
     private List<Post> allPosts, filteredDistancePosts;
     private FloatingActionButton fabCompose;
     private Set<String> friendIds = new HashSet<>();
-    private int currPage, numPostsFetched;
     private CircleImageView currUserProfileImage;
     private ImageButton ibFilter;
     private Toolbar homeToolbar;
     private LottieAnimationView walkingBlob;
-    private TextView tvLoadingMsg;
+    private TextView tvLoadingMsg, tvMaxDistance;
     private SSPullToRefreshLayout pullToRefresh;
+    private Slider distSlider;
+    private FrameLayout filterBottomSheet;
+    private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
+    private Button btnCancelFilter;
+    private boolean filterOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //String s = removeParens("cicken meets rice");
+
 
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
@@ -118,11 +129,74 @@ public class MainActivity extends AppCompatActivity {
         ibFilter = findViewById(R.id.ibFilter);
         vp2Posts = findViewById(R.id.vp2Posts);
         fabCompose = findViewById(R.id.fabAddPost);
+        distSlider = findViewById(R.id.distSlider);
+        tvMaxDistance = findViewById(R.id.tvMaxDistance);
+        filterBottomSheet = findViewById(R.id.filterBottomSheet);
+        btnCancelFilter = findViewById(R.id.btnCancelFilter);
 
         fabCompose.setVisibility(View.INVISIBLE);
 
         user = getIntent().getParcelableExtra("user");
         Glide.with(this).load(user.getString("pictureUrl")).into(currUserProfileImage);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(filterBottomSheet);
+        bottomSheetBehavior.setPeekHeight(0);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        distSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                String val;
+                if (value == 0.0) {
+                    val = "> 100 km";
+                } else {
+                    val = "" + value + " km";
+                }
+                tvMaxDistance.setText(val);
+            }
+        });
+
+        ibFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (filterOn) {
+                    filterOn = false;
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else {
+                    filterOn = true;
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+        });
+
+        btnCancelFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                // filter here
+                float val = distSlider.getValue();
+                if (val == 0.0) {
+                    if (maxDistance == -1) {
+                        // do nothing
+                    } else {
+                        maxDistance = -1;
+                        queryPosts();
+                    }
+                } else {
+                    maxDistance = Math.round(val);
+                    queryPosts();
+                }
+            }
+        });
+
+        currUserProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+                i.putExtra("user", user);
+                startActivity(i);
+            }
+        });
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -143,16 +217,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ibFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEditDialog();
-            }
-        });
-
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();
-        //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
         adapter = new PostsAdapter(this, allPosts, user, currLocation, vp2Posts);
 
@@ -245,20 +311,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == R.id.logout) {
-//            LoginManager.getInstance().logOut();
-//            Intent i = new Intent(this, LoginActivity.class);
-//            startActivity(i);
-//            finish(); // doesn't let you go back to main activity once logged out
-//            return true;
-//        }
-//        if (item.getItemId() == R.id.filter) {
-//            showEditDialog();
-//            return true;
-//        }
-        return super.onOptionsItemSelected(item);
+    private String removeParens(String s) {
+        int openParenIdx = -1;
+        int closeParenIdx = -1;
+        if (s.length() == 0) {
+            return "";
+        }
+        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                openParenIdx = i;
+            } else if (s.charAt(i) == ')') {
+                closeParenIdx = i;
+            }
+            if (openParenIdx != -1 && closeParenIdx != -1) {
+                // assuming space precedes and succeeds paren.
+                if (closeParenIdx == s.length() - 1) {
+                    return s.substring(0, openParenIdx - 1) + removeParens("");
+                }
+                return s.substring(0, openParenIdx - 1) + removeParens(s.substring(closeParenIdx + 2));
+            }
+        }
+        return s;
     }
 
 
@@ -372,6 +446,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void queryPosts() {
+        allPosts.clear();
         currPage = 1;
         numPostsFetched = 0;
         ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
@@ -414,15 +489,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-//    @Override
-//    public void onFinishFilterDialog(int maxDistance) {
-//        Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
-//        this.maxDistance = maxDistance;
-//        allPosts.clear();
-//        adapter.notifyDataSetChanged();
-//        queryPosts();
-//    }
 
     private void filterPosts(List<Post> posts) {
         allPosts.addAll(posts);

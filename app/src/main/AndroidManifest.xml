@@ -36,9 +36,13 @@
         android:theme="@style/Theme.Intandem"
         tools:targetApi="31">
         <activity
-            android:name=".ViewRepliesActivity"
+            android:name=".ProfileActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".ViewRepliesActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".CurrentLocationActivity"
             android:exported="false" />

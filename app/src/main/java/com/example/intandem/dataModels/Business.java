@@ -10,6 +10,7 @@ public class Business {
     String id;
     String name;
     String url;
+    Location location;
 
     @SerializedName("image_url")
     String imageUrl;
@@ -46,5 +47,9 @@ public class Business {
 
     public double getDistance() {
         return distance;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }
