@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -159,6 +160,20 @@ public class ComposeLocationActivity extends AppCompatActivity {
 //            }
 //        });
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Respond to the action bar's Up/Home button
+                Intent i = new Intent(ComposeLocationActivity.this, MainActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.nothing, R.anim.slide_down_out);
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

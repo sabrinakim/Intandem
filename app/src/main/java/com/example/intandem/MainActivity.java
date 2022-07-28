@@ -119,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //String s = removeParens("cicken meets rice");
-
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
         tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
