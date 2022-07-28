@@ -22,10 +22,10 @@
         <entry key="app/src/main/res/layout/activity_current_location.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.18659420289855072" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.36845397949218756" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33686523437499993" />
         <entry key="app/src/main/res/layout/activity_permissions.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.22071197067481885" />
+        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.2630261186240376" />
         <entry key="app/src/main/res/layout/activity_replies_adapter.xml" value="0.21105072463768115" />
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.275" />

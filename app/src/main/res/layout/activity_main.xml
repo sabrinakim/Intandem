@@ -30,7 +30,7 @@
         android:visibility="invisible"
         android:clickable="true"
         android:src="@drawable/ic_baseline_add_24"
-        app:backgroundTint="@color/purple_200"
+        app:backgroundTint="@color/teal_200"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -175,6 +175,9 @@
                     android:valueTo="100.0"
                     android:stepSize="1.0"
                     app:tickVisible="false"
+                    app:trackColor="@color/quantum_tealA100"
+                    app:thumbColor="@color/teal_200"
+                    app:haloColor="@color/quantum_tealA100"
                     app:layout_constraintEnd_toEndOf="@id/tvDescription"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="@id/tvDescription"
@@ -185,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Max Distance"
+                    android:text="Max Distance:"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
