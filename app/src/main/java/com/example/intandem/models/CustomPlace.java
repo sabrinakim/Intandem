@@ -12,6 +12,7 @@ public class CustomPlace extends ParseObject {
     public static final String KEY_PLACE_IMAGE_URL = "placeImageUrl";
     public static final String KEY_LAT = "lat";
     public static final String KEY_LONG = "long";
+    public static final String KEY_ADDRESS = "address";
 
     public CustomPlace() {}
 
@@ -69,5 +70,13 @@ public class CustomPlace extends ParseObject {
 
     public void setLong(double longitude) {
         put(KEY_LONG, longitude);
+    }
+
+    public String getAddress() {
+        return getString(KEY_ADDRESS);
+    }
+
+    public void setAddress(String address) {
+        put(KEY_ADDRESS, address);
     }
 }

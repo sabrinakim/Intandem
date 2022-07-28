@@ -27,8 +27,9 @@
         style="@android:style/Widget.Material.RatingBar.Indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         app:layout_constraintStart_toStartOf="@+id/tvLocationReviews"
-        app:layout_constraintTop_toBottomOf="@+id/tvLocationReviews" />
+        app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
 
     <ImageView
         android:id="@+id/ivPlaceImage"
@@ -57,5 +58,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivPlaceImage" />
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:text="TextView"
+        android:textColor="@color/almost_black"
+        app:layout_constraintEnd_toEndOf="@+id/tvLocationReviews"
+        app:layout_constraintStart_toStartOf="@+id/tvLocationReviews"
+        app:layout_constraintTop_toBottomOf="@+id/tvLocationReviews" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

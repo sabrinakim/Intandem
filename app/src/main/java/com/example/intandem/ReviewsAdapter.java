@@ -43,7 +43,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter {
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivPlaceImage;
-        private TextView tvLocationReviews;
+        private TextView tvLocationReviews, tvAddress;
         private RatingBar ratingsMerged;
 
         public HeaderViewHolder(@NonNull View itemView) {
@@ -51,21 +51,26 @@ public class ReviewsAdapter extends RecyclerView.Adapter {
             ivPlaceImage = itemView.findViewById(R.id.ivPlaceImage);
             tvLocationReviews = itemView.findViewById(R.id.tvLocationReviews);
             ratingsMerged = itemView.findViewById(R.id.ratingsMerged);
+            tvAddress = itemView.findViewById(R.id.tvAddress);
         }
 
         public void bind(ReviewItemClass header) {
             String imageUrl = header.getPlaceImageUrl();
-            if (imageUrl != null) { // image is optional, so its possible that it is null
+            if (imageUrl != null) {
                 Glide.with(context).load(imageUrl).into(ivPlaceImage);
+            } else {
+
             }
+
             tvLocationReviews.setText(header.getPlaceName());
+            tvAddress.setText(header.getAddress());
             ratingsMerged.setRating(((Double) header.getPlaceRatingOverall()).floatValue());
         }
     }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
         private TextView tvReviewUserName, tvReviewText;
-        private ImageView ivReviewProfilePic;
+        private ImageView ivReviewProfilePic, ivSource;
         private RatingBar rbReview;
 
         public ReviewViewHolder(@NonNull View itemView) {
@@ -74,6 +79,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter {
             tvReviewText = itemView.findViewById(R.id.tvReviewText);
             ivReviewProfilePic = itemView.findViewById(R.id.ivReviewProfilePic);
             rbReview = itemView.findViewById(R.id.rbReview);
+            ivSource = itemView.findViewById(R.id.ivSource);
         }
 
         public void bind(ReviewItemClass review) {
@@ -82,6 +88,11 @@ public class ReviewsAdapter extends RecyclerView.Adapter {
             rbReview.setRating(((Double) review.getPlaceRating()).floatValue());
             Glide.with(context).load(review.getProfilePicUrl())
                     .into(ivReviewProfilePic);
+            if (review.getSource().equals("Google")) {
+                Glide.with(context).load(R.drawable.google_logo).into(ivSource);
+            } else {
+                Glide.with(context).load(R.drawable.yelp_logo2).into(ivSource);
+            }
         }
     }
 

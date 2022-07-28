@@ -179,7 +179,7 @@ public class LocationFragment extends Fragment {
         try {
             customPlace.fetchIfNeeded();
             ReviewItemClass header = new ReviewItemClass(0, customPlace.getName(),
-                    customPlace.getPlaceImageUrl(), customPlace.getRating());
+                    customPlace.getAddress(), customPlace.getPlaceImageUrl(), customPlace.getRating());
             allReviews.add(header);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -208,7 +208,8 @@ public class LocationFragment extends Fragment {
                         Log.d(TAG, "" + mapping.getReview().getRating());
                         Review currReview = mapping.getReview();
                         ReviewItemClass reviewItemClass = new ReviewItemClass(1,
-                                currReview.getProfilePicUrl(), currReview.getName(), currReview.getText(), currReview.getRating());
+                                currReview.getProfilePicUrl(), currReview.getName(), currReview.getText(),
+                                currReview.getSource(), currReview.getRating());
                         allReviews.add(reviewItemClass);
                     } catch (ParseException ex) {
                         ex.printStackTrace();
