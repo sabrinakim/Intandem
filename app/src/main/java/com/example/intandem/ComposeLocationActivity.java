@@ -416,24 +416,24 @@ public class ComposeLocationActivity extends AppCompatActivity {
         //2213 Tasman Dr, Santa Clara, CA 95054, USA
         String gNameKey = condensedString(placeName);
         String gAddressKey = condensedString(placeAddress);
-        String gCompositeKey = gNameKey + gAddressKey;
+        String gCompositeKey =  gAddressKey + gNameKey;
 
         BusinessSearchResult businessSearchResult = response.body();
         for (Business b : businessSearchResult.getBusinesses()) {
-            StringBuilder yCompositeKeyBuilder = new StringBuilder(condensedString(b.getName()));
+            StringBuilder yCompositeKeyBuilder = new StringBuilder();
             Location l = b.getLocation();
-            yCompositeKeyBuilder.append(l.getCity())
-                    .append(l.getState())
-                    .append(l.getZipCode());
+            yCompositeKeyBuilder.append(condensedString(l.getCity()))
+                    .append(condensedString(l.getState()))
+                    .append(condensedString(l.getZipCode()));
             if (l.getCountry().equals("US")) {
                 yCompositeKeyBuilder.append("USA");
             }
             // try out every address
-            String noAddr = yCompositeKeyBuilder.toString();
+            String noAddr = yCompositeKeyBuilder.toString() + condensedString(b.getName());
 
-            if ((noAddr + l.getAddress1()).equals(gCompositeKey)
-                || (noAddr + l.getAddress2()).equals(gCompositeKey)
-                || (noAddr + l.getAddress3()).equals(gCompositeKey)) {
+            if ((condensedString(l.getAddress1()) + noAddr).equals(gCompositeKey)
+                || (condensedString(l.getAddress2()) + noAddr).equals(gCompositeKey)
+                || (condensedString(l.getAddress3()) + noAddr).equals(gCompositeKey)) {
                 return b;
             }
         }
