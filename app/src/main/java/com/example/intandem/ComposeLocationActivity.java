@@ -315,7 +315,9 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     double avgRating = (gRating + yRating) / 2;
                     String placeImageUrl = matchingYelpBusiness.getImageUrl();
                     customPlace.setRating(avgRating);
-                    customPlace.setPrice(yPrice);
+                    if (yPrice != null) {
+                        customPlace.setPrice(yPrice);
+                    }
                     customPlace.setPlaceImageUrl(placeImageUrl);
                     customPlace.saveInBackground(new SaveCallback() {
                         @Override

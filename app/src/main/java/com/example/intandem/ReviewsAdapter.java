@@ -59,9 +59,8 @@ public class ReviewsAdapter extends RecyclerView.Adapter {
             if (imageUrl != null) {
                 Glide.with(context).load(imageUrl).into(ivPlaceImage);
             } else {
-
+                Glide.with(context).load(R.drawable.no_image_available).into(ivPlaceImage);
             }
-
             tvLocationReviews.setText(header.getPlaceName());
             tvAddress.setText(header.getAddress());
             ratingsMerged.setRating(((Double) header.getPlaceRatingOverall()).floatValue());
