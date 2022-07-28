@@ -74,6 +74,7 @@ import com.parse.ParseUser;
 import com.simform.refresh.SSPullToRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -111,11 +112,15 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout filterBottomSheet;
     private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
     private Button btnCancelFilter;
+    private boolean filterOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //String s = removeParens("cicken meets rice");
+
 
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
@@ -154,7 +159,13 @@ public class MainActivity extends AppCompatActivity {
         ibFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                if (filterOn) {
+                    filterOn = false;
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else {
+                    filterOn = true;
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
             }
         });
 
@@ -208,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
 
         allPosts = new ArrayList<>();
         filteredDistancePosts = new ArrayList<>();
-        //fabCompose = view.findViewById(R.id.fabAddPost);
         maxDistance = -1;
         adapter = new PostsAdapter(this, allPosts, user, currLocation, vp2Posts);
 
@@ -301,20 +311,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == R.id.logout) {
-//            LoginManager.getInstance().logOut();
-//            Intent i = new Intent(this, LoginActivity.class);
-//            startActivity(i);
-//            finish(); // doesn't let you go back to main activity once logged out
-//            return true;
-//        }
-//        if (item.getItemId() == R.id.filter) {
-//            showEditDialog();
-//            return true;
-//        }
-        return super.onOptionsItemSelected(item);
+    private String removeParens(String s) {
+        int openParenIdx = -1;
+        int closeParenIdx = -1;
+        if (s.length() == 0) {
+            return "";
+        }
+        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                openParenIdx = i;
+            } else if (s.charAt(i) == ')') {
+                closeParenIdx = i;
+            }
+            if (openParenIdx != -1 && closeParenIdx != -1) {
+                // assuming space precedes and succeeds paren.
+                if (closeParenIdx == s.length() - 1) {
+                    return s.substring(0, openParenIdx - 1) + removeParens("");
+                }
+                return s.substring(0, openParenIdx - 1) + removeParens(s.substring(closeParenIdx + 2));
+            }
+        }
+        return s;
     }
 
 
@@ -428,6 +446,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void queryPosts() {
+        allPosts.clear();
         currPage = 1;
         numPostsFetched = 0;
         ParseQuery<Friendship> queryFriends = ParseQuery.getQuery(Friendship.class);
@@ -470,15 +489,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-//    @Override
-//    public void onFinishFilterDialog(int maxDistance) {
-//        Log.d(TAG, "AFTER USER CHOOSES TO FILTER");
-//        this.maxDistance = maxDistance;
-//        allPosts.clear();
-//        adapter.notifyDataSetChanged();
-//        queryPosts();
-//    }
 
     private void filterPosts(List<Post> posts) {
         allPosts.addAll(posts);

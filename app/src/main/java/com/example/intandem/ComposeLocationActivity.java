@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.example.intandem.dataModels.Business;
 import com.example.intandem.dataModels.BusinessSearchResult;
 import com.example.intandem.dataModels.GoogleReview;
+import com.example.intandem.dataModels.Location;
 import com.example.intandem.dataModels.PlaceDetailsSearchResult;
 import com.example.intandem.dataModels.ReviewSearchResult;
 import com.example.intandem.dataModels.YelpReview;
@@ -252,6 +253,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
                             review.putName(name);
                             review.putRating(rating);
                             review.putText(text);
+                            review.putSource("Google");
                             if (profilePicUrl != null) {
                                 review.putProfilePicUrl(profilePicUrl);
                             }
@@ -296,93 +298,91 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        //Log.i(TAG, "place addy: " + placeAddress);
         YelpService yelpService = yelpRetrofit.create(YelpService.class);
         yelpService.searchBusinesses("Bearer " + YELP_API_KEY, placeName, placeAddress,
                 latLng.latitude, latLng.longitude, YELP_LIMIT).enqueue(new Callback<BusinessSearchResult>() {
             @Override
             public void onResponse(Call<BusinessSearchResult> call, Response<BusinessSearchResult> response) {
                 Log.i(TAG, "success getting yelp businesses");
-                // for now, assume matching business is the first one.
-                Business matchingYelpBusiness = response.body().getBusinesses().get(0);
-                double yRating = matchingYelpBusiness.getRating();
-                String yPrice = matchingYelpBusiness.getPrice();
-                double avgRating = (gRating + yRating) / 2;
-                String placeImageUrl = matchingYelpBusiness.getImageUrl();
-                customPlace.setRating(avgRating);
-                customPlace.setPrice(yPrice);
-                customPlace.setPlaceImageUrl(placeImageUrl);
-                customPlace.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.e(TAG, "error saving custom place object");
-                            return;
+
+                Business matchingYelpBusiness = findMatchingYelpBusiness(response);
+
+                if (matchingYelpBusiness != null) {
+                    double yRating = matchingYelpBusiness.getRating();
+                    String yPrice = matchingYelpBusiness.getPrice();
+                    double avgRating = (gRating + yRating) / 2;
+                    String placeImageUrl = matchingYelpBusiness.getImageUrl();
+                    customPlace.setRating(avgRating);
+                    customPlace.setPrice(yPrice);
+                    customPlace.setPlaceImageUrl(placeImageUrl);
+                    customPlace.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            handleSavingCustomPlaceObj(e, customPlace);
                         }
-                        Log.i(TAG, "success saving custom place object");
+                    });
+                    String matchingYelpBusinessId = matchingYelpBusiness.getId();
+                    yelpService.searchReviews("Bearer " + YELP_API_KEY, matchingYelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
+                        @Override
+                        public void onResponse(Call<ReviewSearchResult> call, Response<ReviewSearchResult> response) {
+                            Log.i(TAG, "success getting yelp reviews");
+                            List<YelpReview> yelpReviews = response.body().getReviews();
+                            for (YelpReview yelpReview : yelpReviews) {
+                                String name = yelpReview.getUser().getName();
+                                double rating = yelpReview.getRating();
+                                String text = yelpReview.getText();
+                                String profilePicUrl = yelpReview.getUser().getImageUrl();
 
-                        // custom place exists in database, so we can now attach it to the post
-                        textBNext.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-                                i.putExtras(getIntent());
-                                i.putExtra("customPlace", customPlace);
-                                startActivity(i);
-                            }
-                        });
-                    }
-                });
-                String matchingYelpBusinessId = matchingYelpBusiness.getId();
-                yelpService.searchReviews("Bearer " + YELP_API_KEY, matchingYelpBusinessId).enqueue(new Callback<ReviewSearchResult>() {
-                    @Override
-                    public void onResponse(Call<ReviewSearchResult> call, Response<ReviewSearchResult> response) {
-                        Log.i(TAG, "success getting yelp reviews");
-                        List<YelpReview> yelpReviews = response.body().getReviews();
-                        for (YelpReview yelpReview : yelpReviews) {
-                            String name = yelpReview.getUser().getName();
-                            double rating = yelpReview.getRating();
-                            String text = yelpReview.getText();
-                            String profilePicUrl = yelpReview.getUser().getImageUrl();
-
-                            Review review = new Review();
-                            review.putName(name);
-                            review.putRating(rating);
-                            review.putText(text);
-                            if (profilePicUrl != null) {
-                                review.putProfilePicUrl(profilePicUrl);
-                            }
-
-                            review.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e != null) {
-                                        Log.e(TAG, "error saving yelp review");
-                                        return;
-                                    }
-                                    Log.i(TAG, "success saving yelp review");
-                                    CustomPlaceToReview placeToReview = new CustomPlaceToReview();
-                                    placeToReview.setCustomPlace(customPlace);
-                                    placeToReview.setReview(review);
-                                    placeToReview.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if (e != null) {
-                                                Log.e(TAG, "error saving placeToReview");
-                                                return;
-                                            }
-                                            Log.i(TAG, "success saving placeToReview");
-                                        }
-                                    });
+                                Review review = new Review();
+                                review.putName(name);
+                                review.putRating(rating);
+                                review.putText(text);
+                                review.putSource("Yelp");
+                                if (profilePicUrl != null) {
+                                    review.putProfilePicUrl(profilePicUrl);
                                 }
-                            });
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Call<ReviewSearchResult> call, Throwable t) {
-                        Log.i(TAG, "failure getting yelp reviews");
-                    }
-                });
+                                review.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "error saving yelp review");
+                                            return;
+                                        }
+                                        Log.i(TAG, "success saving yelp review");
+                                        CustomPlaceToReview placeToReview = new CustomPlaceToReview();
+                                        placeToReview.setCustomPlace(customPlace);
+                                        placeToReview.setReview(review);
+                                        placeToReview.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (e != null) {
+                                                    Log.e(TAG, "error saving placeToReview");
+                                                    return;
+                                                }
+                                                Log.i(TAG, "success saving placeToReview");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ReviewSearchResult> call, Throwable t) {
+                            Log.i(TAG, "failure getting yelp reviews");
+                        }
+                    });
+                } else {
+                    customPlace.setRating(gRating);
+                    customPlace.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            handleSavingCustomPlaceObj(e, customPlace);
+                        }
+                    });
+                }
             }
 
             @Override
@@ -392,4 +392,94 @@ public class ComposeLocationActivity extends AppCompatActivity {
         });
     }
 
+    private void handleSavingCustomPlaceObj(ParseException e, CustomPlace customPlace) {
+        if (e != null) {
+            Log.e(TAG, "error saving custom place object");
+            return;
+        }
+        Log.i(TAG, "success saving custom place object");
+
+        // custom place exists in database, so we can now attach it to the post
+        textBNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
+                i.putExtras(getIntent());
+                i.putExtra("customPlace", customPlace);
+                startActivity(i);
+            }
+        });
+    }
+
+    private Business findMatchingYelpBusiness(Response<BusinessSearchResult> response) {
+        // response is a list of plausible responses.
+        //2213 Tasman Dr, Santa Clara, CA 95054, USA
+        String gNameKey = condensedString(placeName);
+        String gAddressKey = condensedString(placeAddress);
+        String gCompositeKey = gNameKey + gAddressKey;
+
+        BusinessSearchResult businessSearchResult = response.body();
+        for (Business b : businessSearchResult.getBusinesses()) {
+            StringBuilder yCompositeKeyBuilder = new StringBuilder(condensedString(b.getName()));
+            Location l = b.getLocation();
+            yCompositeKeyBuilder.append(l.getCity())
+                    .append(l.getState())
+                    .append(l.getZipCode());
+            if (l.getCountry().equals("US")) {
+                yCompositeKeyBuilder.append("USA");
+            }
+            // try out every address
+            String noAddr = yCompositeKeyBuilder.toString();
+
+            if ((noAddr + l.getAddress1()).equals(gCompositeKey)
+                || (noAddr + l.getAddress2()).equals(gCompositeKey)
+                || (noAddr + l.getAddress3()).equals(gCompositeKey)) {
+                return b;
+            }
+        }
+        return null;
+    }
+
+    private String condensedString(String s) {
+        // remove comma, spaces, info in parenthesis
+        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
+        s = removeParens(s);
+
+        StringBuilder stringKey = new StringBuilder();
+        String[] splitCommas = s.split(", ");
+        for (String splitComma : splitCommas) {
+            String[] splitSpaces = splitComma.split(" ");
+            StringBuilder stringKeyComma = new StringBuilder();
+            for (String splitSpace : splitSpaces) {
+                stringKeyComma.append(splitSpace);
+            }
+            stringKey.append(stringKeyComma.toString());
+        }
+        String key = stringKey.toString();
+        return key;
+    }
+
+    private String removeParens(String s) {
+        int openParenIdx = -1;
+        int closeParenIdx = -1;
+        if (s.length() == 0) {
+            return "";
+        }
+        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                openParenIdx = i;
+            } else if (s.charAt(i) == ')') {
+                closeParenIdx = i;
+            }
+            if (openParenIdx != -1 && closeParenIdx != -1) {
+                // assuming space precedes and succeeds paren.
+                if (closeParenIdx == s.length() - 1) {
+                    return s.substring(0, openParenIdx - 1) + removeParens("");
+                }
+                return s.substring(0, openParenIdx - 1) + removeParens(s.substring(closeParenIdx + 2));
+            }
+        }
+        return s;
+    }
 }

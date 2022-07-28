@@ -114,7 +114,7 @@ public class PictureFragment extends Fragment {
             tvMoreData = view.findViewById(R.id.tvMoreData);
             btnViewReplies = view.findViewById(R.id.btnViewReplies);
 
-            tvName.setText(currPost.getUser().getUsername());
+            tvName.setText(currPost.getUser().getString("firstName"));
 
             Calendar rightNow = Calendar.getInstance();
             String timeLeft = DateDiff.findDifference(rightNow.getTime(), currPost.getExpiration());
