@@ -197,7 +197,7 @@ public class PictureFragment extends Fragment {
                 Glide.with(getContext()).load(image.getUrl()).into(ivPictureFeed);
             }
 
-            Glide.with(getContext()).load(currUser.getString("pictureUrl"))
+            Glide.with(getContext()).load(currPost.getUser().getString("pictureUrl"))
                     .transform(new CircleCrop())
                     .into(ivProfilePicture);
 
