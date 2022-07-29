@@ -117,10 +117,8 @@ public class PictureFragment extends Fragment {
 
             Calendar rightNow = Calendar.getInstance();
             String timeLeft = DateDiff.findDifference(rightNow.getTime(), currPost.getExpiration());
-            String timePast = DateDiff.findDifference(currPost.getCreatedAt(), rightNow.getTime());
 
-            String msg = currPost.getUser().getString("firstName") + " invited you "
-                    + timePast + " ago:";
+            String msg = currPost.getUser().getString("firstName") + " invited you:";
 
             tvName.setText(msg);
 
