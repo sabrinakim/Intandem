@@ -119,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //String s = removeParens("cicken meets rice");
-
         currUserProfileImage = findViewById(R.id.toolbarProfileImage);
         walkingBlob = findViewById(R.id.walkingBlob);
         tvLoadingMsg = findViewById(R.id.tvLoadingMsg);
@@ -161,8 +159,10 @@ public class MainActivity extends AppCompatActivity {
                 if (filterOn) {
                     filterOn = false;
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    fabCompose.setVisibility(View.VISIBLE);
                 } else {
                     filterOn = true;
+                    fabCompose.setVisibility(View.INVISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
             }
@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                fabCompose.setVisibility(View.VISIBLE);
                 // filter here
                 float val = distSlider.getValue();
                 if (val == 0.0) {
@@ -194,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, ProfileActivity.class);
                 i.putExtra("user", user);
                 startActivity(i);
+                overridePendingTransition(R.anim.slide_left_out, R.anim.nothing);
             }
         });
 

@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -161,6 +162,20 @@ public class ComposeLocationActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Respond to the action bar's Up/Home button
+                Intent i = new Intent(ComposeLocationActivity.this, MainActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.nothing, R.anim.slide_down_out);
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 //        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -217,6 +232,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
         CustomPlace customPlace = new CustomPlace();
         customPlace.setGPlaceId(placeId);
         customPlace.setName(placeName);
+        customPlace.setAddress(placeAddress);
         customPlace.setLat(latLng.latitude);
         customPlace.setLong(latLng.longitude);
         performQueries(customPlace);
@@ -314,7 +330,9 @@ public class ComposeLocationActivity extends AppCompatActivity {
                     double avgRating = (gRating + yRating) / 2;
                     String placeImageUrl = matchingYelpBusiness.getImageUrl();
                     customPlace.setRating(avgRating);
-                    customPlace.setPrice(yPrice);
+                    if (yPrice != null) {
+                        customPlace.setPrice(yPrice);
+                    }
                     customPlace.setPlaceImageUrl(placeImageUrl);
                     customPlace.saveInBackground(new SaveCallback() {
                         @Override
@@ -415,27 +433,45 @@ public class ComposeLocationActivity extends AppCompatActivity {
         // response is a list of plausible responses.
         //2213 Tasman Dr, Santa Clara, CA 95054, USA
         String gNameKey = condensedString(placeName);
-        String gAddressKey = condensedString(placeAddress);
-        String gCompositeKey =  gAddressKey + gNameKey;
+        //String gAddressKey = condensedString(placeAddress);
+        //String gCompositeKey =  gAddressKey + gNameKey;
 
         BusinessSearchResult businessSearchResult = response.body();
         for (Business b : businessSearchResult.getBusinesses()) {
-            StringBuilder yCompositeKeyBuilder = new StringBuilder();
-            Location l = b.getLocation();
-            yCompositeKeyBuilder.append(condensedString(l.getCity()))
-                    .append(condensedString(l.getState()))
-                    .append(condensedString(l.getZipCode()));
-            if (l.getCountry().equals("US")) {
-                yCompositeKeyBuilder.append("USA");
-            }
-            // try out every address
-            String noAddr = yCompositeKeyBuilder.toString() + condensedString(b.getName());
-
-            if ((condensedString(l.getAddress1()) + noAddr).equals(gCompositeKey)
-                || (condensedString(l.getAddress2()) + noAddr).equals(gCompositeKey)
-                || (condensedString(l.getAddress3()) + noAddr).equals(gCompositeKey)) {
+            String yKey = condensedString(b.getName());
+            if (yKey.equals(gNameKey)) {
                 return b;
             }
+//            StringBuilder yCompositeKeyBuilder = new StringBuilder();
+//            Location l = b.getLocation();
+//            yCompositeKeyBuilder.append(condensedString(l.getCity()))
+//                    .append(condensedString(l.getState()))
+//                    .append(condensedString(l.getZipCode()));
+//            if (l.getCountry().equals("US")) {
+//                yCompositeKeyBuilder.append("USA");
+//            }
+//            // try out every address
+//            String noAddr = yCompositeKeyBuilder.toString() + condensedString(b.getName());
+//            String yCompositeKey;
+//
+//            if (l.getAddress1() != null) {
+//                yCompositeKey = l.getAddress1() + noAddr;
+//                if (yCompositeKey.equals(gCompositeKey)) {
+//                    return b;
+//                }
+//            }
+//            if (l.getAddress2() != null) {
+//                yCompositeKey = l.getAddress2() + noAddr;
+//                if (yCompositeKey.equals(gCompositeKey)) {
+//                    return b;
+//                }
+//            }
+//            if (l.getAddress3() != null) {
+//                yCompositeKey = l.getAddress3() + noAddr;
+//                if (yCompositeKey.equals(gCompositeKey)) {
+//                    return b;
+//                }
+//            }
         }
         return null;
     }

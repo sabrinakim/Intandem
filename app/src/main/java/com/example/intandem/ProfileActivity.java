@@ -1,11 +1,14 @@
 package com.example.intandem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,6 +31,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         user = getIntent().getParcelableExtra("user");
 
         profileToolbar = findViewById(R.id.profileToolbar);
@@ -38,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(profileToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_close_24);
 
         Glide.with(this).load(user.getString("pictureUrl")).into(ivProfileProfilePic);
         tvProfileName.setText(user.getUsername());
@@ -52,5 +59,18 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Respond to the action bar's Up/Home button
+                Intent i = new Intent(ProfileActivity.this, MainActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.nothing, R.anim.slide_right_in);
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

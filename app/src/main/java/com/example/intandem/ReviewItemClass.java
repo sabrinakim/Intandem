@@ -6,12 +6,13 @@ public class ReviewItemClass {
 
     private int viewType;
 
-    private String placeName, placeImageUrl;
+    private String placeName, placeImageUrl, address;
     private double placeRatingOverall;
 
-    public ReviewItemClass(int viewType, String placeName, String placeImageUrl, double placeRatingOverall) {
+    public ReviewItemClass(int viewType, String placeName, String address, String placeImageUrl, double placeRatingOverall) {
         this.placeName = placeName;
         this.placeImageUrl = placeImageUrl;
+        this.address = address;
         this.placeRatingOverall = placeRatingOverall;
         this.viewType = viewType;
     }
@@ -28,6 +29,8 @@ public class ReviewItemClass {
         return placeRatingOverall;
     }
 
+    public String getAddress() { return address; }
+
     public void setPlaceName(String placeName) {
         this.placeName = placeName;
     }
@@ -36,17 +39,20 @@ public class ReviewItemClass {
         this.placeImageUrl = placeImageUrl;
     }
 
+    public void setAddress(String address) { this.address = address; }
+
     public void setPlaceRatingOverall(double placeRatingOverall) {
         this.placeRatingOverall = placeRatingOverall;
     }
 
-    private String profilePicUrl, name, text;
+    private String profilePicUrl, name, text, source;
     private double placeRating;
 
-    public ReviewItemClass(int viewType, String profilePicUrl, String name, String text, double placeRating) {
+    public ReviewItemClass(int viewType, String profilePicUrl, String name, String text, String source, double placeRating) {
         this.profilePicUrl = profilePicUrl;
         this.name = name;
         this.text = text;
+        this.source = source;
         this.placeRating = placeRating;
         this.viewType = viewType;
     }
@@ -63,6 +69,8 @@ public class ReviewItemClass {
         return text;
     }
 
+    public String getSource() { return  source; }
+
     public double getPlaceRating() {
         return placeRating;
     }
@@ -78,6 +86,8 @@ public class ReviewItemClass {
     public void setText(String text) {
         this.text = text;
     }
+
+    public void setSource(String source) { this.source = source; }
 
     public void setPlaceRating(double placeRating) {
         this.placeRating = placeRating;

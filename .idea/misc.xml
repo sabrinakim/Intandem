@@ -22,10 +22,10 @@
         <entry key="app/src/main/res/layout/activity_current_location.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_duration.xml" value="0.2504528985507246" />
         <entry key="app/src/main/res/layout/activity_facebook_login.xml" value="0.14285714285714285" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.18659420289855072" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.21465968586387435" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.36845397949218756" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33686523437499993" />
         <entry key="app/src/main/res/layout/activity_permissions.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.22071197067481885" />
+        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.2630261186240376" />
         <entry key="app/src/main/res/layout/activity_replies_adapter.xml" value="0.21105072463768115" />
         <entry key="app/src/main/res/layout/activity_reply.xml" value="0.2762635807860586" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.275" />
@@ -44,9 +44,9 @@
         <entry key="app/src/main/res/layout/fragment_reviews.xml" value="0.13500506585612967" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.26871257688526573" />
         <entry key="app/src/main/res/layout/item_reply.xml" value="0.12264150943396226" />
-        <entry key="app/src/main/res/layout/item_review.xml" value="0.30322100823894216" />
+        <entry key="app/src/main/res/layout/item_review.xml" value="0.28648669427409845" />
         <entry key="app/src/main/res/layout/layout_bottom_sheet.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/layout_review_header.xml" value="0.13728470111448834" />
+        <entry key="app/src/main/res/layout/layout_review_header.xml" value="0.34754623675901963" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2898148148148148" />
         <entry key="app/src/main/res/menu/menu_compose_event.xml" value="0.26615384615384613" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.25510711669921876" />

@@ -48,4 +48,14 @@
         app:layout_constraintStart_toStartOf="@+id/ivReviewProfilePic"
         app:layout_constraintTop_toBottomOf="@+id/ivReviewProfilePic" />
 
+    <ImageView
+        android:id="@+id/ivSource"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/rbReview"
+        app:layout_constraintStart_toEndOf="@+id/rbReview"
+        app:layout_constraintTop_toTopOf="@+id/rbReview"
+        tools:srcCompat="@tools:sample/avatars" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

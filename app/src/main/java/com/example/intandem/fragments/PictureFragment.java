@@ -58,7 +58,7 @@ public class PictureFragment extends Fragment {
     private Post currPost;
     private Location currLocation;
     private ParseUser currUser;
-    private TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData;
+    private TextView tvLocationFeed, tvCaptionFeed, tvName, tvExpiration, tvMoreData, tvCommentCount;
     private ImageView ivPictureFeed, ivProfilePicture;
     private ImageButton btnViewReplies;
     private boolean durationFlag = false;
@@ -113,19 +113,20 @@ public class PictureFragment extends Fragment {
             tvExpiration = view.findViewById(R.id.tvExpiration);
             tvMoreData = view.findViewById(R.id.tvMoreData);
             btnViewReplies = view.findViewById(R.id.btnViewReplies);
+            tvCommentCount = view.findViewById(R.id.tvCommentCount);
 
             Calendar rightNow = Calendar.getInstance();
             String timeLeft = DateDiff.findDifference(rightNow.getTime(), currPost.getExpiration());
-            String timePast = DateDiff.findDifference(currPost.getCreatedAt(), rightNow.getTime());
 
-            String msg = currPost.getUser().getString("firstName") + " invited you "
-                    + timePast + " ago:";
+            String msg = currPost.getUser().getString("firstName") + " invited you:";
 
             tvName.setText(msg);
 
             String countdownMsg = "You have " + timeLeft + " left to join!";
 
             tvExpiration.setText(countdownMsg);
+
+            tvCommentCount.setText(String.valueOf(currPost.getCommentCount()));
 
             btnViewReplies.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -194,7 +195,7 @@ public class PictureFragment extends Fragment {
                 Glide.with(getContext()).load(image.getUrl()).into(ivPictureFeed);
             }
 
-            Glide.with(getContext()).load(currUser.getString("pictureUrl"))
+            Glide.with(getContext()).load(currPost.getUser().getString("pictureUrl"))
                     .transform(new CircleCrop())
                     .into(ivProfilePicture);
 
