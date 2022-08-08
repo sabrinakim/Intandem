@@ -1,11 +1,8 @@
 # "intandem"
 
-Original App Design Project - README Template
 ===
 
-## Buddy Finding App
-
-build instructions: open project & run
+## Friend Finding App
 
 ## Table of Contents
 1. [Overview]
@@ -18,7 +15,6 @@ build instructions: open project & run
 Through pictures & swipes, users can easily find people to go somewhere/do something with so they don't have to go alone (rather, **in tandem** with their friends).
 
 ### App Evaluation
-[Evaluation of your app across the following attributes]
 - **Category:** Social
 - **Mobile:** Easy access
 - **Story:** Allows users to easily find buddies to go somewhere/do something with so they don't have to go alone.
@@ -28,104 +24,87 @@ Through pictures & swipes, users can easily find people to go somewhere/do somet
 
 ## Product Spec
 
-### 1. User Stories (Required and Optional)
+### 1. User Stories
 
 **Required Must-have Stories**
 
-* [x] User can login, signup, and logout through Facebook Authentication
-* [x] Users can create & post event invitations so that their friends can join them if they want
+* User can login, signup, and logout through Facebook Authentication
+* Users can create & post event invitations so that their friends can join them if they want
   * These posts include:
     * Location: e.g. Fondren Library
     * Duration: e.g. "the next 3 hours"
     * Picture: e.g. (picture of homework at the library)
-    * Message: e.g. "please join me at the library i'm working on comp182 hw rn T_T"
-* [ ] Users can view event invitations created by their FB friends in their home page
-* [x] Users can reply to posted event invitations
+    * Caption: e.g. "please join me at the library i'm working on comp182 hw rn T_T"
+* Users can view posts created by their FB friends in their home page
+* Users can reply to posts
   * Replies will consist of:
     * Picture: e.g. (selfie showing excitement)
     * Message: e.g. "omg i'm doing comp182 hw rn too i will join u"
-  * [ ] Everyone who is invited to the event can see the replies
-* [x] Users can view people's replies to the event invitation they posted
-* [ ] FILTERING (1st technically ambiguous problem)
-  * [x] Users can filter posts through a series of parameters, like location.
-  * [ ] "expired" posts will be shown as grayed out, or will just disappear
-  * [ ] Users can only see posts from their friends in their home feed, and users posts will only be shown to their friends
-  * [ ] posts that are similar to ones that were replied to/interacted with before will be prioritized by being bubbled up to the top of the swiping queue (stretch goal)
-* [ ] MERGING 2 APIS (2nd technically ambiguous problem)
-  * [ ] Users can create custom, very specific locations that are not available on the Google Places API
-    * e.g. Martel Library at Rice University
-    * these custom locations will be stored in a database
-  * [ ] make own autocomplete text box where app makes queries to 2 different APIs
-  * [ ] app merges 2 API responses into one response to make a custom "place" object
+  * Everyone who is invited to the event can see the replies
+* Users can view people's replies to the post
+* FILTERING (1st technically ambiguous problem)
+  * Users can filter posts through a series of parameters, like location.
+  * "expired" posts will disappear from feed
+  * Users can only see posts from their friends in their home feed, and users posts will only be shown to their friends
+* MERGING 2 APIS (2nd technically ambiguous problem)
+  * App merges API responses from Google and Yelp into one response to make a custom "place" object
+  * Users will be able to see Google and Yelp review for locations
   
-
-**Optional Nice-to-have Stories**
-
-* Users can create smaller circles among their friends
-  * e.g. "comp182 study group"; "hiking group"
-* Users can add on more pictures to their post after posting (similar to Instagram stories)
-* Users can tag other users on their posts
 
 ### 2. Screen Archetypes
 
-* Login/Signup screen
+* Login/Signup Screen
    * user can login/signup
-* Event invitation screen (aka Home screen)
-   * Users can view the invitations they have received
-* Event detail screen
-   * Users can see the details of an event, including reviews of the location
-* Invitation creation screen
+* Home Screen
+   * Users can view posts
+* Invitation Detail Screen
+   * Users can see a map view of the location with markers
+   * Users can see Yelp and Google reviews for that location
+* Invitation Creation screen
    * Users can create their event invitation here to share with their friends
-* Activity screen
-   * Users can view the replies they've gotten on their invitations
 * Profile screen
-   * includes profile picture and invitations they've created + replied to.
+   * Users can logout and view their profile picture here
 
 ### 3. Navigation
 
 **Tab Navigation** (Tab to Screen)
 
-* Event invitation screen
-* Create invitation screen
-* Activity screen
-* Profile screen
+* Home Screen
+* Profile Screen
 
 **Flow Navigation** (Screen to Screen)
 
-* Invitation (on Home screen) -> (tap) invitation details
-* Invitation (on Home screen) -> (swipe) replies to your friend's invitation 
-* Invitation (on Activity page) -> (tap) replies to your invtation
+* Invitation (on Home screen) -> (swipe left) invitation details
+* Invitation (on Home screen) -> (double tap) reply to your friend's invitation 
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
 <img src="intandem_wireframe.jpeg" width=1000>
 
-### [BONUS] Digital Wireframes & Mockups
-
-### [BONUS] Interactive Prototype
-
 ## Schema
 ### Models
 
-New Place:
+Place:
 
 | Property | Type | Description |
 | -------- | ------ | --------------------------- |
-| objectId | String | unique id for the user post |
-| name | String | name for the user place |
-| location | JSON Object | location of the place |
+| objectId | String | unique id for the place |
+| name | String | name for the location |
+| gPlaceId | String | Google Place ID for the location |
+| address | String | address |
+| rating | double | averaged rating across Google & Yelp |
+| price | String | price level (e.g. "$$") |
 
-Invitation:
+Post:
 
 | Property | Type | Description |
 | -------- | ------ | --------------------------- |
-| objectId | String | unique id for the user invitation |
+| objectId | String | unique id for the post |
 | author | Pointer to User | invitation author |
 | picture | File | picture accompanying the invitation |
 | caption | String | invitation caption by author |
-| location | JSON Object | location that this event will take place |
-| time | DateTime | date/time that this event will take place |
-| reviews | Pointer | pointer to review object |
+| place | Pointer to Place| location that this event will take place |
+| time | DateTime | date/time that this post will expire |
 
 Reply:
 
@@ -134,17 +113,16 @@ Reply:
 | objectId | String | unique id for the reply |
 | author | Pointer to User | author of this reply |
 | picture | File | picture for this reply |
-| message | String | message for this reply |
-| invitation | Pointer to Invitation | invitation that this reply is replying to |
+| caption | String | message for this reply |
+| post | Pointer to Post | post that this reply is replying to |
 
 Review: 
 
 | Property | Type | Description |
 | -------- | ------ | --------------------------- |
 | objectId | String | unique id for the reviews |
-| invitation | Pointer to Invitation | invitation that this review corresponds to
-| Yelp reviews | ? | ? |
-| Google reviews | ? | ? |
+| post | Pointer to Place | place this review corresponds to |
+| source | String | "Yelp"/"Google" |
 
 User:
 
@@ -153,8 +131,7 @@ User:
 | objectId | String | unique id for the user |
 | username | String | user's username |
 | password | String | user's password |
-| bio | String | user's bio |
-| profilePic | File | image that is the user's profile pic |
+| profilePicUrl | String | URL of user's FB profile picture |
 
 Friendships:
 
@@ -163,35 +140,3 @@ Friendships:
 | user1 | Pointer to User | one side of friendship |
 | user2 | Pointer to User | other end of friendship |
 
-
-### Networking
-List of network requests by screen
-* Home Screen
-   * (Read/GET) Query all invitations created by the user's friends
-      * query = PFQuery("Invitation");
-        query.whereKey("author", currentUser.getFriends())
-        query.order(byDescending: "createdAt")
-        query.findObjectsInBackground(e) {
-           if e != null { 
-              System.out.println("error in fetching invitations");
-              return;
-           } else {
-              System.out.println("Successfully fetched invitations");
-          // TODO: Do something with posts...
-           }
-        }
-   * (Create/POST) Create a new invitation reply
-* Create Invitation Screen
-   * (Create/POST) Create a new invitation
-* Profile Screen
-   * (Read/GET) Query logged in user object
-   * (Update/PUT) Update user profile image/bio
-  
-- [Create basic snippets for each Parse network request]
-- [OPTIONAL: List endpoints if using existing API such as Yelp]
-
-Google Places SDK
-
-| HTTP Verb | Endpoint | Description
-| --------- | -------- | ------------|
-| GET | /place/details/json | gets the details of the specified place |
