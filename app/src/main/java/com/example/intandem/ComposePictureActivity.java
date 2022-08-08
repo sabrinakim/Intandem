@@ -20,17 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.intandem.fragments.PostsFragment;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Post;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,7 +40,6 @@ public class ComposePictureActivity extends AppCompatActivity {
     private ImageView ivImage;
     private EditText etCaption;
     private Button btnShare;
-//    private String event;
     private ParseUser user;
     private String duration;
     private CustomPlace customPlace;
@@ -71,8 +67,6 @@ public class ComposePictureActivity extends AppCompatActivity {
         // unwrap parcel here
         Bundle extras = getIntent().getExtras();
         customPlace = extras.getParcelable("customPlace");
-//        event = extras.getString("event");
-//        Log.i(TAG, event);
         user = extras.getParcelable("user"); // user is null rn
         duration = extras.getString("duration");
 
@@ -93,8 +87,6 @@ public class ComposePictureActivity extends AppCompatActivity {
         photoFile = getPhotoFileUri(photoFileName); // this is where the taken photo will be stored.
 
         // wrap File object into a content provider
-        // required for API >= 24 --> this is for security reasons
-        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
         Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider.intandem", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider); // --> we are telling the camera app where to store the photo that is taken.
 
@@ -113,20 +105,15 @@ public class ComposePictureActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
                 ivImage.setImageBitmap(takenImage);
 
-            } else { // Result was a failure
+            } else {
                 Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos --> points to the image location.
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
         File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
@@ -143,7 +130,6 @@ public class ComposePictureActivity extends AppCompatActivity {
                           File photoFile, String duration) {
         Post post = new Post();
         post.setUser(currentUser);
-//        post.setEvent(event);
         post.setCustomPlace(customPlace);
         post.setPicture(new ParseFile(photoFile));
         post.setCaption(caption);
@@ -151,11 +137,6 @@ public class ComposePictureActivity extends AppCompatActivity {
         post.setCommentCount(0);
 
         Calendar rightNow = Calendar.getInstance();
-//        if (timeUnit.equals("Minute(s)")) {
-//            rightNow.add(Calendar.MINUTE, Integer.parseInt(duration));
-//        } else {
-//            rightNow.add(Calendar.HOUR, Integer.parseInt(duration));
-//        }
 
         double fraction = Double.parseDouble(duration) % 1;
         int minutes = (int) (fraction * 60);

@@ -71,15 +71,10 @@ public class ComposeReplyActivity extends AppCompatActivity {
         photoFile = getPhotoFileUri(photoFileName); // this is where the taken photo will be stored.
 
         // wrap File object into a content provider
-        // required for API >= 24 --> this is for security reasons
-        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
         Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider.intandem", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider); // --> we are telling the camera app where to store the photo that is taken.
 
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
         if (intent.resolveActivity(getPackageManager()) != null) {
-            // Start the image capture intent to take photo
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
@@ -91,8 +86,6 @@ public class ComposeReplyActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
                 ivPictureReply.setImageBitmap(takenImage);
 
             } else { // Result was a failure
@@ -102,9 +95,6 @@ public class ComposeReplyActivity extends AppCompatActivity {
     }
 
     public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos --> points to the image location.
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
         File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
@@ -132,22 +122,10 @@ public class ComposeReplyActivity extends AppCompatActivity {
                 currPost.saveInBackground();
                 ivPictureReply.setImageResource(0);
                 etCaptionReply.setText("");
-                // go to reply feed
                 Intent i = new Intent(ComposeReplyActivity.this, ViewRepliesActivity.class);
                 i.putExtra("currPost", currPost);
                 startActivity(i);
             }
         });
-
-//        PostToReply postToReply = new PostToReply();
-//        postToReply.setPost(currPost);
-//        postToReply.setReply(reply);
-//
-//        postToReply.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                Log.i(TAG, "post to reply relation saved successfully");
-//            }
-//        });
     }
 }

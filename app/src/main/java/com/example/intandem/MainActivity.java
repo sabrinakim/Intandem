@@ -1,36 +1,24 @@
 package com.example.intandem;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -44,7 +32,6 @@ import com.example.intandem.dataModels.DistanceSearchResult;
 import com.example.intandem.models.CustomPlace;
 import com.example.intandem.models.Friendship;
 import com.example.intandem.models.Post;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -74,7 +61,6 @@ import com.parse.ParseUser;
 import com.simform.refresh.SSPullToRefreshLayout;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -208,9 +194,6 @@ public class MainActivity extends AppCompatActivity {
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //fabCompose.setVisibility(View.INVISIBLE);
-                //circle.setVisibility(View.VISIBLE);
-                //animation.start();
                 Intent i = new Intent(MainActivity.this, ComposeLocationActivity.class);
                 i.putExtra("user", user);
                 startActivity(i);
@@ -383,7 +366,6 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
-        // TODO: change token
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         CancellationToken token = tokenSource.getToken();
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token)
@@ -403,8 +385,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 queryPosts();
 
-                            } else { // will execute when an updated location is received.
-                                // idk
+                            } else {
+                                Log.d(TAG, "couldn't get current location");
                             }
 
                         } else {
@@ -412,13 +394,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private void showEditDialog() {
-        FragmentManager fm = this.getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
-//        filterDialogFragment.setTargetFragment(this, 300);
-        filterDialogFragment.show(fm, "fragment_filter_dialog");
     }
 
     private void queryPosts() {

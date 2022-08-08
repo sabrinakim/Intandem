@@ -116,8 +116,6 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         // passes in the login results to the login manager via the callback manager
         super.onActivityResult(requestCode, resultCode, data);
-        // !!! main purpose of logging in is to obtain an access token that allows you to use FB's APIs
-        // we will use the Graph API
         useGraphApi();
     }
 
@@ -164,8 +162,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         Bundle bundle = new Bundle();
-
-        // change later: these are what you are requesting from the graph api
         bundle.putString("fields", "name, id, first_name, last_name, picture.width(150).height(150)");
 
         meGraphRequest.setParameters(bundle);
@@ -225,8 +221,6 @@ public class LoginActivity extends AppCompatActivity {
                                             storedFriendsMap.put(friend.getUser2Id(), friend);
                                         }
                                         // find difference btwn sets.
-                                        // {1, 2, 3} storedFriendsMap
-                                        // {1, 4, 3} currFriendsList
 
                                         FriendshipUpdates friendshipUpdates = new FriendshipUpdates(currFriendsList);
                                         HashMap<String, Friendship> deletedFriendsMap = friendshipUpdates.getFriendsToDelete(storedFriendsMap);

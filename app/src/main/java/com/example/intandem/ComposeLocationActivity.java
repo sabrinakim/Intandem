@@ -52,12 +52,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ComposeLocationActivity extends AppCompatActivity {
 
     private static String TAG = "ComposeLocationActivity";
-    private static int AUTOCOMPLETE_REQUEST_CODE = 100;
     private static int YELP_LIMIT = 5;
     public static final String GOOGLE_BASE_URL = "https://maps.googleapis.com/";
     public static final String YELP_BASE_URL = "https://api.yelp.com/v3/";
     private static final String YELP_API_KEY = "fq038-wNNvkjlvvsz_fBqD8a2Bl-mVUT1XHXz_-EJEZS-8SEO6OoynOpQmgTf5-Y7_Ujsc9LKl5TPJ_6Y2NdFPBVCUeC6v6r0wT3_uee4B2lJLldWP4rfKKqWVizYnYx";
-    private boolean locationChosen = false;
     private Button textBNext;
     private String placeId;
     private String placeAddress;
@@ -139,26 +137,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
-
-        // Create a new PlacesClient instance
-        PlacesClient placesClient = Places.createClient(this);
-
-        //etLocation.setFocusable(false);
-//        search.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // initialize place field list
-//                List<Place.Field> fieldList = Arrays.asList(Place.Field.NAME, Place.Field.ID,
-//                        Place.Field.LAT_LNG, Place.Field.ADDRESS);
-//
-//                // create intent
-//                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
-//                        .build(ComposeLocationActivity.this);
-//
-//                // start activity result
-//                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-//            }
-//        });
     }
 
     @Override
@@ -172,60 +150,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
                 return false;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
-//            // success
-//            Log.i(TAG, "place autocomplete success");
-//
-//            // this place instance can retrieve details about the place
-//            Place place = Autocomplete.getPlaceFromIntent(data);
-//            etLocation.setText(place.getName());
-//            placeId = place.getId();
-//            placeName = place.getName();
-//            placeAddress = place.getAddress();
-//            latLng = place.getLatLng();
-//
-//            // query yelp & places details here and merge responses
-//            // ONLY IF a merged one doesn't already exist in database
-//            ParseQuery<CustomPlace> query = ParseQuery.getQuery(CustomPlace.class);
-//            query.whereEqualTo("gPlaceId", placeId);
-//            query.findInBackground(new FindCallback<CustomPlace>() {
-//                @Override
-//                public void done(List<CustomPlace> objects, ParseException e) {
-//                    if (e != null) {
-//                        Log.e(TAG, "error querying custom places");
-//                    } else {
-//                        Log.i(TAG, "success querying custom places");
-//                        if (objects.size() == 0) { // we did not create a custom place object before.
-//                            createCustomPlace(placeId, placeName);
-//                        } else {
-//                            btnNext2.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    Intent i = new Intent(ComposeLocationActivity.this, ComposeDurationActivity.class);
-//                                    i.putExtras(getIntent());
-//                                    i.putExtra("customPlace", objects.get(0));
-//                                    startActivity(i);
-//                                }
-//                            });
-//                        }
-//                    }
-//                }
-//            });
-//
-//            Log.i(TAG, "place id: " + placeId);
-//            Log.i(TAG, "place name: " + placeName);
-//
-//        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-//            Status status = Autocomplete.getStatusFromIntent(data);
-//            // display toast
-//            Log.e(TAG, "place autocomplete error");
-//        }
     }
 
     private void createCustomPlace(String placeId, String placeName) {
@@ -430,11 +354,7 @@ public class ComposeLocationActivity extends AppCompatActivity {
     }
 
     private Business findMatchingYelpBusiness(Response<BusinessSearchResult> response) {
-        // response is a list of plausible responses.
-        //2213 Tasman Dr, Santa Clara, CA 95054, USA
         String gNameKey = condensedString(placeName);
-        //String gAddressKey = condensedString(placeAddress);
-        //String gCompositeKey =  gAddressKey + gNameKey;
 
         BusinessSearchResult businessSearchResult = response.body();
         for (Business b : businessSearchResult.getBusinesses()) {
@@ -442,43 +362,11 @@ public class ComposeLocationActivity extends AppCompatActivity {
             if (yKey.equals(gNameKey)) {
                 return b;
             }
-//            StringBuilder yCompositeKeyBuilder = new StringBuilder();
-//            Location l = b.getLocation();
-//            yCompositeKeyBuilder.append(condensedString(l.getCity()))
-//                    .append(condensedString(l.getState()))
-//                    .append(condensedString(l.getZipCode()));
-//            if (l.getCountry().equals("US")) {
-//                yCompositeKeyBuilder.append("USA");
-//            }
-//            // try out every address
-//            String noAddr = yCompositeKeyBuilder.toString() + condensedString(b.getName());
-//            String yCompositeKey;
-//
-//            if (l.getAddress1() != null) {
-//                yCompositeKey = l.getAddress1() + noAddr;
-//                if (yCompositeKey.equals(gCompositeKey)) {
-//                    return b;
-//                }
-//            }
-//            if (l.getAddress2() != null) {
-//                yCompositeKey = l.getAddress2() + noAddr;
-//                if (yCompositeKey.equals(gCompositeKey)) {
-//                    return b;
-//                }
-//            }
-//            if (l.getAddress3() != null) {
-//                yCompositeKey = l.getAddress3() + noAddr;
-//                if (yCompositeKey.equals(gCompositeKey)) {
-//                    return b;
-//                }
-//            }
         }
         return null;
     }
 
     private String condensedString(String s) {
-        // remove comma, spaces, info in parenthesis
-        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
         s = removeParens(s);
 
         StringBuilder stringKey = new StringBuilder();
@@ -501,7 +389,6 @@ public class ComposeLocationActivity extends AppCompatActivity {
         if (s.length() == 0) {
             return "";
         }
-        // fdajdal; (fdjal) fjdlka;jdla (jl;) jfkdla; (fd)
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '(') {
                 openParenIdx = i;

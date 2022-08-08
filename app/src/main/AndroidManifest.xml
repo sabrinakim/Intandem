@@ -44,12 +44,6 @@
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".CurrentLocationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PermissionsActivity"
-            android:exported="false" />
-        <activity
             android:name=".ComposeReplyActivity"
             android:exported="false" />
         <activity
@@ -84,9 +78,6 @@
             android:name=".ComposeLocationActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".ComposeEventActivity"
-            android:exported="false" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
